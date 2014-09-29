@@ -19,44 +19,51 @@
 
 #include "headers.h"
 
+#include "facedetect.h"
+
 using namespace cv;
 
 /* Utility Functions */
-IplImage* get_frame();
-
+Mat get_frame();
 
 /* Program Logic */
 int main()
 {
 
-    IplImage* frame;
+    Mat frame, frame2;
     CvFont font;
     cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
-    
+   
+    init_facedetect();
     while(1)    
     {
 	frame = get_frame();
 //	cvPutText(frame, "Testing", cvPoint(50,50), &font, cvScalar(100,100,100, 0));
 //	cvLine(frame, cvPoint(50,50),cvPoint(80,50), cvScalar(100,100,100, 0), 1, 8, 0);
-	imshow("Test", frame);
-	WaitKey(50);
+//	imshow("Test", frame);
+	if( !frame.empty() )
+	{ frame2 = facedetect_display( frame ); }
+	imshow("Face", frame2);
+	waitKey(50);
+		
+
     }
-    WaitKey(0);
+    waitKey(0);
     destroyWindow("Test");
+    destroyWindow("Face");
 
     return 0;
 }
 
 
 /* Implementations */
-IplImage* get_frame()
+Mat get_frame()
 {
     static VideoCapture capture(0);
-    IplImage* frame;
+    Mat frame;
 
     if(capture.read(frame))
 	return frame;
     
-    return 0;
+//    return 0;
 }
-

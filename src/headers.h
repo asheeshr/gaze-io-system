@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdio.h>
 
+#endif /*HEADERS_GIOS*/
 
 /* OpenCV Headers */
 //#include <cv.h>
@@ -14,4 +15,6 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
-#endif /*HEADERS_GIOS*/
+#include <opencv2/core/core.hpp>
+//#include <opencv2/highgui/highgui.hpp>
+//#endif /*HEADERS_GIOS*/
