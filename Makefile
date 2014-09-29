@@ -1,21 +1,21 @@
 CFLAGS = `pkg-config --cflags opencv`
 LIBS = `pkg-config --libs opencv` 
 CMAKE_C_FLAGS = `/D HAVE_DSHOW /D HAVE_VIDEOINPUT`
-CC=gcc
+CC=g++
 
-FILES=main.c facedetect.c featuredetect.c gazeestimate.c
+FILES=main.cpp facedetect.c featuredetect.c gazeestimate.c
 OBJECTS=main.o #facedetect.o #featuredetect.o gazeestimate.o
 PROGRAM=gios
 
 
-build:  $(OBJECTS)
-	echo "Linking object files (did it compile again?)"
+build:  prepare $(OBJECTS)
+	@echo "Linking object files (did it compile again?)"
 	cd ./bin && $(CC) -o $(PROGRAM) $(OBJECTS) $(CFLAGS) $(LIBS)
 	mv ./bin/$(PROGRAM) ../$(PROGRAM)
 
-$(OBJECTS) : %.o: ./src/%.c
-	echo "Compiling files"
-	cd ./bin && gcc $(CFLAGS) -c ../$< -o $@
+$(OBJECTS) : %.o: ./src/%.cpp
+	@echo "Compiling files"
+	cd ./bin && $(CC) $(CFLAGS) -c ../$< -o $@
 
 prepare:
 	if [ ! -d ./bin ]; then mkdir ./bin; fi

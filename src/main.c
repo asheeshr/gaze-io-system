@@ -19,6 +19,8 @@
 
 #include "headers.h"
 
+using namespace cv;
+
 /* Utility Functions */
 IplImage* get_frame();
 
@@ -34,13 +36,13 @@ int main()
     while(1)    
     {
 	frame = get_frame();
-	cvPutText(frame, "Testing", cvPoint(50,50), &font, cvScalar(100,100,100, 0));
-	cvLine(frame, cvPoint(50,50),cvPoint(80,50), cvScalar(100,100,100, 0), 1, 8, 0);
-	cvShowImage("Test", frame);
-	cvWaitKey(50);
+//	cvPutText(frame, "Testing", cvPoint(50,50), &font, cvScalar(100,100,100, 0));
+//	cvLine(frame, cvPoint(50,50),cvPoint(80,50), cvScalar(100,100,100, 0), 1, 8, 0);
+	imshow("Test", frame);
+	WaitKey(50);
     }
-    cvWaitKey(0);
-    cvDestroyWindow("Test");
+    WaitKey(0);
+    destroyWindow("Test");
 
     return 0;
 }
@@ -49,12 +51,12 @@ int main()
 /* Implementations */
 IplImage* get_frame()
 {
-    static CvCapture* capture;
+    static VideoCapture capture(0);
     IplImage* frame;
-    capture = cvCreateCameraCapture(0);
 
-    frame = cvQueryFrame(capture);
-
-    return frame;
+    if(capture.read(frame))
+	return frame;
+    
+    return 0;
 }
 
