@@ -43,7 +43,13 @@ int main()
 //	imshow("Test", frame);
 	if( !frame.empty() )
 	{ frame2 = facedetect_display( frame ); }
-	imshow("Face", frame2);
+	
+//	time_t start = time(0);
+	try{imshow("Face", frame2);}
+	catch(...){};
+//	time_t end = time(0);
+//	printf("Time taken: %d\n", long(difftime(end, start))%100);
+	fflush(stdout);
 	waitKey(50);
 		
 
