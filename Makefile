@@ -3,8 +3,8 @@ LIBS = `pkg-config --libs opencv`
 CMAKE_C_FLAGS = `/D HAVE_DSHOW /D HAVE_VIDEOINPUT`
 CC=g++
 
-FILES=main.cpp facedetect.cpp #featuredetect.c gazeestimate.c
-OBJECTS=facedetect.o main.o #featuredetect.o gazeestimate.o
+FILES=main.cpp facedetect.cpp featuredetect.cpp #gazeestimate.c
+OBJECTS=featuredetect.o facedetect.o main.o #gazeestimate.o
 PROGRAM=gios
 
 

@@ -20,6 +20,7 @@
 #include "headers.h"
 
 #include "facedetect.h"
+#include "featuredetect.h"
 
 using namespace cv;
 
@@ -30,7 +31,7 @@ Mat get_frame();
 int main()
 {
 
-    Mat frame, frame2;
+    Mat frame, frame2, frame3;
     CvFont font;
     cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
    
@@ -45,7 +46,12 @@ int main()
 	{ frame2 = facedetect_display( frame ); }
 	
 //	time_t start = time(0);
-	try{imshow("Face", frame2);}
+	try
+	{
+	    imshow("Face", frame2);
+	    frame3 = eyesdetect(frame2);
+	    imshow("Eyes", frame3);
+	}
 	catch(...){};
 //	time_t end = time(0);
 //	printf("Time taken: %d\n", long(difftime(end, start))%100);
