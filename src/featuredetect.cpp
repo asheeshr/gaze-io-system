@@ -25,10 +25,32 @@ using namespace cv;
 Mat eyesdetect(Mat frame)
 {
     Mat frame_gradient;
-    
+    Point2f origin(0,0);
+    float alpha=0.0;  
+   
     frame_gradient = image_gradient(frame);
+    
+    float min_intensity=256.0;
+
+    for(int i=0;i<frame_gradient.rows;i++)
+    {
+	for(int j=0;j<frame_gradient.cols;j++ )
+	{
+		if(frame_gradient.at<float>(i,j)<min_intensity)
+		{
+			min_intensity=frame_gradient.at<float>(i,j);
+			origin.x=i;
+			origin.y=j;
+			
+		}	
+	}
+	
+    }
 
     
+
+	 	
+        
 
     
 
