@@ -49,7 +49,10 @@ Mat image_gradient(Mat frame)
     /// Generate grad_x and grad_y
     Mat grad_x, grad_y;
     Mat abs_grad_x, abs_grad_y;
+
+    GaussianBlur( frame, frame, Size(3,3), 0, 0, BORDER_DEFAULT );
     
+
     /// Gradient X
     //Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
     Sobel( frame, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );

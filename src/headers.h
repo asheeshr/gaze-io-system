@@ -3,10 +3,15 @@
 
 /* Standard Headers */
 #include <iostream>
-//#include <time>
+#include <ctime>
 #include <stdio.h>
 
 #endif /*HEADERS_GIOS*/
+
+/* Overridden Headers */
+//#include "cascadedetect.hpp"
+
+
 
 /* OpenCV Headers */
 //#include <cv.h>

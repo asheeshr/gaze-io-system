@@ -33,7 +33,9 @@ int main()
 
     Mat frame, frame2, frame3;
     CvFont font;
+    std::clock_t start;
     cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
+
    
     init_facedetect();
     while(1)    
@@ -42,9 +44,14 @@ int main()
 //	cvPutText(frame, "Testing", cvPoint(50,50), &font, cvScalar(100,100,100, 0));
 //	cvLine(frame, cvPoint(50,50),cvPoint(80,50), cvScalar(100,100,100, 0), 1, 8, 0);
 //	imshow("Test", frame);
+	//time_t start = time(0);
+	start = std::clock();
+
 	if( !frame.empty() )
 	{ frame2 = facedetect_display( frame ); }
-	
+	time_t end = time(0);
+	printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
+
 //	time_t start = time(0);
 	try
 	{
@@ -54,7 +61,7 @@ int main()
 	}
 	catch(...){};
 //	time_t end = time(0);
-//	printf("Time taken: %d\n", long(difftime(end, start))%100);
+//	printf("Time taken: %ld\n", long(difftime(end, start)));
 	fflush(stdout);
 	waitKey(50);
 		

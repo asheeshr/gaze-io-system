@@ -1,6 +1,6 @@
 /* 
  * Gaze I/O System
- * Copyright (C) 2014 Asheesh Ranjan, Pranav Jetley, Vasu Bhardwaj
+ * Copyright (C) 2014 Asheesh Ranjan,Osank Jain , Pranav Jetley, Vasu Bhardwaj
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,10 @@ using namespace cv;
  CascadeClassifier eyes_cascade;
  string window_name = "Capture - Face detection";
  RNG rng(12345);
+ 
+ 
+double min_face_size=150;
+double max_face_size=350;
 
 int init_facedetect()
 {
@@ -45,7 +49,7 @@ Mat facedetect_display( Mat frame )
   equalizeHist( frame_gray, frame_gray );
 
   //-- Detect faces
-  face_cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+  face_cascade.detectMultiScale( frame_gray, faces, 1.2, 2, 0 |CV_HAAR_FIND_BIGGEST_OBJECT, Size(min_face_size, min_face_size),Size(max_face_size, max_face_size) );
 
   for( size_t i = 0; i < faces.size(); i++ )
   {
