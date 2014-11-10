@@ -20,82 +20,128 @@
 
 #include "featuredetect.h"
 #include <math.h>
+#include <vector>
 
 using namespace cv;
 
-Mat eyesdetect(Mat frame)
+Mat eyesdetect(Mat frame /*A*/)
 {
 
-	/*
-
-	A:2D array of pixels
- 	AVG:avg intensity of socket region
-	W:deformable eyeball model involves N no. of template windows
-	L:template window consists of Z no. of pixels
-	V:index no. of window where window has highest intensity-variance
-	  between current index and previous index
-	WIDTH:width of input camera image 
-	alpha:angle between windows 
-	cut_off_ratio:ratio determines the initial index with the highest                             variance in a window which is used to get rid of
-                  eyebrows
-	epsilon:tolerance value for eyeball detection
-	B:index of vertex over border of eyeball
-	min_intensity:let it be 256.0f 
-
-	*/	
-   
-	int N; //number of template windows
-	int Z;//size of template window (whatever that means)
-	Mat S;//rectangular region consists of P number of pixels
+    /*
+      
+      A:2D array of pixels
+      AVG:avg intensity of socket region
+      W:deformable eyeball model involves N no. of template windows
+      L:template window consists of Z no. of pixels
+      V:index no. of window where window has highest intensity-variance
+      between current index and previous index
+      WIDTH:width of input camera image 
+      alpha:angle between windows 
+      cut_off_ratio:ratio determines the initial index with the highest variance in a window which is used to get rid of eyebrows
+      epsilon:tolerance value for eyeball detection
+      B:index of vertex over border of eyeball
+      min_intensity:let it be 256.0f 
+      
+    */	
+    
+    int N=40; //number of template windows -- decides accuracy?
+    int Z;//size of template window -- fitting window size
+    Mat S,A;//rectangular region consists of P number of pixels
     Point2f origin(0,0);//Position of template's origin
     float alpha=0.0;  
-   
-    S = image_gradient(frame);
-    
-    float min_intensity=256.0;
+    int V;
+    int AVG, B;
+    float epsilon = 0.15;
+    float cutoff_ratio = 1.25f;
 
-    for(int i=0;i<S.rows;i++)
+    A = frame;
+    S = image_gradient(frame);
+    Z = int(0.10*S.size().height);
+    printf("Size of temp window:%d", Z);
+    fflush(stdout);
+
+    float min_intensity=256.0;
+    int i;
+
+    for(i=0;i<S.rows;i++)
     {
-		for(int j=0;j<S.cols;j++ )
-		{
-			if(S.at<float>(i,j)<min_intensity)
-			{
-				min_intensity=S.at<float>(i,j);
-				origin.x=i;
-				origin.y=j;
+	for(int j=0;j<S.cols;j++ )
+	{
+	    if(S.at<float>(i,j)<min_intensity)
+	    {
+		min_intensity=S.at<float>(i,j);
+		origin.x=i;
+		origin.y=j;
 			
-			}	
-		}
-	
+	    }	
+	}	
     }
 	
-	alpha=0.0;
- 	float	integral_indices=0.0;
-	float	integral_brightness=0.0;
-	for(int j=1;j<=N;j++)
-	{
-		alpha+=(6.28/N);
-		float max_variance=0.0;
-		float max_avg_intensity=0.0;
-		for(int k=Z;k>=1;k--)
-		{	
-			Point2f point(0,0);
-			int index;
-			point.x=origin.x+k*cos(alpha);
-			point.y=origin.y+k*sin(alpha);	
-			
+    alpha=0.0;
+    float integral_indices=0.0;
+    float integral_brightness=0.0;
+    vector<int> windowlist;
+
+
+    for(int j=1;j<=N;j++)
+    {
+	alpha+=(6.28/N);
+	float max_variance=FLT_MIN;
+	float average_intensity=0.0, max_average_intensity=0.0;
+	Point2f point(0,0);
+	int index;
+	float variance;
+
+	for(int k=Z;k>=1;k--)
+	{	
+	    
+	    point.x=origin.x+k*cos(alpha);
+	    point.y=origin.y+k*sin(alpha);	
+	    index = point.y*frame.size().width + point.x; //indexing into mat S -- is it needed?
+	    
+	    A.at<float>(j,k) = S.at<float>(point.y, point.x);
+	    variance = (A.at<float>(j,k)-A.at<float>(j,k-1));
+	    variance = (variance>0)?variance:-variance; //Absolute value
+	    V = INT_MAX;
+	    
+	    if(variance>max_variance /*&& V>Z/cutoff_ratio*/)
+	    {
+		max_variance = variance;
+		V = k;
+	    }
+	    
+/*	    double integral_intensity = 0.0f;
+	    int l1;
+	    try{
+	    for(l1=V; l1>0; l1--)
+	    {
+		try{
+		integral_intensity = integral_intensity + 255 - A.at<float>(j,l1);
 		}
-		
+		catch(...){};
+	    }}
+	    catch(...){};
+	    
+	    average_intensity = integral_intensity/l1;
+	    if(average_intensity > max_average_intensity)
+	    {
+		max_average_intensity = average_intensity;
+		B = V;
+		}*/
 	}
 
-    
+	/*integral_indices += B;
+	integral_brightness += A.at<float>(j,B);
+	if(integral_indices/j>epsilon && integral_brightness/j< AVG)
+	{
+	    windowlist.push_back(B);
+	    
+	    }*/
+	
 
-	 	
-        
-
-    
-
-    return S;
+    }
+		
+    return A;
 }
 
 
