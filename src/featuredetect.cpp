@@ -24,9 +24,68 @@
 
 using namespace cv;
 
-Mat eyesdetect(Mat frame /*A*/)
-{
+#define MIN_THRESHOLD 192
 
+extern std::vector<Rect> eyes;
+
+Mat eyes_closedetect(Mat *frame)
+{
+    Mat *frame2 = new Mat[2];
+    int flip=0;
+
+    if(eyes.size()<2)
+	return frame[0];
+
+    frame2[0] = image_gradient(frame[0]);
+//    printf("Channels %d \n\n", frame2[0].channels());
+//    cvtColor(frame2[0], frame2[0], CV_BGR2GRAY);
+
+    imshow("Eye+Sobel", frame2[0]);
+
+    printf("%d %d", eyes[0].x, eyes[0].y);
+    printf("%d %d", eyes[0].width, eyes[0].height);
+    
+    for(int i=eyes[0].x+10; i<eyes[0].x + eyes[0].width-10; i++)
+    {
+	for(int j=eyes[0].y+10; j<eyes[0].y + eyes[0].height-10; j++)
+	{
+	    if(flip==0)
+	    {
+//		printf("Point %d %d\n", i , j);
+//		fflush(NULL);
+		if(frame2[0].at<uchar>(Point(i,j))<MIN_THRESHOLD)
+		{
+//		    printf("Pixel %d %d\n", i,j);
+//		    frame2[0].at<uchar>(Point(i,j))=MIN_THRESHOLD;
+		}
+		//else if(frame2[0].at<float>(i,j)>=MIN_THRESHOLD) 
+		//    flip=1;
+	    }
+	    if(flip==1)
+	    {
+		//if(frame2[0].at<float>(i,j)<MIN_THRESHOLD)
+		    //frame2[0].at<float>(i,j)=255;
+		/*else*/ 
+//if(frame2[0].at<float>(i,j)>=MIN_THRESHOLD) 
+//		    flip=0;
+	     }
+       	}
+	
+    }
+
+    imshow("Eye+Detect", frame2[0]);
+
+    return frame[0];
+}
+
+
+
+
+
+
+
+Mat eyesdetect_DIASMI(Mat frame /*A*/)
+{
     /*
       
       A:2D array of pixels
@@ -177,3 +236,5 @@ Mat image_gradient(Mat frame)
     return S;
 
 }
+
+

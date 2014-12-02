@@ -23,6 +23,7 @@
 #include "featuredetect.h"
 
 using namespace cv;
+//std::vector<Rect> eyes;
 
 /* Utility Functions */
 Mat get_frame();
@@ -31,9 +32,10 @@ Mat get_frame();
 int main()
 {
 
-    Mat frame, frame2, frame3;
+    Mat frame, frame2, frame3, *frame4, frame5;
     CvFont font;
     std::clock_t start;
+//    std::vector<Rect> eyes;
     cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
 
    
@@ -56,8 +58,18 @@ int main()
 	try
 	{
 	    imshow("Face", frame2);
-	    frame3 = eyesdetect(frame2);
+	    frame3 = eyesdetect_display(frame2);//, eyes);
 	    imshow("Eyes", frame3);
+	    if(!frame3.empty())
+	    frame4 = eyes_sepframes(frame3);
+	    if(!frame4[0].empty() && !frame4[1].empty())
+	    {
+		imshow("EyeL", frame4[0]);
+		imshow("EyeR", frame4[1]);
+	    }
+	    if(!frame4[0].empty() && !frame4[1].empty())
+	    frame5 = eyes_closedetect(frame4);
+	    imshow("Eyes2", frame3);
 	}
 	catch(...){};
 //	time_t end = time(0);
