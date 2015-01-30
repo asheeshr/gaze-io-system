@@ -81,6 +81,7 @@ Mat eyesdetect_display( Mat faceROI )//, std::vector<Rect> eyes)
      {
 	 Point center( /*faces[i].x +*/ eyes[j].x + eyes[j].width*0.5, /*faces[i].y + */eyes[j].y + eyes[j].height*0.5 );
        int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
+	circle( faceROI, center, 1, Scalar( 255, 0, 0 ), 1, 8, 0 );	
        circle( faceROI, center, radius, Scalar( 0, 0, 0 ), 4, 8, 0 );
        }
   //-- Show what you got
