@@ -24,15 +24,22 @@
 
 using namespace cv;
 
-#define MIN_THRESHOLD 192
-
+//#define MIN_THRESHOLD 192
+#define DTHETA 5
+#define MAX_THETA 360
+#define DDISTANCE 3
+#define MAX_DISTANCE   
+#define ERROR_THRESHOLD 30
+#define PI 3.14159265
+#define INTEN_THRESHOLD 190
 extern std::vector<Rect> eyes;
 
 Mat eyes_closedetect(Mat *frame)
 {
     Mat *frame2 = new Mat[2];
     int flip=0;
-
+    float theta, costheta, sintheta;
+    int distance;
     if(eyes.size()<2)
 	return frame[0];
 
@@ -42,13 +49,46 @@ Mat eyes_closedetect(Mat *frame)
 
     imshow("Eye+Sobel", frame2[0]);
 
-    printf("%d %d", eyes[0].x, eyes[0].y);
-    printf("%d %d", eyes[0].width, eyes[0].height);
-    
-    
+    //printf("%d %d", eyes[0].x, eyes[0].y);
+    //printf("height: %d width: %d", eyes[0].width, eyes[0].height);
+    ////////////////
+    int i,j;
+    int p;
+    int nRows = frame2[0].rows;
+    int nCols = frame2[0].cols;// * frame2[0].channels;
+    for( i = 0; i < nRows; ++i)
+    {
+      //p = frame2[0].ptr<uchar>(i);
+        for ( j = 0; j < nCols; ++j)
+        {
+	  p = frame2[0].at<uchar>(j,i);
+	  printf("%d  ", p);
+	  //            p[j] = table[p[j]];
+        }
+	printf("\n");
+    }
+    /////////////// 
+    /*
+    Point iter;
+    uchar pixel_intensity;
+    for(theta=0; theta<MAX_THETA; theta+=DTHETA)
+    {
+
+      costheta =  cos(DTHETA * PI / 180.0);
+      sintheta =  sin(DTHETA * PI / 180.0);
+      for(distance=0; distance<MAX_DISTANCE; distance+=DDISTANCE)
+	{
+	  iter.x = eyes[0].x+eyes[0].width*0.5 + distance*costheta;
+	  iter.y = eyes[0].y+eyes[0].height*0.5 + distance*sintheta;
+	  pixel_intensity = eyes[0].at<uchar>(iter);
+	  //	  printf("pixel intensity: %d\n", pixel_intensity);
+	  
+	}
+    }
+      
 
     imshow("Eye+Detect", frame2[0]);
-
+    */
     return frame[0];
 }
 

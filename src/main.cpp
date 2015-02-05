@@ -52,7 +52,7 @@ int main()
 	if( !frame.empty() )
 	{ frame2 = facedetect_display( frame ); }
 	time_t end = time(0);
-	printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
+	//printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 
 //	time_t start = time(0);
 	try
