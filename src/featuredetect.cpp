@@ -27,37 +27,39 @@ using namespace cv;
 //#define MIN_THRESHOLD 192
 #define DTHETA 5
 #define MAX_THETA 360
-#define DDISTANCE 3
-#define MAX_DISTANCE   
+#define DDISTANCE 1
+#define MAX_DISTANCE 25   
 #define ERROR_THRESHOLD 30
 #define PI 3.14159265
-#define INTEN_THRESHOLD 190
+#define INTEN_THRESHOLD 130    // minimum gradient image intensity to be crossed for the iris border
+#define ACC_THRESHOLD 54       // minimum no of templates required(3/4*360/DTHETA)
 extern std::vector<Rect> eyes;
 
-Mat eyes_closedetect(Mat *frame)
+CvBox2D* eyes_closedetect(Mat *frame)
 {
-    Mat *frame2 = new Mat[2];
-    int flip=0;
-    float theta, costheta, sintheta;
-    int distance;
-    if(eyes.size()<2)
-	return frame[0];
+  CvBox2D* templates = new CvBox2D[100];
+  Mat *frame2 = new Mat[2];
+  int flip=0;
+  float theta, costheta, sintheta;
+  int distance;
+  if(eyes.size()<2)
+    return NULL;
+  
+  frame2[0] = image_gradient(frame[0]);
+  //    printf("Channels %d \n\n", frame2[0].channels());
+  //    cvtColor(frame2[0], frame2[0], CV_BGR2GRAY);
 
-    frame2[0] = image_gradient(frame[0]);
-//    printf("Channels %d \n\n", frame2[0].channels());
-//    cvtColor(frame2[0], frame2[0], CV_BGR2GRAY);
-
-    imshow("Eye+Sobel", frame2[0]);
+  imshow("Eye+Sobel", frame2[0]);
 
     //printf("%d %d", eyes[0].x, eyes[0].y);
     //printf("height: %d width: %d", eyes[0].width, eyes[0].height);
     ////////////////
-    int i,j;
-    int p;
-    int nRows = frame2[0].rows;
-    int nCols = frame2[0].cols;// * frame2[0].channels;
-    for( i = 0; i < nRows; ++i)
-    {
+  /*  int i,j;
+  int p;
+  int nRows = frame2[0].rows;
+  int nCols = frame2[0].cols;// * frame2[0].channels;
+  for( i = 0; i < nRows; ++i)
+      {
       //p = frame2[0].ptr<uchar>(i);
         for ( j = 0; j < nCols; ++j)
         {
@@ -67,29 +69,69 @@ Mat eyes_closedetect(Mat *frame)
         }
 	printf("\n");
     }
+  printf("break");
+  */
     /////////////// 
-    /*
-    Point iter;
-    uchar pixel_intensity;
-    for(theta=0; theta<MAX_THETA; theta+=DTHETA)
+    
+  Point iter, center;
+  uchar pixel_intensity;
+  int attemptno = 0,counter=0;
+  center.x=eyes[0].x+eyes[0].width*0.5;
+  center.y=eyes[0].y+eyes[0].height*0.5;
+  bool flag=1;
+  //std::cout<<"Center: "<<center<<"\n";
+  //  std::cout<<"eyes.width: "<<eyes[0].width<<"\n";
+  //std::cout<<"eyes.height: "<<eyes[0].height<<"\n";
+	    
+    while(flag && attemptno<5)
     {
-
-      costheta =  cos(DTHETA * PI / 180.0);
-      sintheta =  sin(DTHETA * PI / 180.0);
-      for(distance=0; distance<MAX_DISTANCE; distance+=DDISTANCE)
+      printf("\nhello");
+      counter=0;
+      for(theta=0; theta<MAX_THETA; theta+=DTHETA)
 	{
-	  iter.x = eyes[0].x+eyes[0].width*0.5 + distance*costheta;
-	  iter.y = eyes[0].y+eyes[0].height*0.5 + distance*sintheta;
-	  pixel_intensity = eyes[0].at<uchar>(iter);
-	  //	  printf("pixel intensity: %d\n", pixel_intensity);
 	  
+	  costheta =  cos(theta * PI / 180.0);
+	  sintheta =  sin(theta * PI / 180.0);
+	  for(distance=0; distance<MAX_DISTANCE; distance+=DDISTANCE)
+	    {
+	      iter.x = center.x + distance*costheta;
+	      iter.y = center.y + distance*sintheta;
+	      pixel_intensity = frame2[0].at<uchar>(iter);
+	      //std::cout<<iter<<"\n";
+	      // printf("pixel intensity: %d\n", pixel_intensity);
+	      if(pixel_intensity > (INTEN_THRESHOLD-attemptno*5))
+		{
+		  counter++;
+		  //templates[counter].center=iter;
+		  //templates[counter].size.height=1;
+		  //templates[counter].size.width=3;
+		  //templates[counter].angle=theta;
+		  std::cout<<iter<<"\n";
+	    
+		  circle(frame[0], iter, 1, Scalar(127,0,127), 4, 8, 0);
+		  //		  waitKey(0);
+		  //add cvBox2D
+		  break;
+		  //	 printf("pixel intensity: %d\n", pixel_intensity);
+	     	  
+		}
+	    }
 	}
-    }
-      
+      //      printf("\n no of template count: %d",counter);
+      if(counter > ACC_THRESHOLD)
+	{
+	  // imwrite( "./data/template.jpg", frame[0] );
+	  flag=0;	  
+	  printf("\n no of template count: %d",counter);
 
+	}  
+      else
+	attemptno++;
+    }
     imshow("Eye+Detect", frame2[0]);
-    */
-    return frame[0];
+    imshow("view templates",frame[0]);
+    waitKey(0);
+    return templates;
 }
 
 
@@ -111,7 +153,9 @@ Mat image_gradient(Mat frame)
     Mat abs_grad_x, abs_grad_y;
 
     GaussianBlur( frame, frame, Size(3,3), 0, 0, BORDER_DEFAULT );
-    
+    //    GaussianBlur( frame, frame, Size(3,3), 0, 0, BORDER_DEFAULT );
+    //GaussianBlur( frame, frame, Size(3,3), 0, 0, BORDER_DEFAULT );
+
 
     /// Gradient X
     //Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );

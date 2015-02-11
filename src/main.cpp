@@ -34,6 +34,7 @@ int main()
 
     Mat frame, frame2, frame3, *frame4, frame5;
     CvFont font;
+    CvBox2D* templates;
     std::clock_t start;
 //    std::vector<Rect> eyes;
     cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
@@ -68,7 +69,7 @@ int main()
 		imshow("EyeR", frame4[1]);
 	    }
 	    if(!frame4[0].empty() && !frame4[1].empty())
-	    frame5 = eyes_closedetect(frame4);
+	      templates = eyes_closedetect(frame4);
 	    imshow("Eyes2", frame3);
 	}
 	catch(...){};
