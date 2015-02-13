@@ -1,6 +1,6 @@
 /* 
  * Gaze I/O System
- * Copyright (C) 2014 Asheesh Ranjan, Pranav Jetley, Vasu Bhardwaj
+ * Copyright (C) 2014 Asheesh Ranjan, Pranav Jetley, Vasu Bhardwaj, Varun Kalra
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,25 +79,25 @@ CvBox2D* eyes_closedetect(Mat *frame)
   center.x=eyes[0].x+eyes[0].width*0.5;
   center.y=eyes[0].y+eyes[0].height*0.5;
   bool flag=1;
-  //std::cout<<"Center: "<<center<<"\n";
-  //  std::cout<<"eyes.width: "<<eyes[0].width<<"\n";
-  //std::cout<<"eyes.height: "<<eyes[0].height<<"\n";
+  std::cout<<"Center: "<<center<<"\n";
+   std::cout<<"eyes.width: "<<eyes[0].width<<"\n";
+  std::cout<<"eyes.height: "<<eyes[0].height<<"\n";
 	    
     while(flag && attemptno<5)
     {
-      printf("\nhello");
+      printf("hello\n");
       counter=0;
       for(theta=0; theta<MAX_THETA; theta+=DTHETA)
 	{
 	  
 	  costheta =  cos(theta * PI / 180.0);
 	  sintheta =  sin(theta * PI / 180.0);
-	  for(distance=0; distance<MAX_DISTANCE; distance+=DDISTANCE)
+	  for(distance=3; distance<MAX_DISTANCE; distance+=DDISTANCE)
 	    {
 	      iter.x = center.x + distance*costheta;
 	      iter.y = center.y + distance*sintheta;
 	      pixel_intensity = frame2[0].at<uchar>(iter);
-	      //std::cout<<iter<<"\n";
+	      //std::cout<<iter.x<<","<<iter.y<<"\n";
 	      // printf("pixel intensity: %d\n", pixel_intensity);
 	      if(pixel_intensity > (INTEN_THRESHOLD-attemptno*5))
 		{
@@ -106,9 +106,9 @@ CvBox2D* eyes_closedetect(Mat *frame)
 		  //templates[counter].size.height=1;
 		  //templates[counter].size.width=3;
 		  //templates[counter].angle=theta;
-		  std::cout<<iter<<"\n";
-	    
-		  circle(frame[0], iter, 1, Scalar(127,0,127), 4, 8, 0);
+		  // std::cout<<iter<<"\t";
+		  //	  std::cout<<iter.x<<","<<iter.y<<"\n";
+		  //		  circle(frame[0], iter, 1, Scalar(127,0,127), 4, 8, 0);
 		  //		  waitKey(0);
 		  //add cvBox2D
 		  break;
@@ -120,17 +120,18 @@ CvBox2D* eyes_closedetect(Mat *frame)
       //      printf("\n no of template count: %d",counter);
       if(counter > ACC_THRESHOLD)
 	{
+	 
 	  // imwrite( "./data/template.jpg", frame[0] );
 	  flag=0;	  
 	  printf("\n no of template count: %d",counter);
-
+	  waitKey(0);
 	}  
       else
 	attemptno++;
     }
     imshow("Eye+Detect", frame2[0]);
     imshow("view templates",frame[0]);
-    waitKey(0);
+    //  waitKey(0);
     return templates;
 }
 
