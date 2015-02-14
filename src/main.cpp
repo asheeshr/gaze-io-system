@@ -38,6 +38,10 @@ int main()
 	std::clock_t start;
 	cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
 
+	int w, h;
+
+	getScreenSize(&w, &h);
+	printf (" Screen:  width = %d, height = %d \n", w, h);
 
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
 		printf("\ncan't catch SIGINT\n");   

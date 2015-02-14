@@ -1,5 +1,5 @@
-CFLAGS = `pkg-config --cflags opencv`
-LIBS = `pkg-config --libs opencv` 
+CFLAGS = `pkg-config --cflags opencv`"-lX11"
+LIBS = `pkg-config --libs opencv`"-lX11" 
 CMAKE_C_FLAGS = `/D HAVE_DSHOW /D HAVE_VIDEOINPUT`
 CC=g++
 

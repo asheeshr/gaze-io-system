@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <X11/Xlib.h>
 //#endif /*HEADERS_GIOS*/
 
 /* Overridden Headers */
