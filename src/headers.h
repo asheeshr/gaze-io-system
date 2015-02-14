@@ -5,8 +5,10 @@
 #include <iostream>
 #include <ctime>
 #include <stdio.h>
-
-#endif /*HEADERS_GIOS*/
+#include <signal.h>
+#include <unistd.h>
+#include <stdlib.h>
+//#endif /*HEADERS_GIOS*/
 
 /* Overridden Headers */
 //#include "cascadedetect.hpp"
@@ -23,4 +25,4 @@
 
 #include <opencv2/core/core.hpp>
 //#include <opencv2/highgui/highgui.hpp>
-//#endif /*HEADERS_GIOS*/
+#endif /*HEADERS_GIOS*/

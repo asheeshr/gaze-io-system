@@ -106,7 +106,7 @@ CvBox2D* eyes_closedetect(Mat *frame)
 					templates[counter].size.width=4;
 					templates[counter].angle=theta;
 					// std::cout<<iter<<"\t";
-					std::cout<<iter.x<<","<<iter.y<<"\n";
+					//std::cout<<iter.x<<","<<iter.y<<"\n";
 					//		  circle(frame[0], iter, 1, Scalar(127,0,127), 4, 8, 0);
 					//		  waitKey(0);
 					//add cvBox2D
@@ -122,8 +122,8 @@ CvBox2D* eyes_closedetect(Mat *frame)
 	 
 			// imwrite( "./data/template.jpg", frame[0] );
 			flag=0;	  
-			printf("\n no of template count: %d",counter);
-			waitKey(0);
+//			printf("\n no of template count: %d",counter);
+//			waitKey(0);
 		}  
 		else
 			attemptno++;

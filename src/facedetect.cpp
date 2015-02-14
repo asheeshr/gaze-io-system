@@ -1,6 +1,7 @@
 /* 
  * Gaze I/O System
- * Copyright (C) 2014 Asheesh Ranjan,Osank Jain , Pranav Jetley, Vasu Bhardwaj, Varun Kalra
+ * Copyright (C) 2014 Asheesh Ranjan, Osank Jain, Pranav Jetley, 
+ * Vasu Bhardwaj, Varun Kalra
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ */
 
 #include "facedetect.h"
 
@@ -36,75 +37,62 @@ double max_face_size=350;
 
 int init_facedetect()
 {
-   if( !face_cascade.load( face_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
-   if( !eyes_cascade.load( eyes_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
-   return 1;
+	if( !face_cascade.load( face_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
+	if( !eyes_cascade.load( eyes_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
+	return 1;
 }
 
 Mat facedetect_display( Mat frame )
 {
-    //std::vector<Rect> faces;
-  Mat frame_gray;
-  Mat faceROI;
-  cvtColor( frame, frame_gray, CV_BGR2GRAY );
-  equalizeHist( frame_gray, frame_gray );
 
-  //-- Detect faces
-  face_cascade.detectMultiScale( frame_gray, faces, 1.2, 2, 0 |CV_HAAR_FIND_BIGGEST_OBJECT, Size(min_face_size, min_face_size),Size(max_face_size, max_face_size) );
+	Mat frame_gray;
+	Mat faceROI;
+	cvtColor( frame, frame_gray, CV_BGR2GRAY );
+	equalizeHist( frame_gray, frame_gray );
 
-  for( size_t i = 0; i < faces.size(); i++ )
-  {
-    Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
-    //ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0 );
+	//-- Detect faces
+	face_cascade.detectMultiScale( frame_gray, faces, 1.2, 2, 0 |CV_HAAR_FIND_BIGGEST_OBJECT, Size(min_face_size, min_face_size),Size(max_face_size, max_face_size) );
 
-    faceROI = frame_gray( faces[i] );
-  }
-  
-  return faceROI;
-  
+	for( size_t i = 0; i < faces.size(); i++ )
+	{
+		Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
+		//ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0 );
+		faceROI = frame_gray( faces[i] );
+	}
+  	return faceROI;
 }
 
 
 Mat eyesdetect_display( Mat faceROI )//, std::vector<Rect> eyes)
 {
-    
-//    std::vector<Rect> eyes;
-    
-//    if( !eyes_cascade.load( eyes_cascade_name ) ){ printf("--(!)Error loading\n"); return; };
-
-    //-- In each face, detect eyes
-    eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
-  for( size_t i = 0; i < faces.size(); i++ )
-  {
-    Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
-    for( size_t j = 0; j < eyes.size(); j++ )
-     {
-	 Point center( /*faces[i].x +*/ eyes[j].x + eyes[j].width*0.5, /*faces[i].y + */eyes[j].y + eyes[j].height*0.5 );
-       int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
+	//-- In each face, detect eyes
+	eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+	for( size_t i = 0; i < faces.size(); i++ )
+	{
+		Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
+		for( size_t j = 0; j < eyes.size(); j++ )
+		{
+			Point center( eyes[j].x + eyes[j].width*0.5, eyes[j].y + eyes[j].height*0.5 );
+			int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
       
-       //       printf("height: %d width: %d\n", eyes[0].width, eyes[0].height);
+			//       printf("height: %d width: %d\n", eyes[0].width, eyes[0].height);
     
-       //	circle( faceROI, center, 1, Scalar( 255, 0, 0 ), 1, 8, 0 );	
-       circle( faceROI, center, radius, Scalar( 0, 0, 0 ), 4, 8, 0 );
-       }
-  //-- Show what you got
-//  imshow( window_name, frame );
-  }
-  return faceROI;
+			//	circle( faceROI, center, 1, Scalar( 255, 0, 0 ), 1, 8, 0 );	
+			circle( faceROI, center, radius, Scalar( 0, 0, 0 ), 4, 8, 0 );
+		}
+	}
+	return faceROI;
   
 }
 
 
-Mat* eyes_sepframes(Mat frame /*A*/)
+Mat* eyes_sepframes(Mat frame)
 {
-    Mat *eyes_frames = new Mat[2];
-
-    if(eyes.size()==2)
-    {
-    eyes_frames[0] = frame(eyes[0]);
-    eyes_frames[1] = frame(eyes[1]);
-    }
-
-
-    return eyes_frames;
+	Mat *eyes_frames = new Mat[2];
+	if(eyes.size()==2)
+	{
+		eyes_frames[0] = frame(eyes[0]);
+		eyes_frames[1] = frame(eyes[1]);
+	}
+	return eyes_frames;
 }
