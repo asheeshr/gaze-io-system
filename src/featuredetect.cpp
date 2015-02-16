@@ -49,7 +49,7 @@ CvBox2D* eyes_closedetect(Mat *frame)
 	//    printf("Channels %d \n\n", frame2[0].channels());
 	//    cvtColor(frame2[0], frame2[0], CV_BGR2GRAY);
 
-	imshow("Eye+Sobel", frame2[0]);
+	imshow("Eye + Sobel", frame2[0]);
 
 	//printf("%d %d", eyes[0].x, eyes[0].y);
 	//printf("height: %d width: %d", eyes[0].width, eyes[0].height);
