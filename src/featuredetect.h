@@ -1,4 +1,4 @@
-#include "headers.h"
+#include "global.h"
 
 #ifndef FEATUREDETECT_GIOS
 #define FEATUREDETECT_GIOS

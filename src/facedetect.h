@@ -1,4 +1,4 @@
-#include "headers.h"
+#include "global.h"
 
 #ifndef FACEDETECT_GIOS
 #define FACEDETECT_GIOS

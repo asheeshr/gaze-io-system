@@ -18,10 +18,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "headers.h"
+#include "global.h"
 #include "support.h"
 #include "facedetect.h"
 #include "featuredetect.h"
+#include "gazeestimate.h"
 
 using namespace cv;
 
@@ -32,36 +33,49 @@ Mat get_frame();
 int main()
 {
 	
-	Mat frame, frame2, frame3, *frame4, frame5;
-	CvFont font;
+	//Mat frame, frame2, frame3, *frame4, frame5;
+	//CvFont font;
+
+	struct face *face_store;
+	struct eyes *eye_store;
+	struct eyes_template *eyes_store_template;
+
+	if(init_data_structures(face_store,eye_store,eyes_store_template)==0)
+	{
+		printf("Data structures not initialised\n");
+		return 1;
+	}
+
+	/*
 	CvBox2D* templates;
 	std::clock_t start;
 	cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
 
-	int w, h;
+	int screen_width, screen_height;
 
-	getScreenSize(&w, &h);
-	printf (" Screen:  width = %d, height = %d \n", w, h);
+	getScreenSize(&screen_width, &screen_height);
+	printf (" Screen:  width = %d, height = %d \n", screen_width, screen_height);
 
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
 		printf("\ncan't catch SIGINT\n");   
 
 	init_facedetect();
+
 	while(1)    
 	{
-		frame = get_frame();
+		face_store.face = get_frame();
 
 		time_t start = time(0);
  
 		start = std::clock();
 
-		if( !frame.empty() )
-		{ frame2 = facedetect_display( frame ); }
+		//if( !frame.empty() )
+		//{ //frame2 = facedetect_display( frame ); }
 		time_t end = time(0);
 		//printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 
 //	time_t start = time(0);
-		try
+		/*try
 		{
 			imshow("Face", frame2);
 			frame3 = eyesdetect_display(frame2);//, eyes);
@@ -88,7 +102,7 @@ int main()
 	waitKey(0);
 	destroyWindow("Test");
 	destroyWindow("Face");
-
+	*/
 	return 0;
 }
 
