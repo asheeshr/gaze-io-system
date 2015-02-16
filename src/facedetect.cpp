@@ -19,8 +19,9 @@
  */
 
 #include "facedetect.h"
-
+//#include "opencv2/objdetect/src/cascadedetect.hpp"
 using namespace cv;
+
 
 /** Global variables */
 String face_cascade_name = "./data/haarcascades/haarcascade_frontalface_alt.xml";

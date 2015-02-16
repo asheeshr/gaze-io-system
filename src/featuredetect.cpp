@@ -103,7 +103,7 @@ CvBox2D* eyes_closedetect(Mat *frame)
 					counter++;
 					templates[counter].center=iter;
 					templates[counter].size.height=1;
-					templates[counter].size.width=4;
+					templates[counter].size.width=5;
 					templates[counter].angle=theta;
 					// std::cout<<iter<<"\t";
 					//std::cout<<iter.x<<","<<iter.y<<"\n";
