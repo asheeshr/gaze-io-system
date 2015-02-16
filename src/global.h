@@ -41,7 +41,8 @@ struct face {
 struct eyes {
 	
 	std::vector<cv::Rect> eyes;
-	cv::Mat *frame; /* Has to be array of two frames */
+	cv::Mat frame;
+	cv::Mat eye_frame[2];
 	
 };
 

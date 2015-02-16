@@ -35,7 +35,7 @@ using namespace cv;
 #define ACC_THRESHOLD 54       // minimum no of templates required(3/4*360/DTHETA)
 extern std::vector<Rect> eyes;
 
-CvBox2D* eyes_closedetect(Mat *frame)
+int eyes_closedetect(struct face *face_store, struct )
 {
 	CvBox2D* templates = new CvBox2D[100];
 	Mat *frame2 = new Mat[2];

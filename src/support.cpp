@@ -1,5 +1,28 @@
 #include "support.h"
 
+using namespace cv;
+
+cv::Mat get_frame()
+{
+	static cv::VideoCapture capture(0);
+	cv::Mat frame;
+
+	if(capture.read(frame))
+		return frame;
+}
+
+int update_face(cv::Mat frame, struct face *face_store)
+{
+	Mat frame_gray;
+	cvtColor( frame, frame_gray, CV_BGR2GRAY );
+	equalizeHist( frame_gray, frame_gray );
+
+	face_store->frame = frame_gray(face_store->faces[0]);
+
+
+	return 1;
+}
+
 
 int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et)
 {

@@ -73,10 +73,11 @@ int facedetect_display(Mat frame, struct face *face_store)
 }
 
 
-Mat eyesdetect_display( Mat faceROI )//, std::vector<Rect> eyes)
+int eyesdetect_display(struct face *face_store, struct eyes *eyes_store)
 {
+	eyes_store->frame = face_store->frame;
 	//-- In each face, detect eyes
-	eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+	eyes_cascade.detectMultiScale( eyes_store->frame, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
 	for( size_t i = 0; i < faces.size(); i++ )
 	{
 		Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
@@ -88,21 +89,31 @@ Mat eyesdetect_display( Mat faceROI )//, std::vector<Rect> eyes)
 			//       printf("height: %d width: %d\n", eyes[0].width, eyes[0].height);
     
 			//	circle( faceROI, center, 1, Scalar( 255, 0, 0 ), 1, 8, 0 );	
-			circle( faceROI, center, radius, Scalar( 0, 0, 0 ), 4, 8, 0 );
+			circle( eyes_store->frame, center, radius, Scalar( 0, 0, 0 ), 4, 8, 0 );
 		}
 	}
-	return faceROI;
-  
+	
+	if(eyes.size()==0)
+		return 0;
+	eyes_store->eyes = eyes;
+
+	return 1;  
 }
 
 
-Mat* eyes_sepframes(Mat frame)
+int eyes_sepframes(struct eyes *eyes_store)
 {
-	Mat *eyes_frames = new Mat[2];
+
 	if(eyes.size()==2)
 	{
-		eyes_frames[0] = frame(eyes[0]);
-		eyes_frames[1] = frame(eyes[1]);
+		eyes_store->eye_frame[1] = eyes_store->frame(eyes[1]);
+		eyes_store->eye_frame[0] = eyes_store->frame(eyes[0]);
+		return 1;
 	}
-	return eyes_frames;
+	else if(eyes.size()==1)
+	{
+		eyes_store->eye_frame[0] = eyes_store->frame(eyes[0]);
+		return 1;
+	}
+	return 0;
 }
