@@ -35,21 +35,21 @@ int main()
 	
 	//Mat frame, frame2, frame3, *frame4, frame5;
 	//CvFont font;
-
+	Mat frame;
 	struct face *face_store;
 	struct eyes *eye_store;
 	struct eyes_template *eyes_store_template;
 
-	if(init_data_structures(face_store,eye_store,eyes_store_template)==0)
+	if(init_data_structures(&face_store, &eye_store, &eyes_store_template)==0)
 	{
 		printf("Data structures not initialised\n");
 		return 1;
 	}
 
-	/*
+	
 	CvBox2D* templates;
 	std::clock_t start;
-	cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
+	//cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
 
 	int screen_width, screen_height;
 
@@ -63,22 +63,21 @@ int main()
 
 	while(1)    
 	{
-		face_store.face = get_frame();
+		frame = get_frame();
+		//imshow("Webcam", frame);
 
-		time_t start = time(0);
- 
-		start = std::clock();
+		//start = std::clock();
 
-		//if( !frame.empty() )
-		//{ //frame2 = facedetect_display( frame ); }
-		time_t end = time(0);
 		//printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 
-//	time_t start = time(0);
-		/*try
+		try
 		{
-			imshow("Face", frame2);
-			frame3 = eyesdetect_display(frame2);//, eyes);
+			if(facedetect_display( frame, face_store ))
+				imshow("Face", face_store->frame);
+			else
+				printf("Can't see you\n");
+
+			/*frame3 = eyesdetect_display(frame2);//, eyes);
 			imshow("Eyes", frame3);
 			if(!frame3.empty())
 				frame4 = eyes_sepframes(frame3);
@@ -89,20 +88,18 @@ int main()
 			}
 			if(!frame4[0].empty() && !frame4[1].empty())
 				templates = eyes_closedetect(frame4);
-			imshow("Eyes2", frame3);
+				imshow("Eyes2", frame3);*/
 		}
 		catch(...){};
-//	time_t end = time(0);
-//	printf("Time taken: %ld\n", long(difftime(end, start)));
 		fflush(stdout);
 		waitKey(50);
 		
 
 	}
 	waitKey(0);
-	destroyWindow("Test");
-	destroyWindow("Face");
-	*/
+//	destroyWindow("Test");
+//	destroyWindow("Face");
+	
 	return 0;
 }
 

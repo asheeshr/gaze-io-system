@@ -32,8 +32,8 @@
 struct face {
 
 	std::vector<cv::Rect> faces;
-	cv::Mat *frame;
-	cv::Mat *frame_gradient;
+	cv::Mat frame;
+	cv::Mat frame_gradient;
 
 };
 

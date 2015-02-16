@@ -5,7 +5,7 @@
 
 
 int init_facedetect();
-cv::Mat facedetect_display( cv::Mat frame );
+int facedetect_display( cv::Mat frame, struct face *face_store);
 cv::Mat eyesdetect_display( cv::Mat frame );
 cv::Mat* eyes_sepframes(cv::Mat frame);
 
