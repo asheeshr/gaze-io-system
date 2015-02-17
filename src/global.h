@@ -1,5 +1,5 @@
-#ifndef HEADERS_GIOS
-#define HEADERS_GIOS
+#ifndef GLOBAL_GIOS
+#define GLOBAL_GIOS
 
 /* Standard Headers */
 #include <iostream>
@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
-//#endif /*HEADERS_GIOS*/
 
 /* Overridden Headers */
 //#include "cascadedetect.hpp"
@@ -26,4 +25,32 @@
 
 #include <opencv2/core/core.hpp>
 //#include <opencv2/highgui/highgui.hpp>
-#endif /*HEADERS_GIOS*/
+
+
+/* Global Structures */
+
+struct face {
+
+	std::vector<cv::Rect> faces;
+	cv::Mat frame;
+	cv::Mat frame_gradient;
+
+};
+
+
+struct eyes {
+	
+	std::vector<cv::Rect> eyes;
+	cv::Mat frame;
+	cv::Mat eye_frame[2];
+	
+};
+
+struct eyes_template {
+	
+	CvBox2D windows[2][100];
+	uint8_t counter[2];
+
+};
+
+#endif /*GLOBAL_GIOS*/

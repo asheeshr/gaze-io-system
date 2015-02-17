@@ -18,89 +18,98 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "headers.h"
+#include "global.h"
 #include "support.h"
 #include "facedetect.h"
 #include "featuredetect.h"
+#include "gazeestimate.h"
 
 using namespace cv;
-
-/* Utility Functions */
-Mat get_frame();
 
 /* Program Logic */
 int main()
 {
 	
-	Mat frame, frame2, frame3, *frame4, frame5;
-	CvFont font;
+	//Mat frame, frame2, frame3, *frame4, frame5;
+	//CvFont font;
+	Mat frame;
+	struct face *face_store;
+	struct eyes *eyes_store;
+	struct eyes_template *eyes_store_template;
+
+	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template)==0)
+	{
+		printf("Data structures not initialised\n");
+		return 1;
+	}
+
+	
 	CvBox2D* templates;
 	std::clock_t start;
-	cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
+	//cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
 
-	int w, h;
+	int screen_width, screen_height;
 
-	getScreenSize(&w, &h);
-	printf (" Screen:  width = %d, height = %d \n", w, h);
+	getScreenSize(&screen_width, &screen_height);
+	printf (" Screen:  width = %d, height = %d \n", screen_width, screen_height);
 
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
 		printf("\ncan't catch SIGINT\n");   
 
 	init_facedetect();
+	frame = get_frame();
+
 	while(1)    
 	{
-		frame = get_frame();
+		//start = std::clock();
 
-		time_t start = time(0);
- 
-		start = std::clock();
-
-		if( !frame.empty() )
-		{ frame2 = facedetect_display( frame ); }
-		time_t end = time(0);
 		//printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 
-//	time_t start = time(0);
 		try
 		{
-			imshow("Face", frame2);
-			frame3 = eyesdetect_display(frame2);//, eyes);
-			imshow("Eyes", frame3);
-			if(!frame3.empty())
-				frame4 = eyes_sepframes(frame3);
-			if(!frame4[0].empty() && !frame4[1].empty())
+			
+			while(facedetect_display(frame, face_store))
 			{
-				imshow("EyeL", frame4[0]);
-				imshow("EyeR", frame4[1]);
+				imshow("Face", face_store->frame);
+				while(eyesdetect_display(face_store, eyes_store))
+				{
+					imshow("Eyes", eyes_store->frame);
+					if(eyes_sepframes(eyes_store))
+					{
+						if(eyes_store->eyes.size()==1)
+							imshow("Eye 1", eyes_store->eye_frame[0]);
+						else if(eyes_store->eyes.size()==2)
+						{
+							imshow("Eye 1", eyes_store->eye_frame[0]);
+							imshow("Eye 2", eyes_store->eye_frame[1]);
+						}
+						
+						if(eyes_closedetect(face_store, eyes_store, eyes_store_template))
+						{
+							/*TODO: Add gaze estimator here */
+						}
+						
+						
+					}
+					
+					printf("Searching for each of them - 1b\n");
+					waitKey(25);
+					frame = get_frame();
+					update_face(frame, face_store);
+				}
+				printf("Looking for your eyes - 1a\n");
+				waitKey(25);
+				frame = get_frame();
 			}
-			if(!frame4[0].empty() && !frame4[1].empty())
-				templates = eyes_closedetect(frame4);
-			imshow("Eyes2", frame3);
+			printf("Searching for you - 1\n");
+			waitKey(100);
+			frame = get_frame();
 		}
 		catch(...){};
-//	time_t end = time(0);
-//	printf("Time taken: %ld\n", long(difftime(end, start)));
-		fflush(stdout);
-		waitKey(50);
-		
-
 	}
 	waitKey(0);
-	destroyWindow("Test");
-	destroyWindow("Face");
-
+//	destroyWindow("Test");
+//	destroyWindow("Face");
+	
 	return 0;
-}
-
-
-/* Implementations */
-Mat get_frame()
-{
-	static VideoCapture capture(0);
-	Mat frame;
-
-	if(capture.read(frame))
-		return frame;
-    
-//    return 0;
 }

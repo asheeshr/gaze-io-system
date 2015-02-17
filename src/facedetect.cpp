@@ -43,13 +43,15 @@ int init_facedetect()
 	return 1;
 }
 
-Mat facedetect_display( Mat frame )
+int facedetect_display(Mat frame, struct face *face_store)
 {
 
 	Mat frame_gray;
-	Mat faceROI;
+	//Mat faceROI;
 	cvtColor( frame, frame_gray, CV_BGR2GRAY );
 	equalizeHist( frame_gray, frame_gray );
+
+	//printf("Inside facedetect\n");
 
 	//-- Detect faces
 	face_cascade.detectMultiScale( frame_gray, faces, 1.2, 2, 0 |CV_HAAR_FIND_BIGGEST_OBJECT, Size(min_face_size, min_face_size),Size(max_face_size, max_face_size) );
@@ -58,16 +60,25 @@ Mat facedetect_display( Mat frame )
 	{
 		Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
 		//ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0 );
-		faceROI = frame_gray( faces[i] );
+		//	printf("Writing to face store");
+		//fflush(stdin);
+		//faceROI = frame_gray( faces[i] );
+		face_store->frame = frame_gray( faces[i] );
 	}
-  	return faceROI;
+	
+	if(faces.size()==0)
+		return 0;
+	face_store->faces = faces;
+	
+  	return 1;
 }
 
 
-Mat eyesdetect_display( Mat faceROI )//, std::vector<Rect> eyes)
+int eyesdetect_display(struct face *face_store, struct eyes *eyes_store)
 {
+	eyes_store->frame = face_store->frame;
 	//-- In each face, detect eyes
-	eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+	eyes_cascade.detectMultiScale( eyes_store->frame, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
 	for( size_t i = 0; i < faces.size(); i++ )
 	{
 		Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
@@ -79,21 +90,31 @@ Mat eyesdetect_display( Mat faceROI )//, std::vector<Rect> eyes)
 			//       printf("height: %d width: %d\n", eyes[0].width, eyes[0].height);
     
 			//	circle( faceROI, center, 1, Scalar( 255, 0, 0 ), 1, 8, 0 );	
-			circle( faceROI, center, radius, Scalar( 0, 0, 0 ), 4, 8, 0 );
+			circle( eyes_store->frame, center, radius, Scalar( 0, 0, 0 ), 4, 8, 0 );
 		}
 	}
-	return faceROI;
-  
+	
+	if(eyes.size()==0)
+		return 0;
+	eyes_store->eyes = eyes;
+
+	return 1;  
 }
 
 
-Mat* eyes_sepframes(Mat frame)
+int eyes_sepframes(struct eyes *eyes_store)
 {
-	Mat *eyes_frames = new Mat[2];
+
 	if(eyes.size()==2)
 	{
-		eyes_frames[0] = frame(eyes[0]);
-		eyes_frames[1] = frame(eyes[1]);
+		eyes_store->eye_frame[1] = eyes_store->frame(eyes[1]);
+		eyes_store->eye_frame[0] = eyes_store->frame(eyes[0]);
+		return 1;
 	}
-	return eyes_frames;
+	else if(eyes.size()==1)
+	{
+		eyes_store->eye_frame[0] = eyes_store->frame(eyes[0]);
+		return 1;
+	}
+	return 0;
 }

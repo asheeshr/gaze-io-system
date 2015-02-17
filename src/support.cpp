@@ -1,5 +1,54 @@
 #include "support.h"
 
+using namespace cv;
+
+cv::Mat get_frame()
+{
+	static cv::VideoCapture capture(0);
+	cv::Mat frame;
+
+	if(capture.read(frame))
+		return frame;
+}
+
+int update_face(cv::Mat frame, struct face *face_store)
+{
+	Mat frame_gray;
+	cvtColor( frame, frame_gray, CV_BGR2GRAY );
+	equalizeHist( frame_gray, frame_gray );
+
+	face_store->frame = frame_gray(face_store->faces[0]);
+
+
+	return 1;
+}
+
+
+int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et)
+{
+	*f = new face;
+	*e = new struct eyes;
+	*et = new struct eyes_template;
+
+	if(*f==NULL || *e==NULL || *et==NULL)
+		return 0;
+
+	//f->frame = new cv::Mat;
+	//f->frame_gradient = new cv::Mat;
+
+	/*e->frame = new cv::Mat;
+	
+	et->windows = new CvBox2D[100];
+
+	if(/*f->frame==NULL || f->frame_gradient==NULL || e->frame==NULL || et->windows==NULL) 
+		return 0;
+*/
+	return 1;
+}
+
+
+
+
 void sig_handler(int signo)
 {
   if (signo == SIGINT)

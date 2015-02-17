@@ -35,22 +35,33 @@ using namespace cv;
 #define ACC_THRESHOLD 54       // minimum no of templates required(3/4*360/DTHETA)
 extern std::vector<Rect> eyes;
 
-CvBox2D* eyes_closedetect(Mat *frame)
+
+int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
-	CvBox2D* templates = new CvBox2D[100];
-	Mat *frame2 = new Mat[2];
+
+	face_store->frame_gradient = image_gradient(face_store->frame);
+	if(eyes_store->eyes.size()==0)
+		return 0;
+	if(eyes_store->eyes.size()==1)
+		if( eyes_closedetect_helper(0, face_store, eyes_store, eyes_store_template) )
+			return 1;
+		    
+	if(eyes_store->eyes.size()==2)
+		if( eyes_closedetect_helper(0, face_store, eyes_store, eyes_store_template) ||
+		    eyes_closedetect_helper(1, face_store, eyes_store, eyes_store_template) )
+			return 1;
+
+}
+
+
+
+int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
+{
+	CvBox2D templates[100];
 	int flip=0;
 	float theta, costheta, sintheta;
 	int distance;
-	if(eyes.size()<2)
-		return NULL;
   
-	frame2[0] = image_gradient(frame[0]);
-	//    printf("Channels %d \n\n", frame2[0].channels());
-	//    cvtColor(frame2[0], frame2[0], CV_BGR2GRAY);
-
-	imshow("Eye + Sobel", frame2[0]);
-
 	//printf("%d %d", eyes[0].x, eyes[0].y);
 	//printf("height: %d width: %d", eyes[0].width, eyes[0].height);
 	////////////////
@@ -76,27 +87,24 @@ CvBox2D* eyes_closedetect(Mat *frame)
 	Point iter, center;
 	uchar pixel_intensity;
 	int attemptno = 0,counter=0;
-	center.x=eyes[0].x+eyes[0].width*0.5;
-	center.y=eyes[0].y+eyes[0].height*0.5;
+	center.x=eyes[eye_no].x+eyes[eye_no].width*0.5;
+	center.y=eyes[eye_no].y+eyes[eye_no].height*0.5;
 	bool flag=1;
-	std::cout<<"Center: "<<center<<"\n";
-	std::cout<<"eyes.width: "<<eyes[0].width<<"\n";
-	std::cout<<"eyes.height: "<<eyes[0].height<<"\n";
 	    
 	while(flag && attemptno<5)
 	{
-		printf("Start of set\n");
+		//printf("Start of set\n");
 		counter=0;
 		for(theta=0; theta<MAX_THETA; theta+=DTHETA)
 		{
 	  
 			costheta =  cos(theta * PI / 180.0);
 			sintheta =  sin(theta * PI / 180.0);
-			for(distance=fmin(eyes[0].height,eyes[0].width)/10+1; distance<MAX_DISTANCE; distance+=DDISTANCE)
+			for(distance=fmin(eyes[eye_no].height,eyes[eye_no].width)/10+1; distance<MAX_DISTANCE; distance+=DDISTANCE)
 			{
 				iter.x = center.x + distance*costheta;
 				iter.y = center.y + distance*sintheta;
-				pixel_intensity = frame2[0].at<uchar>(iter);
+				pixel_intensity = face_store->frame_gradient.at<uchar>(iter);
 				//std::cout<<iter.x<<","<<iter.y<<"\n";
 				if(pixel_intensity > (INTEN_THRESHOLD-attemptno*5))
 				{
@@ -128,19 +136,20 @@ CvBox2D* eyes_closedetect(Mat *frame)
 		else
 			attemptno++;
 
-		printf("End of set");
+		//printf("End of set");
 	}
 
-	imshow("Eye+Detect", frame2[0]);
-	imshow("view templates",frame[0]);
-	//  waitKey(0);
-	return templates;
+	if(counter < ACC_THRESHOLD)
+		return 0;
+
+	for(int i=0; i<counter; i++)
+	{
+		(eyes_store_template->windows)[eye_no][i] = templates[i];
+		(eyes_store_template->counter)[eye_no] = counter;
+	}
+
+	return 1;
 }
-
-
-
-
-
 
 
 Mat image_gradient(Mat frame)
@@ -149,7 +158,6 @@ Mat image_gradient(Mat frame)
 	int scale = 1;
 	int delta = 0;
 	int ddepth = CV_16S;
-	// namedWindow( , CV_WINDOW_AUTOSIZE );
 
 	/// Generate grad_x and grad_y
 	Mat grad_x, grad_y;
@@ -175,5 +183,3 @@ Mat image_gradient(Mat frame)
 	return S;
 
 }
-
-
