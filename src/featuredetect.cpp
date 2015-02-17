@@ -19,8 +19,6 @@
 
 
 #include "featuredetect.h"
-#include <math.h>
-#include <vector>
 
 using namespace cv;
 

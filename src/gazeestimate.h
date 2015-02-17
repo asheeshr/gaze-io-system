@@ -16,3 +16,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+#include "global.h"
+#ifndef GAZEESTIMATE_GIOS
+#define GAZEESTIMATE_GIOS
+
+float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template);
+int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template);
+
+#endif /*GAZEESTIMATE_GIOS*/

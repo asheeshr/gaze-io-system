@@ -58,7 +58,7 @@ int main()
 
 	init_facedetect();
 	frame = get_frame();
-
+	int *energy = new int[2];
 	while(1)    
 	{
 		//start = std::clock();
@@ -87,6 +87,8 @@ int main()
 						if(eyes_closedetect(face_store, eyes_store, eyes_store_template))
 						{
 							/*TODO: Add gaze estimator here */
+						  printf("in if under eyes_closedetect\n");
+						  energy = gaze_energy(face_store, eyes_store, eyes_store_template);
 						}
 						
 						

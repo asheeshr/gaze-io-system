@@ -9,7 +9,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
-
+#include <cmath>
+#include <vector>
 /* Overridden Headers */
 //#include "cascadedetect.hpp"
 
@@ -26,7 +27,7 @@
 #include <opencv2/core/core.hpp>
 //#include <opencv2/highgui/highgui.hpp>
 
-
+#define PI 3.14159265
 /* Global Structures */
 
 struct face {
