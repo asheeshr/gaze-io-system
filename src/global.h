@@ -48,9 +48,8 @@ struct eyes {
 
 struct eyes_template {
 	
-	CvBox2D* windows;
-	uint8_t counter_left;
-	uint8_t counter_right;
+	CvBox2D windows[2][100];
+	uint8_t counter[2];
 
 };
 

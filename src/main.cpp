@@ -1,4 +1,3 @@
-
 /* 
  * Gaze I/O System
  * Copyright (C) 2014 Asheesh Ranjan, Pranav Jetley, Osank Jain,
@@ -62,9 +61,6 @@ int main()
 
 	while(1)    
 	{
-//		frame = get_frame();
-		//imshow("Webcam", frame);
-
 		//start = std::clock();
 
 		//printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
@@ -90,7 +86,7 @@ int main()
 						
 						if(eyes_closedetect(face_store, eyes_store, eyes_store_template))
 						{
-							
+							/*TODO: Add gaze estimator here */
 						}
 						
 						
@@ -108,18 +104,6 @@ int main()
 			printf("Searching for you - 1\n");
 			waitKey(100);
 			frame = get_frame();
-
-/*
-			  if(!frame3.empty())
-			  frame4 = eyes_sepframes(frame3);
-			  if(!frame4[0].empty() && !frame4[1].empty())
-			  {
-			  imshow("EyeL", frame4[0]);
-			  imshow("EyeR", frame4[1]);
-			  }
-			  if(!frame4[0].empty() && !frame4[1].empty())
-			  templates = eyes_closedetect(frame4);
-			  imshow("Eyes2", frame3);*/
 		}
 		catch(...){};
 	}
