@@ -41,13 +41,19 @@ int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct ey
 	if(eyes_store->eyes.size()==0)
 		return 0;
 	if(eyes_store->eyes.size()==1)
+	{
+//		printf("in if 1\n");
 		if( eyes_closedetect_helper(0, face_store, eyes_store, eyes_store_template) )
 			return 1;
+	}
 		    
 	if(eyes_store->eyes.size()==2)
+	{
+//		printf("in if2\n");
 		if( eyes_closedetect_helper(0, face_store, eyes_store, eyes_store_template) ||
 		    eyes_closedetect_helper(1, face_store, eyes_store, eyes_store_template) )
 			return 1;
+	}
 
 }
 
@@ -138,7 +144,10 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	}
 
 	if(counter < ACC_THRESHOLD)
+	{
+		printf("counter : %d\n",counter);
 		return 0;
+	}
 
 	for(int i=0; i<counter; i++)
 	{

@@ -91,6 +91,7 @@ int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_
     }
   float delxenergy=xenergy - xenergy_prev;
   float delyenergy=yenergy - yenergy_prev;
+  printf("%d i + %d j\n",xenergy,yenergy);
   if(xenergy_prev==0 && yenergy_prev==0)
     { 
       energy[0]=0;
@@ -105,7 +106,7 @@ int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_
       energy[1]=delyenergy;
       return energy;
       }*/
-  printf("%d i + %d j\n",energy[0],energy[1]); 
+//  printf("%d i + %d j\n",energy[0],energy[1]); 
   return NULL;
 }
 /*

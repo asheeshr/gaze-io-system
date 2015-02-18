@@ -44,7 +44,7 @@ int main()
 	}
 
 	
-	CvBox2D* templates;
+//	CvBox2D* templates;
 	std::clock_t start;
 	//cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
 
@@ -90,20 +90,20 @@ int main()
 						  printf("in if under eyes_closedetect\n");
 						  energy = gaze_energy(face_store, eyes_store, eyes_store_template);
 						}
-						
+					
 						
 					}
 					
-					printf("Searching for each of them - 1b\n");
+//					printf("Searching for each of them - 1b\n");
 					waitKey(25);
 					frame = get_frame();
 					update_face(frame, face_store);
 				}
-				printf("Looking for your eyes - 1a\n");
+//				printf("Looking for your eyes - 1a\n");
 				waitKey(25);
 				frame = get_frame();
 			}
-			printf("Searching for you - 1\n");
+//			printf("Searching for you - 1\n");
 			waitKey(100);
 			frame = get_frame();
 		}
