@@ -11,6 +11,7 @@
 #include <X11/Xlib.h>
 #include <cmath>
 #include <vector>
+#include <thread>
 /* Overridden Headers */
 //#include "cascadedetect.hpp"
 

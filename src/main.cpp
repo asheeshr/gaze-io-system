@@ -31,6 +31,8 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 /* Program Logic */
 int main()
 {
+
+	std::thread obj;
 	
 	/* Start the main threads here. 
 	 * Main Flow - Program Logic
