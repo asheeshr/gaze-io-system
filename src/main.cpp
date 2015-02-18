@@ -26,13 +26,18 @@
 
 using namespace cv;
 
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template);
+
 /* Program Logic */
 int main()
 {
 	
-	//Mat frame, frame2, frame3, *frame4, frame5;
+	/* Start the main threads here. 
+	 * Main Flow - Program Logic
+	 * Thread 1 - GUI using Highgui
+	 */
+
 	//CvFont font;
-	Mat frame;
 	struct face *face_store;
 	struct eyes *eyes_store;
 	struct eyes_template *eyes_store_template;
@@ -44,8 +49,7 @@ int main()
 	}
 
 	
-//	CvBox2D* templates;
-	std::clock_t start;
+	//std::clock_t start;
 	//cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
 
 	int screen_width, screen_height;
@@ -57,6 +61,17 @@ int main()
 		printf("\ncan't catch SIGINT\n");   
 
 	init_facedetect();
+	
+	start_geted(face_store, eyes_store, eyes_store_template);
+
+
+	return 0;
+}
+
+
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
+{
+	Mat frame;
 	frame = get_frame();
 	int *energy = new int[2];
 	while(1)    
