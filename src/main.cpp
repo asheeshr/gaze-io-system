@@ -20,6 +20,7 @@
 
 #include "global.h"
 #include "support.h"
+#include "gui.h"
 #include "facedetect.h"
 #include "featuredetect.h"
 #include "gazeestimate.h"
@@ -32,7 +33,6 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 int main()
 {
 
-	std::thread obj;
 	
 	/* Start the main threads here. 
 	 * Main Flow - Program Logic
@@ -63,9 +63,13 @@ int main()
 		printf("\ncan't catch SIGINT\n");   
 
 	init_facedetect();
-	
-	start_geted(face_store, eyes_store, eyes_store_template);
+	start_gui();
 
+	std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template);
+	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template);
+
+	main_thread.join();
+	gui_thread.join();
 
 	return 0;
 }
@@ -104,8 +108,8 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 						if(eyes_closedetect(face_store, eyes_store, eyes_store_template))
 						{
 							/*TODO: Add gaze estimator here */
-						  printf("in if under eyes_closedetect\n");
-						  energy = gaze_energy(face_store, eyes_store, eyes_store_template);
+							printf("in if under eyes_closedetect\n");
+							energy = gaze_energy(face_store, eyes_store, eyes_store_template);
 						}
 					
 						
