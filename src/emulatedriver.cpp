@@ -16,3 +16,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+
+#include "emulatedriver.h"
+
+int draw_on_screen(cv::Point coordinate)
+{
+
+
+
+	return 1; /* On success */
+}
+
+

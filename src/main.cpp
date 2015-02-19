@@ -23,6 +23,7 @@
 #include "facedetect.h"
 #include "featuredetect.h"
 #include "gazeestimate.h"
+#include "emulatedriver.h"
 
 using namespace cv;
 
@@ -31,12 +32,10 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 /* Program Logic */
 int main()
 {
-
-	std::thread obj;
 	
 	/* Start the main threads here. 
-	 * Main Flow - Program Logic
-	 * Thread 1 - GUI using Highgui
+	 * Thread 1 - Program Logic
+	 * Thread 2 - GUI using Highgui
 	 */
 
 	//CvFont font;
