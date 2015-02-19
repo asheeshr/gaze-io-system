@@ -98,10 +98,10 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 				//imshow("Face", face_store->frame);
 				
 				//imshow("GIOS", gui_frame);
-				while(/*mutex_face->try_lock() && /*mutex_eyes->try_lock() &&*/ eyesdetect_display(face_store, eyes_store))
+				while(mutex_eyes->try_lock() && eyesdetect_display(face_store, eyes_store))
 				{
-					/*mutex_face->unlock();*/
 					//mutex_eyes->unlock();
+					//printf("Locked Eyes");
 										
 					//imshow("Eyes", eyes_store->frame);
 					if(/*mutex_eyes->try_lock() &&*/ eyes_sepframes(eyes_store))
@@ -126,11 +126,14 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 						
 					}
 					//printf("%d", face_store->frame.type()==gui_frame.type());
-					
+					mutex_eyes->unlock();
+					//printf("UnLocked Eyes");
 //					printf("Searching for each of them - 1b\n");
 					waitKey(25);
 					frame = get_frame();
+					mutex_face->try_lock();
 					update_face(frame, face_store);
+					mutex_face->unlock();
 				}
 //				printf("Looking for your eyes - 1a\n");
 				waitKey(25);

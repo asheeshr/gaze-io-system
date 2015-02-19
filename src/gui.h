@@ -3,10 +3,10 @@
 #ifndef GIOS_GUI
 #define GIOS_GUI
 
-#define GUI_HEIGHT 640
-#define GUI_WIDTH 480
-#define GUI_HBORDER 10
-#define GUI_WBORDER 10
+#define GUI_XMAX 640
+#define GUI_YMAX 480
+#define GUI_XBORDER 15
+#define GUI_YBORDER 10
 
 
 int start_gui();
