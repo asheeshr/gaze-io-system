@@ -20,6 +20,9 @@ $(OBJECTS) : %.o: ./src/%.cpp
 profile: CC += -pg
 profile: build
 
+debug: CC+= -g
+debug: build
+
 prepare:
 	if [ ! -d ./bin ]; then mkdir ./bin; fi
 	if [ ! -d ./data ]; then mkdir ./data; fi

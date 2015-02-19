@@ -12,6 +12,7 @@
 #include <cmath>
 #include <vector>
 #include <thread>
+#include <mutex>
 /* Overridden Headers */
 //#include "cascadedetect.hpp"
 

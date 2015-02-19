@@ -2,10 +2,12 @@
 
 using namespace cv;
 
+cv::VideoCapture capture(0);
+
 cv::Mat get_frame()
 {
-	static cv::VideoCapture capture(0);
-	cv::Mat frame;
+//	static cv::VideoCapture capture(0);
+	static cv::Mat frame;
 
 	if(capture.read(frame))
 		return frame;
@@ -53,8 +55,8 @@ void sig_handler(int signo)
 {
   if (signo == SIGINT)
     printf("received SIGINT\n");
-  exit(0);
 
+  exit(0);
 }
 
 
