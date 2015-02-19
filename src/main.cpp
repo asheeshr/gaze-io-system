@@ -65,11 +65,11 @@ int main()
 		printf("\ncan't catch SIGINT\n");   
 
 	init_facedetect();
-	//start_gui();
+	start_gui();
 
 	//std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, &mutex_face);
 	
-	//std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes);
+	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes);
 	start_geted(face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes);
 	//main_thread.join();
 	//gui_thread.join();
