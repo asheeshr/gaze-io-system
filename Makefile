@@ -23,6 +23,9 @@ profile: build
 debug: CC+= -g
 debug: build
 
+optimize: CC+= -O3
+optimize: build
+
 prepare:
 	if [ ! -d ./bin ]; then mkdir ./bin; fi
 	if [ ! -d ./data ]; then mkdir ./data; fi

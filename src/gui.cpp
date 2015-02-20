@@ -134,7 +134,7 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			sleep_time = std::chrono::milliseconds((update_frequency->duration_main>1000)?1000:update_frequency->duration_main + 5); /*Dynamically set refresh time*/
 			update_frequency->duration_gui = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - update_frequency->start_gui).count());
 			imshow("Gaze IO System", gui_frame);
-			waitKey(200);
+			if('q' == waitKey(200)) raise(SIGSEGV);
 			update_frequency->start_gui = std::chrono::system_clock::now();
 			//std::this_thread::yield();
 			//std::this_thread::sleep_for(sleep_time);
