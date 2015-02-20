@@ -27,7 +27,7 @@
 
 using namespace cv;
 
-int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct timing_info *update_frequency,
 		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template);
 
 /* Program Logic */
@@ -40,22 +40,19 @@ int main()
 	 * Thread 2 - GUI using Highgui
 	 */
 
-	//CvFont font;
 	struct face *face_store;
 	struct eyes *eyes_store;
 	struct eyes_template *eyes_store_template;
-	
+	struct timing_info *update_frequency;
 	std::mutex mutex_face, mutex_eyes, mutex_eyes_template;
 
-	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template)==0)
+	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template, &update_frequency)==0)
 	{
 		printf("Data structures not initialised\n");
 		return 1;
 	}
 
 	printf("Using OpenCV %d.%d.%d\n", CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION);
-	//std::clock_t start;
-	//cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
 
 	int screen_width, screen_height;
 
@@ -66,12 +63,12 @@ int main()
 		printf("\ncan't catch SIGINT\n");   
 
 	init_facedetect();
-	//start_gui();
+	start_gui();
 
 	//std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, &mutex_face);
 	
-	//std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes, &mutex_eyes_template);
-	start_geted(face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes, &mutex_eyes_template);
+	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes, &mutex_eyes_template);
+	start_geted(face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
 	//main_thread.join();
 	//gui_thread.join();
 
@@ -79,18 +76,17 @@ int main()
 }
 
 
-int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct timing_info *update_frequency,
 		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template)
 {
 	Mat *frame = new Mat;
 	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status;
 	mutex_face_status = mutex_eyes_status = mutex_eyes_template_status = false;
 
-	while(get_frame(frame)==0)
+	while(get_frame(frame, update_frequency)==0)
 	{
 		printf("Cannot load frame!");
 		waitKey(50);
-		//return 0;
 	}
 	
 
@@ -98,7 +94,6 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 	while(1)    
 	{
 		//start = std::clock();
-
 		//printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 
 		try
@@ -109,8 +104,6 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 				test_and_unlock(mutex_face);
 
 				//imshow("Face", face_store->frame);
-				
-				//imshow("GIOS", gui_frame);
 				while( test_and_lock(mutex_eyes) && eyesdetect_display(face_store, eyes_store) )
 				{
 										
@@ -139,13 +132,11 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 					}
 					
 					test_and_unlock(mutex_eyes);
-					//printf("UnLocked Eyes");
 //					printf("Searching for each of them - 1b\n");
 					waitKey(25);
-					if(get_frame(frame)==0)
+					if(get_frame(frame, update_frequency)==0)
 					{
 						printf("Cannot load frame!");
-						//return 0;
 					}
 					if(test_and_lock(mutex_face))
 					{
@@ -155,16 +146,15 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 				}
 //				printf("Looking for your eyes - 1a\n");
 				waitKey(25);
-				if(get_frame(frame)==0)
+				if(get_frame(frame, update_frequency)==0)
 				{
 					printf("Cannot load frame!");
-					//return 0;
 				}
 	
 			}
 //			printf("Searching for you - 1\n");
 			waitKey(100);
-			while(get_frame(frame)==0)
+			while(get_frame(frame, update_frequency)==0)
 			{
 				printf("Cannot load frame!");
 				waitKey(25);
@@ -179,8 +169,7 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 		};
 	}
 	waitKey(100);
-//	destroyWindow("Test");
-//	destroyWindow("Face");
+
 	printf("Exiting start_geted");
 	return 1;
 }

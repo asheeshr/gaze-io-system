@@ -51,6 +51,15 @@ struct eyes_template {
 
 };
 
+struct timing_info {
+
+	std::chrono::time_point<std::chrono::system_clock> start_main;
+	long duration_main;
+	std::chrono::time_point<std::chrono::system_clock> start_gui;
+	long duration_gui;
+
+};
+
 /* Macros */
 #define test_and_lock(X) (X##_status || (X##_status = X->try_lock())) /* Provides a reliable interface for std::mutex. Checks if unlocked, before locking. */
 #define test_and_unlock(X) if(X##_status) {X->unlock(); X##_status = false;} /* Provides a reliable interface for std::mutex. Checks if locked, before unlocking. */

@@ -11,6 +11,6 @@
 
 int start_gui();
 int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
-	       std::unique_lock<std::mutex> *mutex_face, std::unique_lock<std::mutex> *mutex_eyes, std::unique_lock<std::mutex> *mutex_eyes_template);
+	       std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template);
 
 #endif /*GIOS_GUI*/

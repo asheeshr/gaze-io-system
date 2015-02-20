@@ -4,10 +4,12 @@ using namespace cv;
 
 cv::VideoCapture capture(0);
 
-int get_frame(cv::Mat *frame)
+int get_frame(cv::Mat *frame, struct timing_info *update_frequency)
 {
 //	static cv::VideoCapture capture(0);
-
+	update_frequency->duration_main = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - update_frequency->start_main).count());
+	update_frequency->start_main = std::chrono::system_clock::now(); /* Includes capture time */
+	//printf("update_frequency->duration_main %ld\n", update_frequency->duration_main);
 	if(capture.read(*frame))
 		return 1;
 	return 0;
@@ -26,25 +28,15 @@ int update_face(cv::Mat frame, struct face *face_store)
 }
 
 
-int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et)
+int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et, struct timing_info **freq)
 {
 	*f = new face;
 	*e = new struct eyes;
 	*et = new struct eyes_template;
+	*freq = new struct timing_info;
 
-	if(*f==NULL || *e==NULL || *et==NULL)
+	if(*f==NULL || *e==NULL || *et==NULL || *freq==NULL)
 		return 0;
-
-	//f->frame = new cv::Mat;
-	//f->frame_gradient = new cv::Mat;
-
-	/*e->frame = new cv::Mat;
-	
-	et->windows = new CvBox2D[100];
-
-	if(/*f->frame==NULL || f->frame_gradient==NULL || e->frame==NULL || et->windows==NULL) 
-		return 0;
-*/
 	return 1;
 }
 
