@@ -141,13 +141,12 @@ int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[])
 	{
 		fprintf(pipe, "set term png small\n");
 		fprintf(pipe, "unset border; unset xtics; unset ytics \n");
-		
+		fprintf(pipe, "set style line 1 linewidth 6 \n");
 
 		if(/*e.eyes.size()>=1 && */et.counter[0]>30)
 		{
-			
 			fprintf(pipe, "set output './data/eye0_plot.png'\n");
-			fprintf(pipe, "plot '-' with lines notitle\n");
+			fprintf(pipe, "plot '-' with lines linestyle 1 notitle\n");
 			for(int i=1; i<et.counter[0]; i++)
 			{
 				fprintf(pipe, "%.0f %.0f\n", et.windows[0][i].center.x, et.windows[0][i].center.y);
@@ -158,7 +157,7 @@ int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[])
 		if(/*e.eyes.size()==2 &&*/ et.counter[1]>30)
 		{
 			fprintf(pipe, "set output './data/eye1_plot.png'\n");
-			fprintf(pipe, "plot '-' with lines notitle\n");
+			fprintf(pipe, "plot '-' with lines linestyle 1 notitle\n");
 			for(int i=1; i<et.counter[1]; i++)
 			{
 				fprintf(pipe, "%.0f %.0f\n", et.windows[1][i].center.x, et.windows[1][i].center.y);
