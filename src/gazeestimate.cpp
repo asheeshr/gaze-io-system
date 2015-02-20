@@ -29,7 +29,7 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
   ene = new float[2];
   ene[0]=ene[1]=0;
   Point iter;
-  printf("after point\n");
+  //  printf("after point\n");
   int mid = (eyes_store_template->windows)[0][pos].size.width/2;
   float costheta = cos((eyes_store_template->windows)[0][pos].angle * PI / 180.0);
   float sintheta = sin((eyes_store_template->windows)[0][pos].angle * PI /180.0);
@@ -56,7 +56,7 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
     }
   j=0;
   xinc=yinc=0;
-  printf("after first loop\n");
+  // printf("after first loop\n");
   iter=eyes_store_template->windows[0][pos].center;
   while(j<mid)
     {
@@ -74,11 +74,11 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
 	}
       //      k--;
     }
-  fflush(stdin);
+  fflush(stdout);
   //  waitKey(0);
   ene[0]=float((xenergy/(eyes_store_template->windows[0][pos].size.width)-255/2)*costheta);
   ene[1]=float((xenergy/(eyes_store_template->windows[0][pos].size.width)-255/2)*sintheta);
-  printf("%f  energy   %f       %f\n",xenergy,ene[0],ene[1]);
+  //  printf("%f       %f    %f    %f\n",ene[0],ene[1],costheta,sintheta);
   //  waitKey(0);
   return ene;
 }
@@ -90,20 +90,31 @@ int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_
   energy=new int[2];
   energy[0]=energy[1]=0;
   static float xenergy_prev,yenergy_prev;
-  float xenergy=0, yenergy=0;
+  float xenergy=0.0, yenergy=0.0;
   float *ene=new float[2];//supplementary energy variable to store the pointer returned by calculate_energy
+  ene[0]=ene[1]=0.0;
   //  printf("before for loop\n");
+  //  printf("%f i + %f j\n",xenergy,yenergy);
+
   for(i=0;i<(eyes_store_template->counter)[0];i++)//counter is defined in featuredetect.cpp
     {
-      printf("inside for\n");
+      //      printf("inside for\n");
       ene=calculate_energy(face_store, eyes_store_template,i);
-      xenergy+=ene[0];
-      yenergy+=ene[1];
+      //      printf("ene %f i + ene %f j\n",ene[0],ene[1]);
+      // printf("%f i + %f j\n",xenergy,yenergy);
+      if(i==0)                     //at i=0 the value returned by calculate_energy is garbage. need to know why?????
+	continue;
+      xenergy+=float(ene[0]);
+      yenergy+=float(ene[1]);
+      //      printf("%f i + %f j\n",xenergy,yenergy);
+      //  printf("ene %f i + ene %f j\n",ene[0],ene[1]);
+
     }
 
   float delxenergy=xenergy - xenergy_prev;
   float delyenergy=yenergy - yenergy_prev;
-  //  printf("%d i + %d j\n",xenergy,yenergy);
+  printf("%f i + %f j\n",xenergy,yenergy);
+  //waitKey(0);
   if(xenergy_prev==0 && yenergy_prev==0)
     { 
       energy[0]=0;

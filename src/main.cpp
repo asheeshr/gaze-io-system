@@ -105,6 +105,8 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 							/*TODO: Add gaze estimator here */
 						  printf("in if under eyes_closedetect\n");
 						  energy = gaze_energy(face_store, eyes_store, eyes_store_template);
+						  // printf("%f i + %f j\n",energy[0],energy[1]);
+						  //waitKey(0);
 						}
 					
 						
