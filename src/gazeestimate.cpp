@@ -19,16 +19,18 @@
 
 #include "gazeestimate.h"
 
+#define ERROR_PER 10
+#define TEMP_THRESHOLD 30//threshold to determine the no of similar templates so as to determine whether the eyes is in template or not
 using namespace cv;
 
 float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template, int pos)
 {
   float* ene;
   int j,i;
-  float xenergy=0,yenergy=0;
+  float energy_sum=0;//yenergy=0;
   ene = new float[2];
   ene[0]=ene[1]=0;
-  Point iter;
+  Point iter(eyes_store_template->windows[0][pos].center);
   //  printf("after point\n");
   int mid = (eyes_store_template->windows)[0][pos].size.width/2;
   float costheta = cos((eyes_store_template->windows)[0][pos].angle * PI / 180.0);
@@ -36,9 +38,10 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
   float xinc=0,yinc=0;
   //      for(j=0;j<mid;j++)
   j=0;
+  //  iter=eyes_store_template->windows[0][i].center;
   
-  xenergy+=(face_store->frame_gradient.at<uchar>(iter));
-  yenergy+=(face_store->frame_gradient.at<uchar>(iter));  
+  energy_sum+=(face_store->frame_gradient.at<uchar>(iter));
+  //  yenergy+=(face_store->frame_gradient.at<uchar>(iter));  
   while(j<mid)
     {
       // int k=1;
@@ -49,7 +52,7 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
 	  j++;
 	  iter.x+=xinc;
 	  iter.y+=yinc;
-	  xenergy+=float((face_store->frame_gradient.at<uchar>(iter)));
+	  energy_sum+=float((face_store->frame_gradient.at<uchar>(iter)));
 	  //	  yenergy+=(face_store->frame_gradient.at<uchar>(iter));
 	}
       //k++;
@@ -68,7 +71,7 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
 	  j++;
 	  iter.x-=xinc;
 	  iter.y-=yinc;
-	  xenergy+=float((face_store->frame_gradient.at<uchar>(iter)));
+	  energy_sum+=float((face_store->frame_gradient.at<uchar>(iter)));
 	  //	  printf("%f  1st\n",xenergy);
 	  // yenergy+=(face_store->frame_gradient.at<uchar>(iter));
 	}
@@ -76,8 +79,8 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
     }
   fflush(stdout);
   //  waitKey(0);
-  ene[0]=float((xenergy/(eyes_store_template->windows[0][pos].size.width)-255/2)*costheta);
-  ene[1]=float((xenergy/(eyes_store_template->windows[0][pos].size.width)-255/2)*sintheta);
+  ene[0]=float((energy_sum/(eyes_store_template->windows[0][pos].size.width)-255/2)*costheta);
+  ene[1]=float((energy_sum/(eyes_store_template->windows[0][pos].size.width)-255/2)*sintheta);
   //  printf("%f       %f    %f    %f\n",ene[0],ene[1],costheta,sintheta);
   //  waitKey(0);
   return ene;
@@ -113,57 +116,114 @@ int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_
 
   float delxenergy=xenergy - xenergy_prev;
   float delyenergy=yenergy - yenergy_prev;
-  printf("%f i + %f j\n",delxenergy,delyenergy);
+  //  printf("%f i + %f j\n",delxenergy,delyenergy);
   //waitKey(0);
   if(xenergy_prev==0 && yenergy_prev==0)
     { 
+      // printf("1st if\n");
       energy[0]=0;
       energy[1]=0;
-      return energy;
+      //return energy;
     }
-  /*    if(iseyeintemp(template,frame))
+  else if(istemp_on_eye(face_store,eyes_store_template))
     {
-      xenergy_prev=xenergy;
-      yenergy_prev=yenergy;
-      energy[0]=delxenergy;
-      energy[1]=delyenergy;
-      return energy;
-      }*/
-//  printf("%d i + %d j\n",energy[0],energy[1]); 
+      //    printf("2nd if\n");
+      // xenergy_prev=xenergy;
+      //      yenergy_prev=yenergy;
+      energy[0]=int(delxenergy);
+      energy[1]=int(delyenergy);
+      //      return energy;
+    }
+  xenergy_prev=xenergy;
+  yenergy_prev=yenergy;
+
+  //  printf("%d i + %d j\n",energy[0],energy[1]); 
   return energy;
 }
-/* iseyeintemplate(CvBox2D* template, Mat frame)
+bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_template)
 {
 
+  // printf("in function\n");
   int count=0; //to determine the no of templates that have passed the test
   int i,j;
-  for(i=0; i<counter; i++)
+  int mid;
+  float costheta, sintheta, xinc, yinc;
+  int inten, inten_max, inten_min,error;
+  int flag;
+  Point iter;
+  //printf("in istemp_eye function\n");
+  for(i=0;i<eyes_store_template->counter[0];i++)
     {
-      int mid=template[i].size/2;
-      float intensum=0,avginten;
-      Point iter=template[i].center;
-      float costheta = cos(template[i].angle * PI / 180.0);
-      float sintheta = sin(template[i].angle * PI /180.0);
-      
-      for(j=-mid;j<mid;j++)
+      flag=1;
+      mid = (eyes_store_template->windows)[0][i].size.width/2;
+      costheta = cos((eyes_store_template->windows)[0][i].angle * PI / 180.0);
+      sintheta = sin((eyes_store_template->windows)[0][i].angle * PI /180.0);
+      xinc=0,yinc=0;
+      j=0;
+      iter=eyes_store_template->windows[0][i].center;
+      inten=int(face_store->frame_gradient.at<uchar>(iter));
+      error= int(face_store->frame_gradient.at<uchar>(iter)) * ERROR_PER /100;
+      inten_max = inten + error;
+      inten_min = inten - error;      
+      while(j<mid && flag)
 	{
-	  iter.x+=j*costheta;//sec(template[i].angle * PI / 180.0);
-	  iter.y+=j*sintheta;//cosec(template[i].angle * PI / 180.0);
-	  intensum+=frame.at<uchar>(iter);
+	  // int k=1;
+	  
+	  xinc+=costheta;
+	  yinc+=sintheta;
+	  if(int(iter.x) != int(iter.x+xinc) || int(iter.y)!= int(iter.y+yinc))
+	    {
+	      j++;
+	      iter.x+=xinc;
+	      iter.y+=yinc;
+	      //	      error= int(face_store->frame_gradient.at<uchar>(iter)) * ERROR_PER /100;
+	      if(int(face_store->frame_gradient.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
+		{
+		  flag=0;
+		}
+	      //	      xenergy+=float((face_store->frame_gradient.at<uchar>(iter)));
+	      //	  yenergy+=(face_store->frame_gradient.at<uchar>(iter));
+	    }
+	  //k++;
 	}
-      avginten/=template[i].size;
-      if(put condition for checking whether the template is similar or not)
+      j=0;
+      xinc=yinc=0;
+      // printf("after first loop\n");
+      iter=eyes_store_template->windows[0][i].center;
+      while(j<mid && flag)
+	{
+	  //int k=0;
+	  xinc+=costheta;
+	  yinc+=sintheta;
+	  if(int(iter.x) != int(iter.x-xinc) || int(iter.y)!= int(iter.y-yinc))
+	    {
+	      j++;
+	      iter.x-=xinc;
+	      iter.y-=yinc;
+	      if(int(face_store->frame_gradient.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
+		{
+		  flag=0;
+		}
+	    
+	      //	  printf("%f  1st\n",xenergy);
+	      // yenergy+=(face_store->frame_gradient.at<uchar>(iter));
+	    }
+	  //      k--;
+	}
+      if(flag==1)
 	{
 	  count++;
+	  printf("count of no of similar templates %d\n",count);
 	}
     }
-  if(count>THRESHOLD)//threshold to determine 
+  
+  if(count>TEMP_THRESHOLD)//threshold to determine 
     {
       return false;
     }
   return true;
 }
-*/
+
 /*int* energy_to_coord(float* energy)
 {
   int *coord;
