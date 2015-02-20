@@ -28,11 +28,14 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 	 * ----------------------------------------------
 	 */
 
+	cv::Mat *graph[2];
+	graph[0] = new cv::Mat;
+	graph[1] = new cv::Mat;
 	struct face f; 
 	struct eyes e;
 	struct eyes_template et;
 	std::chrono::milliseconds sleep_time(250)/*, wait_time(100)*/;
-	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status;
+	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status, graph_state=false;
 	mutex_face_status = mutex_eyes_status = mutex_eyes_template_status = false;
 	
 	while(1)
@@ -66,6 +69,7 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 					et.windows[1][counter] = eyes_store_template->windows[1][counter];
 				
 				test_and_unlock(mutex_eyes_template);
+				graph_state = plot_data(e, et, graph); /* Plot graph only if update available */
 			}
 				
 			/* Create and display GUI */
@@ -86,6 +90,13 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 									 (((update_frequency->duration_gui - sleep_time.count())<0)?0:update_frequency->duration_gui - sleep_time.count())) + " ms", 
 				Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 4*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
 			
+			/* Display Eye Graphs */
+			if(graph_state)
+			{
+				if(!(graph[0]->empty())) resize(*graph[0], gui_frame(Rect(GUI_XBORDER, 3*GUI_YBORDER + 2*GUI_YMAX/3, GUI_XMAX/3, GUI_YMAX/3)), Size(GUI_XMAX/3, GUI_YMAX/3));
+				if(!(graph[1]->empty())) resize(*graph[1], gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/3, 3*GUI_YBORDER + 2*GUI_YMAX/3, GUI_XMAX/3, GUI_YMAX/3)), 
+								Size(GUI_XMAX/3, GUI_YMAX/3));
+			}
 
 			/* Display Eye Detection Accuracy Info */
 
@@ -120,4 +131,56 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 	};
 
 	return 1;
+}
+
+int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[])
+{
+       	FILE *pipe = popen("gnuplot", "w");
+	
+	if(pipe!=NULL)
+	{
+		fprintf(pipe, "set term png small\n");
+		fprintf(pipe, "unset border; unset xtics; unset ytics \n");
+		
+
+		if(/*e.eyes.size()>=1 && */et.counter[0]>30)
+		{
+			
+			fprintf(pipe, "set output './data/eye0_plot.png'\n");
+			fprintf(pipe, "plot '-' with lines notitle\n");
+			for(int i=1; i<et.counter[0]; i++)
+			{
+				fprintf(pipe, "%.0f %.0f\n", et.windows[0][i].center.x, et.windows[0][i].center.y);
+			}
+			fprintf(pipe, "%s\n", "e");
+		}
+		
+		if(/*e.eyes.size()==2 &&*/ et.counter[1]>30)
+		{
+			fprintf(pipe, "set output './data/eye1_plot.png'\n");
+			fprintf(pipe, "plot '-' with lines notitle\n");
+			for(int i=1; i<et.counter[1]; i++)
+			{
+				fprintf(pipe, "%.0f %.0f\n", et.windows[1][i].center.x, et.windows[1][i].center.y);
+			}
+			fprintf(pipe, "%s\n", "e");
+			//fprintf(pipe, "plot './data/eye1.csv' notitle \n");
+		//fprintf(pipe, "plot '-' with lines\n");
+		}
+		fflush(pipe);
+                pclose(pipe);
+
+		*graph[0] = imread("./data/eye0_plot.png", CV_LOAD_IMAGE_GRAYSCALE);
+		*graph[1] = imread("./data/eye1_plot.png", CV_LOAD_IMAGE_GRAYSCALE);
+		
+	}
+	else
+	{
+		std::cout << "Could not open pipe" << std::endl; 
+		return 0;
+	}
+	
+	if(!(graph[0]->empty())||!(graph[1]->empty()))
+		return 1;
+	return 0;
 }

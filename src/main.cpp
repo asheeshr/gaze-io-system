@@ -168,7 +168,6 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 			waitKey(100);
 		};
 	}
-	waitKey(100);
 
 	printf("Exiting start_geted");
 	return 1;
