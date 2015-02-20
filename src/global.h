@@ -13,25 +13,20 @@
 #include <vector>
 #include <thread>
 #include <mutex>
-/* Overridden Headers */
-//#include "cascadedetect.hpp"
-
-
+#include <chrono>
+#include <exception>
 
 /* OpenCV Headers */
-//#include <cv.h>
-//#include <highgui.h>
-
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
-
 #include <opencv2/core/core.hpp>
 //#include <opencv2/highgui/highgui.hpp>
 
+/* Constants */
 #define PI 3.14159265
-/* Global Structures */
 
+/* Global Structures */
 struct face {
 
 	std::vector<cv::Rect> faces;
@@ -55,5 +50,9 @@ struct eyes_template {
 	uint8_t counter[2];
 
 };
+
+/* Macros */
+#define test_and_lock(X) (X##_status || (X##_status = X->try_lock())) /* Provides a reliable interface for std::mutex. Checks if unlocked, before locking. */
+#define test_and_unlock(X) if(X##_status) {X->unlock(); X##_status = false;} /* Provides a reliable interface for std::mutex. Checks if locked, before unlocking. */
 
 #endif /*GLOBAL_GIOS*/

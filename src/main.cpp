@@ -27,7 +27,8 @@
 
 using namespace cv;
 
-int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, std::mutex *mutex_face, std::mutex *mutex_eyes);
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
+		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template);
 
 /* Program Logic */
 int main()
@@ -44,7 +45,7 @@ int main()
 	struct eyes *eyes_store;
 	struct eyes_template *eyes_store_template;
 	
-	std::mutex mutex_face, mutex_eyes;
+	std::mutex mutex_face, mutex_eyes, mutex_eyes_template;
 
 	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template)==0)
 	{
@@ -52,7 +53,7 @@ int main()
 		return 1;
 	}
 
-	
+	printf("Using OpenCV %d.%d.%d\n", CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION);
 	//std::clock_t start;
 	//cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
 
@@ -65,12 +66,12 @@ int main()
 		printf("\ncan't catch SIGINT\n");   
 
 	init_facedetect();
-	start_gui();
+	//start_gui();
 
 	//std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, &mutex_face);
 	
-	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes);
-	start_geted(face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes);
+	//std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes, &mutex_eyes_template);
+	start_geted(face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes, &mutex_eyes_template);
 	//main_thread.join();
 	//gui_thread.join();
 
@@ -78,10 +79,21 @@ int main()
 }
 
 
-int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, std::mutex *mutex_face, std::mutex *mutex_eyes)
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
+		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template)
 {
-	Mat frame;
-	frame = get_frame();
+	Mat *frame = new Mat;
+	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status;
+	mutex_face_status = mutex_eyes_status = mutex_eyes_template_status = false;
+
+	while(get_frame(frame)==0)
+	{
+		printf("Cannot load frame!");
+		waitKey(50);
+		//return 0;
+	}
+	
+
 	int *energy = new int[2];
 	while(1)    
 	{
@@ -92,21 +104,21 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 		try
 		{
 			
-			while(mutex_face->try_lock() && facedetect_display(frame, face_store))
+			while( test_and_lock(mutex_face) && facedetect_display(*frame, face_store) )
 			{
-				mutex_face->unlock();
+				test_and_unlock(mutex_face);
+
 				//imshow("Face", face_store->frame);
 				
 				//imshow("GIOS", gui_frame);
-				while(mutex_eyes->try_lock() && eyesdetect_display(face_store, eyes_store))
+				while( test_and_lock(mutex_eyes) && eyesdetect_display(face_store, eyes_store) )
 				{
-					//mutex_eyes->unlock();
-					//printf("Locked Eyes");
 										
 					//imshow("Eyes", eyes_store->frame);
-					if(/*mutex_eyes->try_lock() &&*/ eyes_sepframes(eyes_store))
+					if( test_and_lock(mutex_eyes) && eyes_sepframes(eyes_store) )
 					{
-						//mutex_eyes->unlock();
+						test_and_unlock(mutex_eyes);
+						
 						if(eyes_store->eyes.size()==1)
 							//imshow("Eye 1", eyes_store->eye_frame[0]);
 							;
@@ -116,34 +128,55 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 							//imshow("Eye 2", eyes_store->eye_frame[1]);
 						}
 						
-						if(eyes_closedetect(face_store, eyes_store, eyes_store_template))
+						if(test_and_lock(mutex_eyes_template) && eyes_closedetect(face_store, eyes_store, eyes_store_template))
 						{
 							/*TODO: Add gaze estimator here */
 							printf("in if under eyes_closedetect\n");
 							energy = gaze_energy(face_store, eyes_store, eyes_store_template);
 						}
-					
+						test_and_unlock(mutex_eyes_template);
 						
 					}
-					//printf("%d", face_store->frame.type()==gui_frame.type());
-					mutex_eyes->unlock();
+					
+					test_and_unlock(mutex_eyes);
 					//printf("UnLocked Eyes");
 //					printf("Searching for each of them - 1b\n");
 					waitKey(25);
-					frame = get_frame();
-					mutex_face->try_lock();
-					update_face(frame, face_store);
-					mutex_face->unlock();
+					if(get_frame(frame)==0)
+					{
+						printf("Cannot load frame!");
+						//return 0;
+					}
+					if(test_and_lock(mutex_face))
+					{
+						update_face(*frame, face_store);
+						test_and_unlock(mutex_face);
+					}
 				}
 //				printf("Looking for your eyes - 1a\n");
 				waitKey(25);
-				frame = get_frame();
+				if(get_frame(frame)==0)
+				{
+					printf("Cannot load frame!");
+					//return 0;
+				}
+	
 			}
 //			printf("Searching for you - 1\n");
 			waitKey(100);
-			frame = get_frame();
+			while(get_frame(frame)==0)
+			{
+				printf("Cannot load frame!");
+				waitKey(25);
+			}
+	
 		}
-		catch(...){};
+		catch(std::exception &e)
+		{
+			printf("Exception!\n");
+			std::cout<<e.what();
+			waitKey(100);
+		};
 	}
 	waitKey(100);
 //	destroyWindow("Test");

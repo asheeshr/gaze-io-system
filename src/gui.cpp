@@ -15,12 +15,14 @@ int start_gui()
 
 
 
-int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, std::mutex *mutex_face, std::mutex *mutex_eyes)
+int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
+	       std::unique_lock<std::mutex> *mutex_face, std::unique_lock<std::mutex> *mutex_eyes, std::unique_lock<std::mutex> *mutex_eyes_template)
 {
 	//Mat frame;
 	struct face f; 
 	struct eyes e;
 	struct eyes_template et;
+	std::chrono::milliseconds sleep_time(250);
 
 	while(1)
 	{
@@ -53,8 +55,8 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			if(!e.eye_frame[1].empty()) resize(e.eye_frame[1], gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/3, 2*GUI_YBORDER + GUI_YMAX/3, GUI_XMAX/3, GUI_YMAX/3)), Size(GUI_XMAX/3, GUI_YMAX/3));
 
 			imshow("Gaze IO System", gui_frame);
-			std::this_thread::yield();
-			waitKey(1000);
+			//std::this_thread::yield();
+			std::this_thread::sleep_for(sleep_time);
 		}
 		catch(...){};
 

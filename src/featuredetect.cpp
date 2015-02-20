@@ -54,7 +54,7 @@ int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct ey
 		    eyes_closedetect_helper(1, face_store, eyes_store, eyes_store_template) )
 			return 1;
 	}
-
+	return 0;
 }
 
 

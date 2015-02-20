@@ -4,13 +4,13 @@ using namespace cv;
 
 cv::VideoCapture capture(0);
 
-cv::Mat get_frame()
+int get_frame(cv::Mat *frame)
 {
 //	static cv::VideoCapture capture(0);
-	static cv::Mat frame;
 
-	if(capture.read(frame))
-		return frame;
+	if(capture.read(*frame))
+		return 1;
+	return 0;
 }
 
 int update_face(cv::Mat frame, struct face *face_store)
@@ -56,6 +56,8 @@ void sig_handler(int signo)
   if (signo == SIGINT)
     printf("received SIGINT\n");
 
+  capture.~VideoCapture();
+  cv::destroyAllWindows();
   exit(0);
 }
 
