@@ -134,9 +134,10 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			sleep_time = std::chrono::milliseconds((update_frequency->duration_main>1000)?1000:update_frequency->duration_main + 5); /*Dynamically set refresh time*/
 			update_frequency->duration_gui = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - update_frequency->start_gui).count());
 			imshow("Gaze IO System", gui_frame);
+			waitKey(200);
 			update_frequency->start_gui = std::chrono::system_clock::now();
 			//std::this_thread::yield();
-			std::this_thread::sleep_for(sleep_time);
+			//std::this_thread::sleep_for(sleep_time);
 		}
 		catch(std::exception &e)
 		{
@@ -168,6 +169,10 @@ int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct
 	putText(gui_frame, "GUI Time: " + std::to_string((update_frequency->duration_gui>1000)?1000:
 							 (((update_frequency->duration_gui - sleep_time.count())<0)?0:update_frequency->duration_gui - sleep_time.count())) + " ms", 
 		Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 5*GUI_YBORDER), 
+		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
+
+	putText(gui_frame, "Status: " + std::string(gios_state(update_frequency->status)), 
+		Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, -2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 
 	/* Display Eye Detection Accuracy Info */

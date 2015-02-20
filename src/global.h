@@ -77,11 +77,25 @@ struct timing_info {
 	long duration_main;
 	std::chrono::time_point<std::chrono::system_clock> start_gui;
 	long duration_gui;
-
+	uint8_t status; /* Retains current status of GIOS */
 };
 
 /* Macros */
 #define test_and_lock(X) (X##_status || (X##_status = X->try_lock())) /* Provides a reliable interface for std::mutex. Checks if unlocked, before locking. */
 #define test_and_unlock(X) if(X##_status) {X->unlock(); X##_status = false;} /* Provides a reliable interface for std::mutex. Checks if locked, before unlocking. */
+
+/* Functions */
+inline const char * gios_state(int state)
+{
+	switch(state)
+	{
+	case 0: return "Starting";
+	case 1: return "FaceDetect";
+	case 2: return "FeatDetect";
+	case 3: return "GazeEstima";
+	case 4: return "InpUpdate";
+	default: return "";
+	}
+};
 
 #endif /*GLOBAL_GIOS*/

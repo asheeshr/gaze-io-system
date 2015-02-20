@@ -62,15 +62,18 @@ int main()
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
 		printf("\ncan't catch SIGINT\n");   
 
+	update_frequency->status=0;
+	
 	init_facedetect();
 	start_gui();
 
 	//std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, &mutex_face);
 	
 	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
-	start_geted(face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
-	//main_thread.join();
-	//gui_thread.join();
+	std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
+	
+	main_thread.join();
+	gui_thread.join();
 
 	return 0;
 }
@@ -82,11 +85,12 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 	Mat *frame = new Mat;
 	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status;
 	mutex_face_status = mutex_eyes_status = mutex_eyes_template_status = false;
+	std::chrono::milliseconds wait_time(25);
 
 	while(get_frame(frame, update_frequency)==0)
 	{
 		printf("Cannot load frame!");
-		waitKey(50);
+		std::this_thread::sleep_for(wait_time);
 	}
 	
 
@@ -102,11 +106,10 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 			while( test_and_lock(mutex_face) && facedetect_display(*frame, face_store) )
 			{
 				test_and_unlock(mutex_face);
-
+				update_frequency->status=1;
 				//imshow("Face", face_store->frame);
 				while( test_and_lock(mutex_eyes) && eyesdetect_display(face_store, eyes_store) )
 				{
-										
 					//imshow("Eyes", eyes_store->frame);
 					if( test_and_lock(mutex_eyes) && eyes_sepframes(eyes_store) )
 					{
@@ -123,9 +126,11 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 						
 						if(test_and_lock(mutex_eyes_template) && eyes_closedetect(face_store, eyes_store, eyes_store_template))
 						{
+							update_frequency->status=2;
 							/*TODO: Add gaze estimator here */
 							printf("in if under eyes_closedetect\n");
 							energy = gaze_energy(face_store, eyes_store, eyes_store_template);
+							update_frequency->status=3;
 						}
 						test_and_unlock(mutex_eyes_template);
 						
@@ -133,19 +138,24 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 					
 					test_and_unlock(mutex_eyes);
 //					printf("Searching for each of them - 1b\n");
-					waitKey(25);
+					
+					std::this_thread::sleep_for(wait_time);
 					if(get_frame(frame, update_frequency)==0)
 					{
 						printf("Cannot load frame!");
 					}
-					if(test_and_lock(mutex_face))
+					else
 					{
-						update_face(*frame, face_store);
-						test_and_unlock(mutex_face);
+						update_frequency->status=1;
+						if(test_and_lock(mutex_face))
+						{
+							update_face(*frame, face_store);
+							test_and_unlock(mutex_face);
+						}
 					}
 				}
 //				printf("Looking for your eyes - 1a\n");
-				waitKey(25);
+				//std::this_thread::sleep_for(wait_time);
 				if(get_frame(frame, update_frequency)==0)
 				{
 					printf("Cannot load frame!");
@@ -153,11 +163,11 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 	
 			}
 //			printf("Searching for you - 1\n");
-			waitKey(100);
+			//std::this_thread::sleep_for(wait_time);
 			while(get_frame(frame, update_frequency)==0)
 			{
 				printf("Cannot load frame!");
-				waitKey(25);
+				std::this_thread::sleep_for(wait_time);
 			}
 	
 		}
@@ -165,7 +175,7 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 		{
 			printf("Exception!\n");
 			std::cout<<e.what();
-			waitKey(100);
+			//std::this_thread::sleep_for(wait_time);
 		};
 	}
 
