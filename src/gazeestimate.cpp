@@ -21,23 +21,24 @@
 
 using namespace cv;
 
-float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template)
+float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template, int pos)
 {
   float* ene;
   int j,i;
   float xenergy=0,yenergy=0;
   ene = new float[2];
-  Point iter((eyes_store_template->windows)[0][i].center);
-  int mid = (eyes_store_template->windows)[0][i].size.width/2;
-  float costheta = cos((eyes_store_template->windows)[0][i].angle * PI / 180.0);
-  float sintheta = sin((eyes_store_template->windows)[0][i].angle * PI /180.0);
+  ene[0]=ene[1]=0;
+  Point iter;
+  printf("after point\n");
+  int mid = (eyes_store_template->windows)[0][pos].size.width/2;
+  float costheta = cos((eyes_store_template->windows)[0][pos].angle * PI / 180.0);
+  float sintheta = sin((eyes_store_template->windows)[0][pos].angle * PI /180.0);
   float xinc=0,yinc=0;
   //      for(j=0;j<mid;j++)
   j=0;
   
   xenergy+=(face_store->frame_gradient.at<uchar>(iter));
-  yenergy+=(face_store->frame_gradient.at<uchar>(iter));
-		      
+  yenergy+=(face_store->frame_gradient.at<uchar>(iter));  
   while(j<mid)
     {
       // int k=1;
@@ -48,12 +49,15 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
 	  j++;
 	  iter.x+=xinc;
 	  iter.y+=yinc;
-	  xenergy+=(face_store->frame_gradient.at<uchar>(iter));
-	  yenergy+=(face_store->frame_gradient.at<uchar>(iter));
+	  xenergy+=float((face_store->frame_gradient.at<uchar>(iter)));
+	  //	  yenergy+=(face_store->frame_gradient.at<uchar>(iter));
 	}
       //k++;
     }
   j=0;
+  xinc=yinc=0;
+  printf("after first loop\n");
+  iter=eyes_store_template->windows[0][pos].center;
   while(j<mid)
     {
       //int k=0;
@@ -64,14 +68,18 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
 	  j++;
 	  iter.x-=xinc;
 	  iter.y-=yinc;
-	  xenergy+=(face_store->frame_gradient.at<uchar>(iter));
-	  yenergy+=(face_store->frame_gradient.at<uchar>(iter));
+	  xenergy+=float((face_store->frame_gradient.at<uchar>(iter)));
+	  //	  printf("%f  1st\n",xenergy);
+	  // yenergy+=(face_store->frame_gradient.at<uchar>(iter));
 	}
       //      k--;
     }
-  ene[0]=(xenergy/(eyes_store_template->counter)[0]-255/2)*costheta;
-  ene[1]=(yenergy/(eyes_store_template->counter)[0]-255/2)*sintheta;
-  //  printf()
+  fflush(stdin);
+  //  waitKey(0);
+  ene[0]=float((xenergy/(eyes_store_template->windows[0][pos].size.width)-255/2)*costheta);
+  ene[1]=float((xenergy/(eyes_store_template->windows[0][pos].size.width)-255/2)*sintheta);
+  printf("%f  energy   %f       %f\n",xenergy,ene[0],ene[1]);
+  //  waitKey(0);
   return ene;
 }
 
@@ -80,18 +88,22 @@ int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_
   int i,j;
   int *energy;
   energy=new int[2];
+  energy[0]=energy[1]=0;
   static float xenergy_prev,yenergy_prev;
   float xenergy=0, yenergy=0;
   float *ene=new float[2];//supplementary energy variable to store the pointer returned by calculate_energy
+  //  printf("before for loop\n");
   for(i=0;i<(eyes_store_template->counter)[0];i++)//counter is defined in featuredetect.cpp
     {
-      ene=calculate_energy(face_store, eyes_store_template);
+      printf("inside for\n");
+      ene=calculate_energy(face_store, eyes_store_template,i);
       xenergy+=ene[0];
       yenergy+=ene[1];
     }
+
   float delxenergy=xenergy - xenergy_prev;
   float delyenergy=yenergy - yenergy_prev;
-  printf("%d i + %d j\n",xenergy,yenergy);
+  //  printf("%d i + %d j\n",xenergy,yenergy);
   if(xenergy_prev==0 && yenergy_prev==0)
     { 
       energy[0]=0;
@@ -107,10 +119,9 @@ int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_
       return energy;
       }*/
 //  printf("%d i + %d j\n",energy[0],energy[1]); 
-  return NULL;
+  return energy;
 }
-/*
-bool iseyeintemplate(CvBox2D* template, Mat frame)
+/* iseyeintemplate(CvBox2D* template, Mat frame)
 {
 
   int count=0; //to determine the no of templates that have passed the test
@@ -130,7 +141,7 @@ bool iseyeintemplate(CvBox2D* template, Mat frame)
 	  intensum+=frame.at<uchar>(iter);
 	}
       avginten/=template[i].size;
-      if(/*put condition for checking whether the template is similar or not)
+      if(put condition for checking whether the template is similar or not)
 	{
 	  count++;
 	}
