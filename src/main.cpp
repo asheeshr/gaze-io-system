@@ -67,7 +67,7 @@ int main()
 
 	//std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, &mutex_face);
 	
-	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, &mutex_face, &mutex_eyes, &mutex_eyes_template);
+	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
 	start_geted(face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
 	//main_thread.join();
 	//gui_thread.join();

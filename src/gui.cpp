@@ -15,7 +15,7 @@ int start_gui()
 
 
 
-int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
+int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct timing_info *update_frequency, 
 	       std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template)
 {
 	//Mat frame;
@@ -66,8 +66,22 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			//if(!e.frame.empty()) resize(e.frame, gui_frame(Rect(0 +  (GUI_HEIGHT/3)*2, GUI_WBORDER, GUI_HEIGHT/3, GUI_WIDTH/3)), Size(GUI_HEIGHT/3, GUI_WIDTH/3));
 			if(!e.eye_frame[0].empty()) resize(e.eye_frame[0], gui_frame(Rect(GUI_XBORDER, 2*GUI_YBORDER + GUI_YMAX/3, GUI_XMAX/3, GUI_YMAX/3)), Size(GUI_XMAX/3, GUI_YMAX/3));
 			if(!e.eye_frame[1].empty()) resize(e.eye_frame[1], gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/3, 2*GUI_YBORDER + GUI_YMAX/3, GUI_XMAX/3, GUI_YMAX/3)), Size(GUI_XMAX/3, GUI_YMAX/3));
-
+			/* Display Timing Info */
+			
+			rectangle(gui_frame, Rect(3*GUI_XBORDER + 2*GUI_XMAX/3, GUI_YBORDER, GUI_XMAX/3, GUI_YMAX/3), Scalar(0,0,0), CV_FILLED); /*Clear Text*/
+			putText(gui_frame, "Loop Time: ", Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 2*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			putText(gui_frame, std::to_string((update_frequency->duration_main>1000)?1000:update_frequency->duration_main) + " ms", 
+				Point(3*GUI_XBORDER + 2*GUI_XMAX/3 + 90, 2*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			
+			putText(gui_frame, "GUI Time: ", Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 4*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			putText(gui_frame, std::to_string((update_frequency->duration_gui>1000)?1000:
+							  (((update_frequency->duration_gui - sleep_time.count())<0)?0:update_frequency->duration_gui - sleep_time.count())) + " ms", 
+				Point(3*GUI_XBORDER + 2*GUI_XMAX/3 + 90, 4*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			
+			sleep_time = std::chrono::milliseconds((update_frequency->duration_main>1000)?1000:update_frequency->duration_main + 5); /*Dynamically set refresh time*/
+			update_frequency->duration_gui = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - update_frequency->start_gui).count());
 			imshow("Gaze IO System", gui_frame);
+			update_frequency->start_gui = std::chrono::system_clock::now();
 			//std::this_thread::yield();
 			std::this_thread::sleep_for(sleep_time);
 		}
