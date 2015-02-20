@@ -18,7 +18,16 @@ int start_gui()
 int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct timing_info *update_frequency, 
 	       std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template)
 {
-	//Mat frame;
+	/* GUI Window 3x3
+	 * ----------------------------------------------
+	 * | Haar Output | Eye Detection | Timing Info  |
+	 * ----------------------------------------------
+	 * | Eye Close Detect [0] and [1]| Hit Accuracy |
+	 * ----------------------------------------------
+	 * | Graph for eyes [0] and [1]  | Vectors      |
+	 * ----------------------------------------------
+	 */
+
 	struct face f; 
 	struct eyes e;
 	struct eyes_template et;
@@ -68,16 +77,32 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			if(!e.eye_frame[1].empty()) resize(e.eye_frame[1], gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/3, 2*GUI_YBORDER + GUI_YMAX/3, GUI_XMAX/3, GUI_YMAX/3)), Size(GUI_XMAX/3, GUI_YMAX/3));
 			/* Display Timing Info */
 			
-			rectangle(gui_frame, Rect(3*GUI_XBORDER + 2*GUI_XMAX/3, GUI_YBORDER, GUI_XMAX/3, GUI_YMAX/3), Scalar(0,0,0), CV_FILLED); /*Clear Text*/
-			putText(gui_frame, "Loop Time: ", Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 2*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
-			putText(gui_frame, std::to_string((update_frequency->duration_main>1000)?1000:update_frequency->duration_main) + " ms", 
-				Point(3*GUI_XBORDER + 2*GUI_XMAX/3 + 90, 2*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			rectangle(gui_frame, Rect(3*GUI_XBORDER + 2*GUI_XMAX/3, GUI_YBORDER, GUI_XMAX/3, 3*GUI_YMAX/3 + 3*GUI_YBORDER), Scalar(0,0,0), CV_FILLED); /*Clear Text*/
+
+			putText(gui_frame, "Loop Time: " + std::to_string((update_frequency->duration_main>1000)?1000:update_frequency->duration_main) + " ms", 
+				Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 2*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
 			
-			putText(gui_frame, "GUI Time: ", Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 4*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
-			putText(gui_frame, std::to_string((update_frequency->duration_gui>1000)?1000:
-							  (((update_frequency->duration_gui - sleep_time.count())<0)?0:update_frequency->duration_gui - sleep_time.count())) + " ms", 
-				Point(3*GUI_XBORDER + 2*GUI_XMAX/3 + 90, 4*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			putText(gui_frame, "GUI Time: " + std::to_string((update_frequency->duration_gui>1000)?1000:
+									 (((update_frequency->duration_gui - sleep_time.count())<0)?0:update_frequency->duration_gui - sleep_time.count())) + " ms", 
+				Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 4*GUI_YBORDER), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
 			
+
+			/* Display Eye Detection Accuracy Info */
+
+			putText(gui_frame, "Number of Windows::", Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 3*GUI_YBORDER + GUI_YMAX/3), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			putText(gui_frame, "0: " + std::to_string(et.counter[0]), Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 5*GUI_YBORDER + GUI_YMAX/3), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			putText(gui_frame, "1: " + std::to_string(et.counter[1]), Point(7*GUI_XBORDER + 2*GUI_XMAX/3, 5*GUI_YBORDER + GUI_YMAX/3), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			
+			/* Display Energy and Position Vectors */
+			putText(gui_frame, "Energy Vector::", Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 4*GUI_YBORDER + 2*GUI_YMAX/3), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			putText(gui_frame, "X: " + std::to_string(0), Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 6*GUI_YBORDER + 2*GUI_YMAX/3), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			putText(gui_frame, "Y: " + std::to_string(0), Point(8*GUI_XBORDER + 2*GUI_XMAX/3, 6*GUI_YBORDER + 2*GUI_YMAX/3), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+
+			putText(gui_frame, "Position Vector::", Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 8*GUI_YBORDER + 2*GUI_YMAX/3), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			putText(gui_frame, "X: " + std::to_string(0), Point(3*GUI_XBORDER + 2*GUI_XMAX/3, 10*GUI_YBORDER + 2*GUI_YMAX/3), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+			putText(gui_frame, "Y: " + std::to_string(0), Point(8*GUI_XBORDER + 2*GUI_XMAX/3, 10*GUI_YBORDER + 2*GUI_YMAX/3), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,0,0));
+
+
 			sleep_time = std::chrono::milliseconds((update_frequency->duration_main>1000)?1000:update_frequency->duration_main + 5); /*Dynamically set refresh time*/
 			update_frequency->duration_gui = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - update_frequency->start_gui).count());
 			imshow("Gaze IO System", gui_frame);
