@@ -102,7 +102,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 		counter=0;
 #pragma omp parallel num_threads(6) 
 		{
-			#pragma omp for ordered
+#pragma omp for //ordered
 			for(theta=0; theta<MAX_THETA; theta+=DTHETA)
 			{
 	  
@@ -116,7 +116,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 					//std::cout<<iter.x<<","<<iter.y<<"\n";
 					if(pixel_intensity > (INTEN_THRESHOLD-attemptno*5))
 					{
-						#pragma omp ordered
+						//#pragma omp ordered
 						{
 						counter++;
 						templates[counter].center=iter;
