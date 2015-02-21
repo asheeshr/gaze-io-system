@@ -53,7 +53,7 @@ int main()
 	//std::clock_t start;
 	//cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
 
-	int screen_width, screen_height;
+	int screen_width=0, screen_height=0;
 
 	getScreenSize(&screen_width, &screen_height);
 	printf (" Screen:  width = %d, height = %d \n", screen_width, screen_height);
@@ -62,7 +62,6 @@ int main()
 		printf("\ncan't catch SIGINT\n");   
 
 	init_facedetect();
-	
 	start_geted(face_store, eyes_store, eyes_store_template);
 
 
