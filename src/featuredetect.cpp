@@ -145,7 +145,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 
 	if(counter < ACC_THRESHOLD)
 	{
-		printf("counter : %d\n",counter);
+		//printf("counter : %d\n",counter);
 		return 0;
 	}
 
