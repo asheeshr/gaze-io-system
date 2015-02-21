@@ -36,7 +36,7 @@ int start_gui()
 {
 	namedWindow("Gaze IO System", WINDOW_AUTOSIZE);
 	printf("Gui Started");
-//	imshow("Gaze IO System", gui_frame);
+	//	imshow("Gaze IO System", gui_frame);
 	return 1;
 }
 
@@ -100,6 +100,7 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 				graph_state = plot_data(e, et, graph); /* Plot graph only if update available */
 			}
 			
+			//			printf("after all test and locks\n");
 			/* Create and display GUI */
 			if(!f.frame.empty()) 
 				resize(f.frame, gui_frame( Rect(GUI_XBORDER, GUI_YBORDER, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
@@ -128,11 +129,12 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 					resize(*graph[1], gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, 3*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
 								Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			}
-			
+			//	printf("bfore rende text\n");
 			render_text(gui_frame, sleep_time, et, update_frequency);
 
 			sleep_time = std::chrono::milliseconds((update_frequency->duration_main>1000)?1000:update_frequency->duration_main + 5); /*Dynamically set refresh time*/
 			update_frequency->duration_gui = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - update_frequency->start_gui).count());
+			printf("before imshow\n");
 			imshow("Gaze IO System", gui_frame);
 			if('q' == waitKey(200)) raise(SIGSEGV);
 			update_frequency->start_gui = std::chrono::system_clock::now();
@@ -146,7 +148,7 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			waitKey(100);
 		};
 
-	};
+	}
 
 	return 1;
 }
