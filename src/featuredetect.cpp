@@ -63,7 +63,8 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 {
 	CvBox2D templates[100];
 	int flip=0;
-	float theta, costheta, sintheta;
+	float costheta, sintheta;
+	int theta;
 	int distance;
   
 	//printf("%d %d", eyes[0].x, eyes[0].y);
@@ -93,38 +94,45 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	int attemptno = 0,counter=0;
 	center.x=eyes[eye_no].x+eyes[eye_no].width*0.5;
 	center.y=eyes[eye_no].y+eyes[eye_no].height*0.5;
-	bool flag=1;
+	bool flag=1, done=0;
 	    
 	while(flag && attemptno<5)
 	{
 		//printf("Start of set\n");
 		counter=0;
-		for(theta=0; theta<MAX_THETA; theta+=DTHETA)
+#pragma omp parallel num_threads(6) 
 		{
-	  
-			costheta =  cos(theta * PI / 180.0);
-			sintheta =  sin(theta * PI / 180.0);
-			for(distance=fmin(eyes[eye_no].height,eyes[eye_no].width)/10+1; distance<MAX_DISTANCE; distance+=DDISTANCE)
+			#pragma omp for ordered
+			for(theta=0; theta<MAX_THETA; theta+=DTHETA)
 			{
-				iter.x = center.x + distance*costheta;
-				iter.y = center.y + distance*sintheta;
-				pixel_intensity = face_store->frame_gradient.at<uchar>(iter);
-				//std::cout<<iter.x<<","<<iter.y<<"\n";
-				if(pixel_intensity > (INTEN_THRESHOLD-attemptno*5))
+	  
+				costheta =  cos(theta * PI / 180.0);
+				sintheta =  sin(theta * PI / 180.0);
+				for(distance=fmin(eyes[eye_no].height,eyes[eye_no].width)/10+1, done=0; !done && distance<MAX_DISTANCE; distance+=DDISTANCE)
 				{
-					counter++;
-					templates[counter].center=iter;
-					templates[counter].size.height=1;
-					templates[counter].size.width=5;
-					templates[counter].angle=theta;
-					// std::cout<<iter<<"\t";
+					iter.x = center.x + distance*costheta;
+					iter.y = center.y + distance*sintheta;
+					pixel_intensity = face_store->frame_gradient.at<uchar>(iter);
 					//std::cout<<iter.x<<","<<iter.y<<"\n";
-					//		  circle(frame[0], iter, 1, Scalar(127,0,127), 4, 8, 0);
-					//		  waitKey(0);
-					//add cvBox2D
-					break;
-					//	 printf("pixel intensity: %d\n", pixel_intensity);
+					if(pixel_intensity > (INTEN_THRESHOLD-attemptno*5))
+					{
+						#pragma omp ordered
+						{
+						counter++;
+						templates[counter].center=iter;
+						templates[counter].size.height=1;
+						templates[counter].size.width=5;
+						templates[counter].angle=theta;
+						done = true;
+						// std::cout<<iter<<"\t";
+						//std::cout<<iter.x<<","<<iter.y<<"\n";
+						//		  circle(frame[0], iter, 1, Scalar(127,0,127), 4, 8, 0);
+						//		  waitKey(0);
+						//add cvBox2D
+						}
+						//	 printf("pixel intensity: %d\n", pixel_intensity);
 	     	  
+					}
 				}
 			}
 		}

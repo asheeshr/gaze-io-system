@@ -26,6 +26,9 @@ debug: build
 optimize: CC+= -O3
 optimize: build
 
+parallel: CC+= -fopenmp
+parallel: build
+
 prepare:
 	if [ ! -d ./bin ]; then mkdir ./bin; fi
 	if [ ! -d ./data ]; then mkdir ./data; fi

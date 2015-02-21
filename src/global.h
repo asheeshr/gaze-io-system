@@ -35,6 +35,7 @@
 #include <mutex>
 #include <chrono>
 #include <exception>
+#include <omp.h>
 
 /* OpenCV Headers */
 #include "opencv2/objdetect/objdetect.hpp"
