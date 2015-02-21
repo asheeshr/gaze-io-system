@@ -127,7 +127,7 @@ int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_
     }
   else if(istemp_on_eye(face_store,eyes_store_template))
     {
-      //    printf("2nd if\n");
+      //      printf("2nd if\n");
       // xenergy_prev=xenergy;
       //      yenergy_prev=yenergy;
       energy[0]=int(delxenergy);
@@ -176,6 +176,7 @@ bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_tem
 	      j++;
 	      iter.x+=xinc;
 	      iter.y+=yinc;
+	      printf("%d    ", face_store->frame_gradient.at<uchar>(iter));
 	      //	      error= int(face_store->frame_gradient.at<uchar>(iter)) * ERROR_PER /100;
 	      if(int(face_store->frame_gradient.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
 		{
@@ -200,6 +201,7 @@ bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_tem
 	      j++;
 	      iter.x-=xinc;
 	      iter.y-=yinc;
+	      printf("%d    ", face_store->frame_gradient.at<uchar>(iter));
 	      if(int(face_store->frame_gradient.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
 		{
 		  flag=0;
@@ -210,6 +212,7 @@ bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_tem
 	    }
 	  //      k--;
 	}
+      printf("\n");
       if(flag==1)
 	{
 	  count++;
@@ -229,7 +232,7 @@ bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_tem
   int *coord;
   coord = new int[2];
   coord[0]=k * energy[0] + c;
-  coord[1]=k*energy[1] + c;
+  coord[1]=k*energy[1] + c; 
   return coord;
 }
 */
