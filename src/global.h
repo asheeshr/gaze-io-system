@@ -35,6 +35,7 @@
 #include <mutex>
 #include <chrono>
 #include <exception>
+#include <atomic>
 
 /* OpenCV Headers */
 #include "opencv2/objdetect/objdetect.hpp"
@@ -74,10 +75,10 @@ struct eyes_template {
 struct timing_info {
 
 	std::chrono::time_point<std::chrono::system_clock> start_main;
-	long duration_main;
+	std::atomic<std::uint64_t> duration_main;
 	std::chrono::time_point<std::chrono::system_clock> start_gui;
-	long duration_gui;
-	uint8_t status; /* Retains current status of GIOS */
+	std::atomic<std::uint64_t> duration_gui;
+	std::atomic<std::uint8_t> status; /* Retains current status of GIOS */
 };
 
 /* Macros */

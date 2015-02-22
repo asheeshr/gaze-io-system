@@ -34,7 +34,7 @@ cv::Mat gui_frame(Size(GUI_XMAX + (GUI_XSECTIONS+1)*GUI_XBORDER, GUI_YMAX + (GUI
 
 int start_gui()
 {
-	namedWindow("Gaze IO System", WINDOW_AUTOSIZE);
+	namedWindow("Gaze IO System", WINDOW_AUTOSIZE|WINDOW_OPENGL);
 	printf("Gui Started");
 //	imshow("Gaze IO System", gui_frame);
 	return 1;
@@ -134,7 +134,8 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			sleep_time = std::chrono::milliseconds((update_frequency->duration_main>1000)?1000:update_frequency->duration_main + 5); /*Dynamically set refresh time*/
 			update_frequency->duration_gui = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - update_frequency->start_gui).count());
 			imshow("Gaze IO System", gui_frame);
-			if('q' == waitKey(200)) raise(SIGSEGV);
+			//updateWindow("Gaze IO System");
+			if('q' == waitKey(sleep_time.count())) raise(SIGSEGV);
 			update_frequency->start_gui = std::chrono::system_clock::now();
 			//std::this_thread::yield();
 			//std::this_thread::sleep_for(sleep_time);
@@ -156,18 +157,20 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct eyes_template et, struct timing_info *update_frequency)
 {
 	
+	uint64_t duration_main = update_frequency->duration_main;
+	uint64_t duration_gui = update_frequency->duration_gui;
 	
+
 	/* Display Timing Info */
 			
 	rectangle(gui_frame, Rect(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, GUI_YBORDER, GUI_XMAX/GUI_XSECTIONS, 3*GUI_YMAX/GUI_YSECTIONS + 3*GUI_YBORDER), 
 		  Scalar(0,0,0), CV_FILLED); /*Clear Text*/
 
-	putText(gui_frame, "Loop Time: " + std::to_string((update_frequency->duration_main>1000)?1000:update_frequency->duration_main) + " ms", 
+	putText(gui_frame, "Loop Time: " + std::to_string(duration_main>1000?999:duration_main) + " ms", 
 		Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 3*GUI_YBORDER), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 			
-	putText(gui_frame, "GUI Time: " + std::to_string((update_frequency->duration_gui>1000)?1000:
-							 (((update_frequency->duration_gui - sleep_time.count())<0)?0:update_frequency->duration_gui - sleep_time.count())) + " ms", 
+	putText(gui_frame, "GUI Time: " + std::to_string(duration_gui>1000?999:/*((duration_gui - sleep_time.count())<0)?0:*/duration_gui/* - sleep_time.count()*/) + " ms", 
 		Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 5*GUI_YBORDER), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 
