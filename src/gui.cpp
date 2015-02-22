@@ -61,7 +61,7 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 	struct face f; 
 	struct eyes e;
 	struct eyes_template et;
-	std::chrono::milliseconds sleep_time(250);
+	std::chrono::milliseconds sleep_time(100);
 	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status, graph_state;
 	mutex_face_status = mutex_eyes_status = mutex_eyes_template_status = graph_state = false;
 
