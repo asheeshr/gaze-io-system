@@ -108,16 +108,23 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 				resize(f.frame_gradient, gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, GUI_YBORDER, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
 				       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			
+			if(e.eyes.size()>=1)
+				resize(f.frame_gradient(e.eyes[0]), gui_frame(Rect(GUI_XBORDER, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
+				       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
+
+			if(e.eyes.size()==2)
+				resize(f.frame_gradient(e.eyes[1]), gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
+				       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			
 			//if(!e.frame.empty()) resize(e.frame, gui_frame(Rect(0 +  (GUI_HEIGHT/3)*2, GUI_WBORDER, GUI_HEIGHT/3, GUI_WIDTH/3)), Size(GUI_HEIGHT/3, GUI_WIDTH/3));
-			if(!e.eye_frame[0].empty()) 
+			/*if(!e.eye_frame[0].empty()) 
 				resize(e.eye_frame[0], gui_frame(Rect(GUI_XBORDER, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
 				       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			
 			if(!e.eye_frame[1].empty()) 
 				resize(e.eye_frame[1], gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
 				       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
-			
+			*/
 			/* Display Eye Graphs */
 			if(graph_state)
 			{
