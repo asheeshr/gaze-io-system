@@ -34,10 +34,6 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 /* Program Logic */
 int main()
 {
-<<<<<<< HEAD
-=======
-
->>>>>>> gui
 	
 	/* Start the main threads here. 
 	 * Thread 1 - Program Logic
@@ -66,15 +62,10 @@ int main()
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
 		printf("\ncan't catch SIGINT\n");   
 
-<<<<<<< HEAD
-	init_facedetect();
-	start_geted(face_store, eyes_store, eyes_store_template);
-=======
 	update_frequency->status=0;
 	
 	init_facedetect();
 	start_gui();
->>>>>>> gui
 
 	//std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, &mutex_face);
 	
@@ -137,16 +128,9 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 						{
 							update_frequency->status=2;
 							/*TODO: Add gaze estimator here */
-<<<<<<< HEAD
-						  //						  printf("in if under eyes_closedetect\n");
-						  energy = gaze_energy(face_store, eyes_store, eyes_store_template);
-						  // printf("%f i + %f j\n",energy[0],energy[1]);
-						  //waitKey(0);
-=======
 							printf("in if under eyes_closedetect\n");
 							energy = gaze_energy(face_store, eyes_store, eyes_store_template);
 							update_frequency->status=3;
->>>>>>> gui
 						}
 						test_and_unlock(mutex_eyes_template);
 						
