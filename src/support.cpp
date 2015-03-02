@@ -1,14 +1,38 @@
+/* 
+ * Gaze I/O System
+ * Copyright (C) 2014 Asheesh Ranjan, Pranav Jetley, Osank Jain,
+ * Vasu Bhardwaj, Varun Kalra
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 #include "support.h"
 
 using namespace cv;
 
-cv::Mat get_frame()
-{
-	static cv::VideoCapture capture(0);
-	cv::Mat frame;
+cv::VideoCapture capture(0);
 
-	if(capture.read(frame))
-		return frame;
+int get_frame(cv::Mat *frame, struct timing_info *update_frequency)
+{
+//	static cv::VideoCapture capture(0);
+	update_frequency->duration_main = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - update_frequency->start_main).count());
+	update_frequency->start_main = std::chrono::system_clock::now(); /* Includes capture time */
+	//printf("update_frequency->duration_main %ld\n", update_frequency->duration_main);
+	if(capture.read(*frame))
+		return 1;
+	return 0;
 }
 
 int update_face(cv::Mat frame, struct face *face_store)
@@ -24,25 +48,15 @@ int update_face(cv::Mat frame, struct face *face_store)
 }
 
 
-int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et)
+int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et, struct timing_info **freq)
 {
 	*f = new face;
 	*e = new struct eyes;
 	*et = new struct eyes_template;
+	*freq = new struct timing_info;
 
-	if(*f==NULL || *e==NULL || *et==NULL)
+	if(*f==NULL || *e==NULL || *et==NULL || *freq==NULL)
 		return 0;
-
-	//f->frame = new cv::Mat;
-	//f->frame_gradient = new cv::Mat;
-
-	/*e->frame = new cv::Mat;
-	
-	et->windows = new CvBox2D[100];
-
-	if(/*f->frame==NULL || f->frame_gradient==NULL || e->frame==NULL || et->windows==NULL) 
-		return 0;
-*/
 	return 1;
 }
 
@@ -53,8 +67,10 @@ void sig_handler(int signo)
 {
   if (signo == SIGINT)
     printf("received SIGINT\n");
-  exit(0);
 
+  capture.~VideoCapture();
+  cv::destroyAllWindows();
+  exit(0);
 }
 
 

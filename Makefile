@@ -21,3 +21,14 @@ vpath %.o ./bin
 
 $(LINK_TARGET): $(OBJECTS)
 	g++ $(LIBS) $(CXXFLAGS) -o $@ $^
+
+debug: CC+= -g
+debug: $(LINK_TARGET)
+
+optimize: CC+= -O3
+optimize: $(LINK_TARGET)
+
+prepare:
+	if [ ! -d ./bin ]; then mkdir ./bin; fi
+	if [ ! -d ./data ]; then mkdir ./data; fi
+

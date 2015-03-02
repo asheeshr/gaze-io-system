@@ -1,6 +1,7 @@
 /* 
  * Gaze I/O System
- * Copyright (C) 2014 Asheesh Ranjan, Pranav Jetley, Vasu Bhardwaj, Varun Kalra
+ * Copyright (C) 2014 Asheesh Ranjan, Pranav Jetley, Osank Jain,
+ * Vasu Bhardwaj, Varun Kalra
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +18,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-
 #include "featuredetect.h"
 
 using namespace cv;
@@ -30,7 +30,11 @@ using namespace cv;
 #define ERROR_THRESHOLD 30
 #define PI 3.14159265
 #define INTEN_THRESHOLD 130    // minimum gradient image intensity to be crossed for the iris border
+<<<<<<< HEAD
 #define ACC_THRESHOLD 25       // minimum no of templates required(3/4*360/DTHETA)default=54
+=======
+#define ACC_THRESHOLD 45       // minimum no of templates required(3/4*360/DTHETA)
+>>>>>>> gui
 extern std::vector<Rect> eyes;
 
 
@@ -54,7 +58,7 @@ int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct ey
 		    eyes_closedetect_helper(1, face_store, eyes_store, eyes_store_template) )
 			return 1;
 	}
-
+	return 0;
 }
 
 
@@ -145,7 +149,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 
 	if(counter < ACC_THRESHOLD)
 	{
-		printf("counter : %d\n",counter);
+		//printf("counter : %d\n",counter);
 		return 0;
 	}
 

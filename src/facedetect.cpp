@@ -79,7 +79,7 @@ int eyesdetect_display(struct face *face_store, struct eyes *eyes_store)
 	eyes_store->frame = face_store->frame;
 	//-- In each face, detect eyes
 	eyes_cascade.detectMultiScale( eyes_store->frame, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
-	for( size_t i = 0; i < faces.size(); i++ )
+	/*for( size_t i = 0; i < faces.size(); i++ )
 	{
 		Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
 		for( size_t j = 0; j < eyes.size(); j++ )
@@ -90,9 +90,9 @@ int eyesdetect_display(struct face *face_store, struct eyes *eyes_store)
 			//       printf("height: %d width: %d\n", eyes[0].width, eyes[0].height);
     
 			//	circle( faceROI, center, 1, Scalar( 255, 0, 0 ), 1, 8, 0 );	
-			circle( eyes_store->frame, center, radius, Scalar( 0, 0, 0 ), 4, 8, 0 );
+			//circle( eyes_store->frame, center, radius, Scalar( 0, 0, 0 ), 4, 8, 0 );
 		}
-	}
+		}*/
 	
 	if(eyes.size()==0)
 		return 0;

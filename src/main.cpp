@@ -20,6 +20,7 @@
 
 #include "global.h"
 #include "support.h"
+#include "gui.h"
 #include "facedetect.h"
 #include "featuredetect.h"
 #include "gazeestimate.h"
@@ -27,31 +28,35 @@
 
 using namespace cv;
 
-int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template);
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct timing_info *update_frequency,
+		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template);
 
 /* Program Logic */
 int main()
 {
+<<<<<<< HEAD
+=======
+
+>>>>>>> gui
 	
 	/* Start the main threads here. 
 	 * Thread 1 - Program Logic
 	 * Thread 2 - GUI using Highgui
 	 */
 
-	//CvFont font;
 	struct face *face_store;
 	struct eyes *eyes_store;
 	struct eyes_template *eyes_store_template;
+	struct timing_info *update_frequency;
+	std::mutex mutex_face, mutex_eyes, mutex_eyes_template;
 
-	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template)==0)
+	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template, &update_frequency)==0)
 	{
 		printf("Data structures not initialised\n");
 		return 1;
 	}
 
-	
-	//std::clock_t start;
-	//cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1, 1, 1, 1, 8);
+	printf("Using OpenCV %d.%d.%d\n", CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION);
 
 	int screen_width=0, screen_height=0;
 
@@ -61,74 +66,135 @@ int main()
 	if (signal(SIGINT, sig_handler) == SIG_ERR)
 		printf("\ncan't catch SIGINT\n");   
 
+<<<<<<< HEAD
 	init_facedetect();
 	start_geted(face_store, eyes_store, eyes_store_template);
+=======
+	update_frequency->status=0;
+	
+	init_facedetect();
+	start_gui();
+>>>>>>> gui
 
+	//std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, &mutex_face);
+	
+	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
+	std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
+	
+	main_thread.join();
+	gui_thread.join();
 
 	return 0;
 }
 
 
-int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct timing_info *update_frequency,
+		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template)
 {
-	Mat frame;
-	frame = get_frame();
+	Mat *frame = new Mat;
+	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status;
+	mutex_face_status = mutex_eyes_status = mutex_eyes_template_status = false;
+	std::chrono::milliseconds wait_time(25);
+
+	while(get_frame(frame, update_frequency)==0)
+	{
+		printf("Cannot load frame!");
+		std::this_thread::sleep_for(wait_time);
+	}
+	
+
 	int *energy = new int[2];
 	while(1)    
 	{
 		//start = std::clock();
-
 		//printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 
 		try
 		{
 			
-			while(facedetect_display(frame, face_store))
+			while( test_and_lock(mutex_face) && facedetect_display(*frame, face_store) )
 			{
-				imshow("Face", face_store->frame);
-				while(eyesdetect_display(face_store, eyes_store))
+				test_and_unlock(mutex_face);
+				update_frequency->status=1;
+				//imshow("Face", face_store->frame);
+				while( test_and_lock(mutex_eyes) && eyesdetect_display(face_store, eyes_store) )
 				{
-					imshow("Eyes", eyes_store->frame);
-					if(eyes_sepframes(eyes_store))
+					//imshow("Eyes", eyes_store->frame);
+					if( test_and_lock(mutex_eyes) && eyes_sepframes(eyes_store) )
 					{
+						test_and_unlock(mutex_eyes);
+						
 						if(eyes_store->eyes.size()==1)
-							imshow("Eye 1", eyes_store->eye_frame[0]);
+							//imshow("Eye 1", eyes_store->eye_frame[0]);
+							;
 						else if(eyes_store->eyes.size()==2)
 						{
-							imshow("Eye 1", eyes_store->eye_frame[0]);
-							imshow("Eye 2", eyes_store->eye_frame[1]);
+							//imshow("Eye 1", eyes_store->eye_frame[0]);
+							//imshow("Eye 2", eyes_store->eye_frame[1]);
 						}
 						
-						if(eyes_closedetect(face_store, eyes_store, eyes_store_template))
+						if(test_and_lock(mutex_eyes_template) && eyes_closedetect(face_store, eyes_store, eyes_store_template))
 						{
+							update_frequency->status=2;
 							/*TODO: Add gaze estimator here */
+<<<<<<< HEAD
 						  //						  printf("in if under eyes_closedetect\n");
 						  energy = gaze_energy(face_store, eyes_store, eyes_store_template);
 						  // printf("%f i + %f j\n",energy[0],energy[1]);
 						  //waitKey(0);
+=======
+							printf("in if under eyes_closedetect\n");
+							energy = gaze_energy(face_store, eyes_store, eyes_store_template);
+							update_frequency->status=3;
+>>>>>>> gui
 						}
-					
+						test_and_unlock(mutex_eyes_template);
 						
 					}
 					
+					test_and_unlock(mutex_eyes);
 //					printf("Searching for each of them - 1b\n");
-					waitKey(25);
-					frame = get_frame();
-					update_face(frame, face_store);
+					
+					std::this_thread::sleep_for(wait_time);
+					if(get_frame(frame, update_frequency)==0)
+					{
+						printf("Cannot load frame!");
+					}
+					else
+					{
+						update_frequency->status=1;
+						if(test_and_lock(mutex_face))
+						{
+							update_face(*frame, face_store);
+							test_and_unlock(mutex_face);
+						}
+					}
 				}
 //				printf("Looking for your eyes - 1a\n");
-				waitKey(25);
-				frame = get_frame();
+				//std::this_thread::sleep_for(wait_time);
+				if(get_frame(frame, update_frequency)==0)
+				{
+					printf("Cannot load frame!");
+				}
+	
 			}
 //			printf("Searching for you - 1\n");
-			waitKey(100);
-			frame = get_frame();
-		}
-		catch(...){};
-	}
-	waitKey(0);
-//	destroyWindow("Test");
-//	destroyWindow("Face");
+			//std::this_thread::sleep_for(wait_time);
+			while(get_frame(frame, update_frequency)==0)
+			{
+				printf("Cannot load frame!");
+				std::this_thread::sleep_for(wait_time);
+			}
 	
-	return 0;
+		}
+		catch(std::exception &e)
+		{
+			printf("Exception!\n");
+			std::cout<<e.what();
+			//std::this_thread::sleep_for(wait_time);
+		};
+	}
+
+	printf("Exiting start_geted");
+	return 1;
 }
