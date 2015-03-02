@@ -1,5 +1,5 @@
-CXXFLAGS= -std=c++11 `pkg-config --cflags opencv` -lX11
-LIBS = `pkg-config --libs opencv`"-lX11"
+CXXFLAGS= -std=c++11 `pkg-config --cflags opencv` -lX11 -lXext -lXrender -lGL
+LIBS = `pkg-config --libs opencv`
 
 OBJECTS= support.o \
 	 facedetect.o \
@@ -7,7 +7,8 @@ OBJECTS= support.o \
 	 gazeestimate.o \
 	 emulatedriver.o \
 	 main.o \
-	 gui.o 
+	 gui.o \
+	 guipointer.o	
 
 LINK_TARGET=gios
 

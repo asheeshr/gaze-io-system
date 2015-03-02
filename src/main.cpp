@@ -21,6 +21,7 @@
 #include "global.h"
 #include "support.h"
 #include "gui.h"
+#include "guipointer.h"
 #include "facedetect.h"
 #include "featuredetect.h"
 #include "gazeestimate.h"
@@ -71,9 +72,11 @@ int main()
 	
 	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
 	std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
-	
+	std::thread gui_pointer_thread(start_update_gui_pointer);
+
 	main_thread.join();
 	gui_thread.join();
+	gui_pointer_thread.join();
 
 	return 0;
 }
