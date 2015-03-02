@@ -1,33 +1,23 @@
-CFLAGS = -std=c++11 `pkg-config --cflags opencv`"-lX11"
-LIBS = `pkg-config --libs opencv`"-lX11" 
-CMAKE_C_FLAGS = `/D HAVE_DSHOW /D HAVE_VIDEOINPUT`
-CC=g++
+CXXFLAGS= -std=c++11 `pkg-config --cflags opencv` -lX11
+LIBS = `pkg-config --libs opencv`"-lX11"
 
-FILES=main.cpp facedetect.cpp featuredetect.cpp gazeestimate.cpp emulatedriver.cpp support.cpp
-OBJECTS=support.o emulatedriver.o gazeestimate.o featuredetect.o facedetect.o main.o
-PROGRAM=gios
+OBJECTS= support.o \
+	 facedetect.o \
+	 featuredetect.o \
+	 gazeestimate.o \
+	 emulatedriver.o \
+	 main.o \
+	 gui.o 
+
+LINK_TARGET=gios
+
+vpath %.h ./src
+vpath %.cpp ./src
+vpath %.o ./bin
+
+%.o: %.cpp
+	g++ $(CXXFLAGS) -o ./bin/$@ -c $<
 
 
-build:  $(OBJECTS) #featuredetect.o facedetect.o main.o gazeestimate.o support.o #$(OBJECTS)
-	@echo "Linking object files (did it compile again?)"
-	cd ./bin && $(CC) -o $(PROGRAM) $(OBJECTS) $(CFLAGS) $(LIBS)
-	mv ./bin/$(PROGRAM) ./$(PROGRAM)
-
-$(OBJECTS) : %.o: ./src/%.cpp
-	@echo "Compiling files"
-	cd ./bin && $(CC) $(CFLAGS) -c ../$< -o $@
-
-profile: CC += -pg
-profile: build
-
-prepare:
-	if [ ! -d ./bin ]; then mkdir ./bin; fi
-	if [ ! -d ./data ]; then mkdir ./data; fi
-
-clean:
-	rm -rf *.o *.exe
-
-cleandir: clean
-	rm -rf *~ *\#
-
-rebuild: clean build
+$(LINK_TARGET): $(OBJECTS)
+	g++ $(LIBS) $(CXXFLAGS) -o $@ $^
