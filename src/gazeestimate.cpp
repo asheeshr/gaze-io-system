@@ -30,13 +30,9 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
   int j,i;
   float energy_sum=0;//yenergy=0;
   ene = new float[2];
-<<<<<<< HEAD
   ene[0]=ene[1]=0;
   Point iter(eyes_store_template->windows[0][pos].center);
   //  printf("after point\n");
-=======
-  Point iter((eyes_store_template->windows)[0][pos].center);
->>>>>>> gui
   int mid = (eyes_store_template->windows)[0][pos].size.width/2;
   float costheta = cos((eyes_store_template->windows)[0][pos].angle * PI / 180.0);
   float sintheta = sin((eyes_store_template->windows)[0][pos].angle * PI /180.0);
@@ -106,7 +102,6 @@ int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_
 
   for(i=0;i<(eyes_store_template->counter)[0];i++)//counter is defined in featuredetect.cpp
     {
-<<<<<<< HEAD
       //      printf("inside for\n");
       ene=calculate_energy(face_store, eyes_store_template,i);
       //      printf("ene %f i + ene %f j\n",ene[0],ene[1]);
@@ -118,11 +113,6 @@ int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_
       //      printf("%f i + %f j\n",xenergy,yenergy);
       //  printf("ene %f i + ene %f j\n",ene[0],ene[1]);
 
-=======
-      ene=calculate_energy(face_store, eyes_store_template, i);
-      xenergy+=ene[0];
-      yenergy+=ene[1];
->>>>>>> gui
     }
 
   float delxenergy=xenergy - xenergy_prev;
