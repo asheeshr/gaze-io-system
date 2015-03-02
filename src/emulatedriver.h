@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-#include "global.h"
-
-#ifndef GIOS_EMDRIVER
-#define GIOS_EMDRIVER
-
-int draw_on_screen(cv::Point coordinate);
-
-#endif /*GIOS_EMDRIVER*/
-=======
 /* 
  * Gaze I/O System
  * Copyright (C) 2014 Asheesh Ranjan, Pranav Jetley, Osank Jain,
@@ -27,4 +17,12 @@ int draw_on_screen(cv::Point coordinate);
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
->>>>>>> gui
+
+#include "global.h"
+
+#ifndef GIOS_EMDRIVER
+#define GIOS_EMDRIVER
+
+int draw_on_screen(cv::Point coordinate);
+
+#endif /*GIOS_EMDRIVER*/
