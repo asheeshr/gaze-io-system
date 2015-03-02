@@ -20,7 +20,7 @@ vpath %.o ./bin
 
 
 $(LINK_TARGET): $(OBJECTS)
-	g++ $(LIBS) $(CXXFLAGS) -o $@ $^
+	g++ -o $@ $^ $(LIBS) $(CXXFLAGS)
 
 debug: CC+= -g
 debug: $(LINK_TARGET)
