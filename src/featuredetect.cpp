@@ -30,11 +30,7 @@ using namespace cv;
 #define ERROR_THRESHOLD 30
 #define PI 3.14159265
 #define INTEN_THRESHOLD 130    // minimum gradient image intensity to be crossed for the iris border
-<<<<<<< HEAD
-#define ACC_THRESHOLD 25       // minimum no of templates required(3/4*360/DTHETA)default=54
-=======
 #define ACC_THRESHOLD 45       // minimum no of templates required(3/4*360/DTHETA)
->>>>>>> gui
 extern std::vector<Rect> eyes;
 
 
