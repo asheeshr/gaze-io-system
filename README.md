@@ -17,10 +17,25 @@ The project has the following dependencies for building:
 
 The project also uses X11 API, and hence will only run on distros that utilise X11 display servers.
 
-
 Structure
 ---------
+The software is divided into the following modules:
+- `facedetect` contains wrapper functions for calls to OpenCV's Haar cascade filter
+- `featuredetect` implements an algorithm for high accuracy eye detection
+- `gazeestimate` implmenents the logic for mapping eye gaze movements to an absolute co-ordinate
+- `emulatedriver` contains the input driver emulation code that uses udev and kernel API
 
+The other modules contain supporting code:
+- `gui` contains a GUI implementation for debugging
+- `guipointer` implements a debugging GUI that maps the pointer to the X11 desktop
+- `support` (self-explanatory)
+
+The program runs in three main threads:
+1. Main Program Logic - processes the images and generates co-ordinates using OpenCV
+2. Debugging GUI - uses HighGUI from OpenCV
+3. Pointer GUI - using OpenGL 
+
+OpenMP will also be incorporated in the main program logic to increase parallelization of the program code, and increase responsiveness.
 
 Progress
 --------
