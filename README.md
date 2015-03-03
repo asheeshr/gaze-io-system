@@ -1,9 +1,20 @@
-gaze-io-system
+GIOS - Gaze-IO-System
 ==============
 
-Software that will use your gaze to control the desktop environment.
+Goal
+----
 
-To compile the executable:
+Progress
+--------
 
-    $ make prepare
-    $ make 
+Dependencies
+------------
+
+Structure
+---------
+
+Building and Executing
+----------------------
+
+Authors
+-------
