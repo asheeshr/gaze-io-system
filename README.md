@@ -57,4 +57,4 @@ To run the software, from the project root directory, run `./gios`
 
 Authors
 -------
-Asheesh Ranjan
+Asheesh Ranjan, Pranav Jetley
