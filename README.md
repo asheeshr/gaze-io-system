@@ -31,11 +31,12 @@ The other modules contain supporting code:
 - `support` (self-explanatory)
 
 The program runs in three main threads:
+
 1. Main Program Logic - processes the images and generates co-ordinates using OpenCV
 2. Debugging GUI - uses HighGUI from OpenCV
 3. Pointer GUI - using OpenGL 
 
-OpenMP will also be incorporated in the main program logic to increase parallelization of the program code, and increase responsiveness.
+OpenMP will also be incorporated in the main program logic to increase parallelization of the program code, and increase responsiveness. It will generate more threads based on number of cores available.
 
 Progress
 --------
