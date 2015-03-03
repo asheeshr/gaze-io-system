@@ -48,14 +48,15 @@ int update_face(cv::Mat frame, struct face *face_store)
 }
 
 
-int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et, struct timing_info **freq)
+int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et, struct timing_info **freq, struct position_vector **ep)
 {
 	*f = new face;
 	*e = new struct eyes;
 	*et = new struct eyes_template;
 	*freq = new struct timing_info;
-
-	if(*f==NULL || *e==NULL || *et==NULL || *freq==NULL)
+	*ep = new struct position_vector;
+	
+	if(*f==NULL || *e==NULL || *et==NULL || *freq==NULL || *ep==NULL)
 		return 0;
 	return 1;
 }

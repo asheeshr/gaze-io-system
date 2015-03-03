@@ -48,6 +48,10 @@
 #define PI 3.14159265
 
 /* Global Structures */
+
+/* Use mutexes for non primitive types */
+/* Use std::atomic for primitive types */
+
 struct face {
 
 	std::vector<cv::Rect> faces;
@@ -80,6 +84,12 @@ struct timing_info {
 	std::atomic<std::uint64_t> duration_gui;
 	std::atomic<std::uint8_t> status; /* Retains current status of GIOS */
 };
+
+struct position_vector {
+	
+	std::atomic<std::int16_t> ex, ey; /* Energy vector */
+	std::atomic<std::int16_t> px, py; /* Position vector */
+}; /* Doesnt need mutex as atomic types */
 
 /* Macros */
 #define test_and_lock(X) (X##_status || (X##_status = X->try_lock())) /* Provides a reliable interface for std::mutex. Checks if unlocked, before locking. */

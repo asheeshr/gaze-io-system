@@ -29,7 +29,8 @@
 
 using namespace cv;
 
-int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct timing_info *update_frequency,
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
+		struct timing_info *update_frequency, struct position_vector *ep_vector,
 		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template);
 
 /* Program Logic */
@@ -45,9 +46,10 @@ int main()
 	struct eyes *eyes_store;
 	struct eyes_template *eyes_store_template;
 	struct timing_info *update_frequency;
+	struct position_vector *ep_vector; /* Energy and Position Vector */
 	std::mutex mutex_face, mutex_eyes, mutex_eyes_template;
 
-	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template, &update_frequency)==0)
+	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template, &update_frequency, &ep_vector)==0)
 	{
 		printf("Data structures not initialised\n");
 		return 1;
@@ -56,22 +58,19 @@ int main()
 	printf("Using OpenCV %d.%d.%d\n", CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION);
 
 	int screen_width=0, screen_height=0;
-
 	getScreenSize(&screen_width, &screen_height);
 	printf (" Screen:  width = %d, height = %d \n", screen_width, screen_height);
 
-	if (signal(SIGINT, sig_handler) == SIG_ERR)
+	if (signal(SIGINT, sig_handler) == SIG_ERR) /* Attach signal handler for SIGNINT */
 		printf("\ncan't catch SIGINT\n");   
 
-	update_frequency->status=0;
+	update_frequency->status=0; /* Set Program Status to STARTING */
 	
-	init_facedetect();
-	start_gui();
-
-	//std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, &mutex_face);
+	init_facedetect(); /* Initialise Facedetect Module */
+	start_gui(); /* Initialise the Debug GUI */
 	
-	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
-	std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, update_frequency, &mutex_face, &mutex_eyes, &mutex_eyes_template);
+	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, update_frequency, ep_vector, &mutex_face, &mutex_eyes, &mutex_eyes_template);
+	std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, update_frequency, ep_vector, &mutex_face, &mutex_eyes, &mutex_eyes_template);
 	std::thread gui_pointer_thread(start_update_gui_pointer);
 
 	main_thread.join();
@@ -82,7 +81,7 @@ int main()
 }
 
 
-int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct timing_info *update_frequency,
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct timing_info *update_frequency, struct position_vector *ep_vector,
 		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template)
 {
 	Mat *frame = new Mat;
