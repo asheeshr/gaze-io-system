@@ -47,6 +47,9 @@ We have completed the GUI for debugging and mapping the pointer on screen for de
 
 Building and Executing
 ----------------------
+
+Git clone or download this repository.
+
 Create a directory under the root directory named `bin`. Then, run `make`. If you encounter an error stating any `.o` file is not found, run `make` again. 
 
 To run the software, from the project root directory, run `./gios`
