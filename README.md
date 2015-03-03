@@ -44,6 +44,7 @@ The software is being developed at a brisk pace. We have developed and tested an
 
 We have completed the GUI for debugging and mapping the pointer on screen for demonstration purposes.
 
+<img src="https://raw.githubusercontent.com/asheeshr/gaze-io-system/master/data/gios-debug-gui.png">
 
 Building and Executing
 ----------------------
