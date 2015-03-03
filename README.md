@@ -40,10 +40,18 @@ OpenMP will also be incorporated in the main program logic to increase paralleli
 
 Progress
 --------
+The software is being developed at a brisk pace. We have developed and tested an algorithm for eye detection, and have since moved to developing our own custom algorithm in it's place as we were not satisfied with its performance. It is currently being developed. We have also implemented an initial function for mapping the eye position to an intermediate vector. The final stage of mapping this interemediate vector to a position vector on screen is being developed. Lastly, input driver emulation will be implmented once the previous modules have stabilised.
+
+We have completed the GUI for debugging and mapping the pointer on screen for demonstration purposes.
 
 
 Building and Executing
 ----------------------
+Create a directory under the root directory named `bin`. Then, run `make`. If you encounter an error stating any `.o` file is not found, run `make` again. 
+
+To run the software, from the project root directory, run `./gios`
+
 
 Authors
 -------
+Asheesh Ranjan
