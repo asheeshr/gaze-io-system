@@ -107,14 +107,33 @@ int eyes_sepframes(struct eyes *eyes_store)
 
 	if(eyes.size()==2)
 	{
-		eyes_store->eye_frame[1] = eyes_store->frame(eyes[1]);
-		eyes_store->eye_frame[0] = eyes_store->frame(eyes[0]);
-		return 1;
+		/* Compare each eye with the other */
+		if( eyes[0].x<eyes[1].x )
+		{
+			eyes_store->eye_frame[LEFT_EYE] = eyes_store->frame(eyes[0]);
+			eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[1]);
+		}
+		else
+		{
+			eyes_store->eye_frame[LEFT_EYE] = eyes_store->frame(eyes[1]);
+			eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[0]);
+		}
+
+		return (eyes_store->position = LEFT_EYE|RIGHT_EYE);
 	}
 	else if(eyes.size()==1)
 	{
-		eyes_store->eye_frame[0] = eyes_store->frame(eyes[0]);
-		return 1;
+		/* Compare eye center with face center */
+		if( eyes[0].x<eyes_store->frame.size().width/2 )
+		{
+			eyes_store->eye_frame[LEFT_EYE] = eyes_store->frame(eyes[0]);
+			return (eyes_store->position = LEFT_EYE);
+		}
+		else
+		{
+			eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[0]);
+			return (eyes_store->position = RIGHT_EYE);
+		}
 	}
 	return 0;
 }

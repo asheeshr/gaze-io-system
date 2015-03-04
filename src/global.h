@@ -46,6 +46,8 @@
 
 /* Constants */
 #define PI 3.14159265
+#define LEFT_EYE 0b010
+#define RIGHT_EYE 0b001
 
 /* Global Structures */
 
@@ -65,14 +67,15 @@ struct eyes {
 	
 	std::vector<cv::Rect> eyes;
 	cv::Mat frame;
-	cv::Mat eye_frame[2];
+	cv::Mat eye_frame[3]; /* Position 0 unused */
+	std::uint8_t position;
 	
 };
 
 struct eyes_template {
 	
-	CvBox2D windows[2][100];
-	uint8_t counter[2];
+	CvBox2D windows[3][100]; /* Position 0 unused */
+	uint8_t counter[3]; /* Position 0 unused */
 
 };
 

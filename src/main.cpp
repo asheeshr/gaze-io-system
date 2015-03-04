@@ -89,6 +89,7 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status;
 	mutex_face_status = mutex_eyes_status = mutex_eyes_template_status = false;
 	std::chrono::milliseconds wait_time(25);
+	std::uint8_t eyes_found; /* Identifies which eye has been found */
 
 	while(get_frame(frame, update_frequency)==0)
 	{
@@ -112,18 +113,9 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 				while( test_and_lock(mutex_eyes) && eyesdetect_display(face_store, eyes_store) )
 				{
 				
-					if( test_and_lock(mutex_eyes) && eyes_sepframes(eyes_store) )
+					if( test_and_lock(mutex_eyes) && (eyes_found = eyes_sepframes(eyes_store)) )
 					{
 						test_and_unlock(mutex_eyes);
-						
-						if(eyes_store->eyes.size()==1)
-							//imshow("Eye 1", eyes_store->eye_frame[0]);
-							;
-						else if(eyes_store->eyes.size()==2)
-						{
-							//imshow("Eye 1", eyes_store->eye_frame[0]);
-							//imshow("Eye 2", eyes_store->eye_frame[1]);
-						}
 						
 						if(test_and_lock(mutex_eyes_template) && eyes_closedetect(face_store, eyes_store, eyes_store_template))
 						{
@@ -132,7 +124,6 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 							printf("in if under eyes_closedetect\n");
 							if(gaze_energy(face_store, eyes_store, eyes_store_template, ep_vector))
 							{
-
 								update_frequency->status=3;
 							}
 						}
