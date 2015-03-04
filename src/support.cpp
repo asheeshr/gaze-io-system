@@ -54,8 +54,14 @@ int init_data_structures(struct face **f, struct eyes **e, struct eyes_template 
 	*e = new struct eyes;
 	*et = new struct eyes_template;
 	*freq = new struct timing_info;
-	*ep = new struct position_vector;
 	*s = new struct screen_resolution;
+	*ep = new struct position_vector ;
+	
+	if( *ep!=NULL )
+	{
+		(*ep)->ex = (*ep)->ey = (*ep)->px = (*ep)->py = 0;
+	}
+	
 	if(*f==NULL || *e==NULL || *et==NULL || *freq==NULL || *ep==NULL)
 		return 0;
 	return 1;

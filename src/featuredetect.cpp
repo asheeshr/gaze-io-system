@@ -31,27 +31,23 @@ int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct ey
   //std::clock_t start;
 	// start = std::clock();
 
+	std::uint8_t status = 0;
+	
 	face_store->frame_gradient = image_gradient(face_store->frame);
-	//	printf("     Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
-
-	if(eyes_store->eyes.size()==0)
+	
+	if( eyes_store->position==0 )
 		return 0;
-	if(eyes_store->eyes.size()==1)	
-
+	if( eyes_store->position & LEFT_EYE )
 	{
-//		printf("in if 1\n");
-		if( eyes_closedetect_helper(0, face_store, eyes_store, eyes_store_template) )
-			return 1;
+		status |= eyes_closedetect_helper(LEFT_EYE, face_store, eyes_store, eyes_store_template);
 	}
 		    
-	if(eyes_store->eyes.size()==2)
+	if(eyes_store->position & RIGHT_EYE )
 	{
-//		printf("in if2\n");
-		if( eyes_closedetect_helper(0, face_store, eyes_store, eyes_store_template) ||
-		    eyes_closedetect_helper(1, face_store, eyes_store, eyes_store_template) )
-			return 1;
+		status |= eyes_closedetect_helper(RIGHT_EYE, face_store, eyes_store, eyes_store_template);
 	}
-	return 0;
+
+	return status;
 }
 
 
@@ -62,28 +58,6 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	int flip=0;
 	float theta, costheta, sintheta;
 	int distance;
-  
-	//printf("%d %d", eyes[0].x, eyes[0].y);
-	//printf("height: %d width: %d", eyes[0].width, eyes[0].height);
-	////////////////
-	/*  int i,j;
-	    int p;
-	    int nRows = frame2[0].rows;
-	    int nCols = frame2[0].cols;// * frame2[0].channels;
-	    for( i = 0; i < nRows; ++i)
-	    {
-	    //p = frame2[0].ptr<uchar>(i);
-	    for ( j = 0; j < nCols; ++j)
-	    {
-	    p = frame2[0].at<uchar>(j,i);
-	    printf("%d  ", p);
-	    //            p[j] = table[p[j]];
-	    }
-	    printf("\n");
-	    }
-	    printf("break");
-	*/
-	/////////////// 
     
 	Point iter, center;
 	uchar pixel_intensity;
@@ -152,7 +126,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 		(eyes_store_template->counter)[eye_no] = counter;
 	}
 
-	return 1;
+	return eye_no;
 }
 
 
