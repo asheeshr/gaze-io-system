@@ -82,15 +82,15 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			{
 				//if(!eyes_store->frame.empty()) e.frame = eyes_store->frame;
 				e.eyes = eyes_store->eyes;
-				if(!eyes_store->eye_frame[0].empty()) e.eye_frame[0] = eyes_store->eye_frame[0];
-				if(!eyes_store->eye_frame[1].empty()) e.eye_frame[1] = eyes_store->eye_frame[1];
+				if(eyes_store->position & LEFT_EYE && !eyes_store->eye_frame[LEFT_EYE].empty()) e.eye_frame[0] = eyes_store->eye_frame[LEFT_EYE];
+				if(eyes_store->position & RIGHT_EYE && !eyes_store->eye_frame[RIGHT_EYE].empty()) e.eye_frame[1] = eyes_store->eye_frame[RIGHT_EYE];
 				test_and_unlock(mutex_eyes);
 			}
 			
 			if(test_and_lock(mutex_eyes_template))
 			{
-				et.counter[0] = eyes_store_template->counter[0];
-				et.counter[1] = eyes_store_template->counter[1];
+				et.counter[0] = eyes_store_template->counter[1];
+				et.counter[1] = eyes_store_template->counter[2];
 				
 				for(int counter=0; counter<et.counter[0]; counter++)
 					et.windows[0][counter] = eyes_store_template->windows[0][counter];

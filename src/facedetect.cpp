@@ -96,6 +96,7 @@ int eyesdetect_display(struct face *face_store, struct eyes *eyes_store)
 	
 	if(eyes.size()==0)
 		return 0;
+	eyes_store->eyes.push_back(cv::Rect());
 	eyes_store->eyes = eyes;
 
 	return 1;  
@@ -135,5 +136,5 @@ int eyes_sepframes(struct eyes *eyes_store)
 			return (eyes_store->position = RIGHT_EYE);
 		}
 	}
-	return 0;
+	return (eyes_store->position = 0);
 }
