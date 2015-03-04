@@ -86,6 +86,7 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 		struct timing_info *update_frequency, struct position_vector *ep_vector, struct screen_resolution *screen_store,
 		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template)
 {
+  //  std::clock_t start;
 	Mat *frame = new Mat;
 	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status;
 	mutex_face_status = mutex_eyes_status = mutex_eyes_template_status = false;
@@ -125,9 +126,12 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 							//imshow("Eye 1", eyes_store->eye_frame[0]);
 							//imshow("Eye 2", eyes_store->eye_frame[1]);
 						}
+						//						start = std::clock();
 						
 						if(test_and_lock(mutex_eyes_template) && eyes_closedetect(face_store, eyes_store, eyes_store_template))
 						{
+				  
+						  //  printf("Time taken in template: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 							update_frequency->status=2;
 							/*TODO: Add gaze estimator here */
 							printf("in if under eyes_closedetect\n");
@@ -138,7 +142,8 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 							}
 						}
 						test_and_unlock(mutex_eyes_template);
-						
+						//					printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
+			
 					}
 					
 					test_and_unlock(mutex_eyes);

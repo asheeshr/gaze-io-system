@@ -151,15 +151,15 @@ static void createTheWindow(struct screen_resolution *screen_store)
 		CWEventMask |
 		CWOverrideRedirect;
 
-	width = DisplayWidth(Xdisplay, DefaultScreen(Xdisplay));
-	height = DisplayHeight(Xdisplay, DefaultScreen(Xdisplay));
+	//	width = DisplayWidth(Xdisplay, DefaultScreen(Xdisplay));
+	//	height = DisplayHeight(Xdisplay, DefaultScreen(Xdisplay));
 	//	printf("\n\n\n %d    %d   ",width,height);
 	x=1;//width/2;
 	y=0;//height/2;
 
 	window_handle = XCreateWindow(	Xdisplay,
 					Xroot,
-					x, y, width, height,
+					x, y, screen_store->width, screen_store->height,
 					0,
 					visual->depth,
 					InputOutput,
@@ -188,8 +188,8 @@ static void createTheWindow(struct screen_resolution *screen_store)
 
 	hints.x = x;
 	hints.y = y;
-	hints.width = width;
-	hints.height = height;
+	hints.width = screen_store->width;
+	hints.height = screen_store->height;
 	hints.flags = USPosition|USSize;
 
 	startup_state = XAllocWMHints();
@@ -274,17 +274,20 @@ static void createTheRenderContext()
 	}
 }
 
-static int updateTheMessageQueue()
+static int updateTheMessageQueue(struct screen_resolution *screen_store)
 {
+  //  printf("\n in update");
 	XEvent event;
 	XConfigureEvent *xc;
 
 	while (XPending(Xdisplay))
 	{
+	  //	  printf("\n\n in while");
 		XNextEvent(Xdisplay, &event);
 		switch (event.type)
 		{
-		case ClientMessage:
+		  //		case ClientMessage:
+		  printf("\n\n client message");
 			if (event.xclient.data.l[0] == del_atom)
 			{
 				return 0;
@@ -293,8 +296,9 @@ static int updateTheMessageQueue()
 
 		case ConfigureNotify:
 			xc = &(event.xconfigure);
-			width = xc->width;
-			height = xc->height;
+			screen_store->width = xc->width;
+			screen_store->height = xc->height;
+			//		printf("\n\n  %d \t %d",screen_store->width,screen_store->height);
 			break;
 		}
 	}
@@ -302,7 +306,7 @@ static int updateTheMessageQueue()
 };
 
 
-static void redrawTheWindow()
+static void redrawTheWindow(struct screen_resolution *screen_store)
 {
 	//float const aspect = (float)width / (float)height;
 
@@ -310,7 +314,7 @@ static void redrawTheWindow()
 
 	glDrawBuffer(GL_BACK);
 
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, screen_store->width, screen_store->height);
 
 	// Clear with alpha = 0.0, i.e. full transparency
 	glClearColor(0.0, 0.0, 0.0, 0.1);
@@ -361,8 +365,8 @@ int start_update_gui_pointer(struct screen_resolution *screen_store)
 	createTheWindow(screen_store);
 	createTheRenderContext();
 
-	while (updateTheMessageQueue()) {
-		redrawTheWindow();
+	while (updateTheMessageQueue(screen_store)) {
+		redrawTheWindow(screen_store);
 	}
 
 	return 0;
