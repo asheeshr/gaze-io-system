@@ -72,7 +72,7 @@ int main()
 	
 	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, update_frequency, ep_vector, &mutex_face, &mutex_eyes, &mutex_eyes_template);
 	std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, update_frequency, ep_vector, screen_store, &mutex_face, &mutex_eyes, &mutex_eyes_template);
-	std::thread gui_pointer_thread(start_update_gui_pointer, screen_store);
+	std::thread gui_pointer_thread(start_update_gui_pointer, screen_store,ep_vector);
 
 	main_thread.join();
 	gui_thread.join();

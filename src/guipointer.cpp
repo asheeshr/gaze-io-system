@@ -306,7 +306,7 @@ static int updateTheMessageQueue(struct screen_resolution *screen_store)
 };
 
 
-static void redrawTheWindow(struct screen_resolution *screen_store)
+static void redrawTheWindow(struct screen_resolution *screen_store, struct position_vector *ptr)
 {
 	//float const aspect = (float)width / (float)height;
 
@@ -327,10 +327,10 @@ static void redrawTheWindow(struct screen_resolution *screen_store)
 	
 	glBegin(GL_POINTS); //starts drawing of points
 
-	glVertex3f(0,0,0.0f);
-	glVertex3f(1,1,0.0f);
-	glVertex3f(0,0,0.0f);
-	glVertex3f(1,-1,0.0f);
+//	glVertex3f(0,0,0.0f);
+//	glVertex3f(1,1,0.0f);
+	glVertex3f(ptr->px,ptr->py,0.0f);
+//	glVertex3f(1,-1,0.0f);
 
 //	glVertex3f(-0.25,+0.20,0.0f);
 //	glVertex3f(-0.15,+0.15,0.0f);
@@ -360,13 +360,12 @@ static void redrawTheWindow(struct screen_resolution *screen_store)
 }
 
 
-int start_update_gui_pointer(struct screen_resolution *screen_store)
+int start_update_gui_pointer(struct screen_resolution *screen_store, struct position_vector *ep_vector)
 {
 	createTheWindow(screen_store);
 	createTheRenderContext();
-
 	while (updateTheMessageQueue(screen_store)) {
-		redrawTheWindow(screen_store);
+	  redrawTheWindow(screen_store, ep_vector);
 	}
 
 	return 0;
