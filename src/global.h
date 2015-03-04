@@ -91,6 +91,11 @@ struct position_vector {
 	std::atomic<std::int16_t> px, py; /* Position vector */
 }; /* Doesnt need mutex as atomic types */
 
+struct screen_resolution{
+
+        std::int16_t width;
+        std::int16_t height;
+};
 /* Macros */
 #define test_and_lock(X) (X##_status || (X##_status = X->try_lock())) /* Provides a reliable interface for std::mutex. Checks if unlocked, before locking. */
 #define test_and_unlock(X) if(X##_status) {X->unlock(); X##_status = false;} /* Provides a reliable interface for std::mutex. Checks if locked, before unlocking. */

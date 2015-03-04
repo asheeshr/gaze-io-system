@@ -21,7 +21,7 @@
 #include "global.h"
 
 int get_frame(cv::Mat *frame, struct timing_info *freq);
-int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et, struct timing_info **freq, struct position_vector **ep);
+int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et, struct timing_info **freq, struct position_vector **ep, struct screen_resolution **s);
 void sig_handler(int signo);
-int getScreenSize(int *w, int*h);
+int getScreenSize(struct screen_resolution *screen_store);
 int update_face(cv::Mat frame, struct face *face_store);

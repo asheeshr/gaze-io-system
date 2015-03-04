@@ -85,7 +85,7 @@ static void describe_fbconfig(GLXFBConfig fbconfig)
 		red_bits, green_bits, blue_bits, alpha_bits, depth_bits);
 }
 
-static void createTheWindow()
+static void createTheWindow(struct screen_resolution *screen_store)
 {
 	XEvent event;
 	int x,y, attr_mask;
@@ -153,6 +153,7 @@ static void createTheWindow()
 
 	width = DisplayWidth(Xdisplay, DefaultScreen(Xdisplay));
 	height = DisplayHeight(Xdisplay, DefaultScreen(Xdisplay));
+	//	printf("\n\n\n %d    %d   ",width,height);
 	x=1;//width/2;
 	y=0;//height/2;
 
@@ -355,9 +356,9 @@ static void redrawTheWindow()
 }
 
 
-int start_update_gui_pointer()
+int start_update_gui_pointer(struct screen_resolution *screen_store)
 {
-	createTheWindow();
+	createTheWindow(screen_store);
 	createTheRenderContext();
 
 	while (updateTheMessageQueue()) {
