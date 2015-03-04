@@ -351,7 +351,7 @@ static void redrawTheWindow()
 	clock_gettime(CLOCK_MONOTONIC_RAW, &Ta);
  	glXSwapBuffers(Xdisplay, glX_window_handle);
 	clock_gettime(CLOCK_MONOTONIC_RAW, &Tb);
-	fprintf(stderr, "glXSwapBuffers refresh rate %.0f Hz\n", 1000/(1e3*((double)Tb.tv_sec + 1e-6*(double)Tb.tv_nsec) - 1e3*((double)Ta.tv_sec + 1e-6*(double)Ta.tv_nsec)));	
+	//fprintf(stderr, "glXSwapBuffers refresh rate %.0f Hz\n", 1000/(1e3*((double)Tb.tv_sec + 1e-6*(double)Tb.tv_nsec) - 1e3*((double)Ta.tv_sec + 1e-6*(double)Ta.tv_nsec)));	
 }
 
 

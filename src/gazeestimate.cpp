@@ -87,7 +87,7 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
   return ene;
 }
 
-int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
+int gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *ep_vector)
 { 
   int i,j;
   int *energy;
@@ -138,9 +138,15 @@ int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_
   xenergy_prev=xenergy;
   yenergy_prev=yenergy;
 
+
+  ep_vector->ex = energy[0];
+  ep_vector->ey = energy[1];
+
   //  printf("%d i + %d j\n",energy[0],energy[1]); 
-  return energy;
+  return 1;
 }
+
+
 bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_template)
 {
 

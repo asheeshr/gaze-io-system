@@ -31,7 +31,7 @@ int start_gui();
 int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
 	       struct timing_info *update_frequency, struct position_vector *ep_vector,
 	       std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template);
-int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct eyes_template et, struct timing_info *update_frequency);
+int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct eyes_template et, struct timing_info *update_frequency, struct position_vector *ep_vector);
 int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[]);
 
 #endif /*GIOS_GUI*/

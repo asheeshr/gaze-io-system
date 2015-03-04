@@ -81,7 +81,8 @@ int main()
 }
 
 
-int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct timing_info *update_frequency, struct position_vector *ep_vector,
+int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
+		struct timing_info *update_frequency, struct position_vector *ep_vector,
 		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template)
 {
 	Mat *frame = new Mat;
@@ -95,8 +96,6 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 		std::this_thread::sleep_for(wait_time);
 	}
 	
-
-	int *energy = new int[2];
 	while(1)    
 	{
 		//start = std::clock();
@@ -109,10 +108,10 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 			{
 				test_and_unlock(mutex_face);
 				update_frequency->status=1;
-				//imshow("Face", face_store->frame);
+				
 				while( test_and_lock(mutex_eyes) && eyesdetect_display(face_store, eyes_store) )
 				{
-					//imshow("Eyes", eyes_store->frame);
+				
 					if( test_and_lock(mutex_eyes) && eyes_sepframes(eyes_store) )
 					{
 						test_and_unlock(mutex_eyes);
@@ -131,8 +130,11 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 							update_frequency->status=2;
 							/*TODO: Add gaze estimator here */
 							printf("in if under eyes_closedetect\n");
-							energy = gaze_energy(face_store, eyes_store, eyes_store_template);
-							update_frequency->status=3;
+							if(gaze_energy(face_store, eyes_store, eyes_store_template, ep_vector))
+							{
+
+								update_frequency->status=3;
+							}
 						}
 						test_and_unlock(mutex_eyes_template);
 						

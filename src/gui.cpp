@@ -138,11 +138,13 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 								Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			}
 			//	printf("bfore rende text\n");
-			render_text(gui_frame, sleep_time, et, update_frequency);
+			render_text(gui_frame, sleep_time, et, update_frequency, ep_vector);
 
-			sleep_time = std::chrono::milliseconds((update_frequency->duration_main>1000)?1000:update_frequency->duration_main + 5); /*Dynamically set refresh time*/
+			sleep_time = (std::chrono::milliseconds((update_frequency->duration_main>1000)?1000:update_frequency->duration_main + 5)); /*Dynamically set refresh time*/
+			sleep_time = sleep_time.count()<50?std::chrono::milliseconds(50):sleep_time;
+
 			update_frequency->duration_gui = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - update_frequency->start_gui).count());
-			printf("before imshow\n");
+			
 			imshow("Gaze IO System", gui_frame);
 			//updateWindow("Gaze IO System");
 			if('q' == waitKey(sleep_time.count())) raise(SIGSEGV);
@@ -164,12 +166,22 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 
 
 
-int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct eyes_template et, struct timing_info *update_frequency)
+int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct eyes_template et, struct timing_info *update_frequency, struct position_vector *ep_vector)
 {
 	
 	uint64_t duration_main = update_frequency->duration_main;
 	uint64_t duration_gui = update_frequency->duration_gui;
 	
+	int32_t ex = ep_vector->ex;	int32_t ey = ep_vector->ey;
+	int32_t px = ep_vector->px;	int32_t py = ep_vector->py;
+	
+	ex = constrain(ex, -999, +999);
+	ey = constrain(ex, -999, +999);
+	px = constrain(ex, -999, +999);
+	py = constrain(ex, -999, +999);
+	
+
+	//ex = ex>1000 || -ex>1000
 
 	/* Display Timing Info */
 			
@@ -201,16 +213,16 @@ int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct
 
 	putText(gui_frame, "Energy Vector::", Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 5*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
-	putText(gui_frame, "X: " + std::to_string(0 /*FILL*/), Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 7*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
+	putText(gui_frame, "X: " + std::to_string(ex), Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 7*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
-	putText(gui_frame, "Y: " + std::to_string(0 /*FILL*/), Point(8*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 7*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
+	putText(gui_frame, "Y: " + std::to_string(ey), Point(9*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 7*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 
 	putText(gui_frame, "Position Vector::", Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 9*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
-	putText(gui_frame, "X: " + std::to_string(0 /*FILL*/), Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 11*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
+	putText(gui_frame, "X: " + std::to_string(px), Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 11*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
-	putText(gui_frame, "Y: " + std::to_string(0 /*FILL*/), Point(8*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 11*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
+	putText(gui_frame, "Y: " + std::to_string(py), Point(9*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 11*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 
 	return 1;
