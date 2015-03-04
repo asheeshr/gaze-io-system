@@ -20,8 +20,6 @@
 
 #include "gazeestimate.h"
 
-#define ERROR_PER 10
-#define TEMP_THRESHOLD 30//threshold to determine the no of similar templates so as to determine whether the eyes is in template or not
 using namespace cv;
 
 float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template, int pos)
