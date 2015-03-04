@@ -28,11 +28,16 @@ extern std::vector<Rect> eyes;
 
 int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
+  //std::clock_t start;
+	// start = std::clock();
 
 	face_store->frame_gradient = image_gradient(face_store->frame);
+	//	printf("     Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
+
 	if(eyes_store->eyes.size()==0)
 		return 0;
-	if(eyes_store->eyes.size()==1)
+	if(eyes_store->eyes.size()==1)	
+
 	{
 //		printf("in if 1\n");
 		if( eyes_closedetect_helper(0, face_store, eyes_store, eyes_store_template) )

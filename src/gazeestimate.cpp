@@ -39,7 +39,7 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
   j=0;
   //  iter=eyes_store_template->windows[0][i].center;
   
-  energy_sum+=(face_store->frame_gradient.at<uchar>(iter));
+  energy_sum+=(face_store->frame.at<uchar>(iter));
   //  yenergy+=(face_store->frame_gradient.at<uchar>(iter));  
   while(j<mid)
     {
@@ -51,7 +51,7 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
 	  j++;
 	  iter.x+=xinc;
 	  iter.y+=yinc;
-	  energy_sum+=float((face_store->frame_gradient.at<uchar>(iter)));
+	  energy_sum+=float((face_store->frame.at<uchar>(iter)));
 	  //	  yenergy+=(face_store->frame_gradient.at<uchar>(iter));
 	}
       //k++;
@@ -70,7 +70,7 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
 	  j++;
 	  iter.x-=xinc;
 	  iter.y-=yinc;
-	  energy_sum+=float((face_store->frame_gradient.at<uchar>(iter)));
+	  energy_sum+=float((face_store->frame.at<uchar>(iter)));
 	  //	  printf("%f  1st\n",xenergy);
 	  // yenergy+=(face_store->frame_gradient.at<uchar>(iter));
 	}
@@ -166,8 +166,8 @@ bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_tem
       xinc=0,yinc=0;
       j=0;
       iter=eyes_store_template->windows[0][i].center;
-      inten=int(face_store->frame_gradient.at<uchar>(iter));
-      error= int(face_store->frame_gradient.at<uchar>(iter)) * ERROR_PER /100;
+      inten=int(face_store->frame.at<uchar>(iter));
+      error= int(face_store->frame.at<uchar>(iter)) * ERROR_PER /100;
       inten_max = inten + error;
       inten_min = inten - error;      
       while(j<mid && flag)
@@ -183,7 +183,7 @@ bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_tem
 	      iter.y+=yinc;
 	      // printf("%d    ", face_store->frame_gradient.at<uchar>(iter));
 	      //	      error= int(face_store->frame_gradient.at<uchar>(iter)) * ERROR_PER /100;
-	      if(int(face_store->frame_gradient.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
+	      if(int(face_store->frame.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
 		{
 		  flag=0;
 		}
@@ -207,7 +207,7 @@ bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_tem
 	      iter.x-=xinc;
 	      iter.y-=yinc;
 	      //printf("%d    ", face_store->frame_gradient.at<uchar>(iter));
-	      if(int(face_store->frame_gradient.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
+	      if(int(face_store->frame.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
 		{
 		  flag=0;
 		}
