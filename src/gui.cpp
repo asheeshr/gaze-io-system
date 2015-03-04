@@ -89,8 +89,8 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			
 			if(test_and_lock(mutex_eyes_template))
 			{
-				et.counter[0] = eyes_store_template->counter[1];
-				et.counter[1] = eyes_store_template->counter[2];
+				et.counter[0] = eyes_store_template->counter[LEFT_EYE];
+				et.counter[1] = eyes_store_template->counter[RIGHT_EYE];
 				
 				for(int counter=0; counter<et.counter[0]; counter++)
 					et.windows[0][counter] = eyes_store_template->windows[0][counter];
@@ -137,7 +137,7 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 					resize(*graph[1], gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, 3*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
 								Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			}
-			//	printf("bfore rende text\n");
+
 			render_text(gui_frame, sleep_time, et, update_frequency, ep_vector);
 
 			sleep_time = (std::chrono::milliseconds((update_frequency->duration_main>1000)?1000:update_frequency->duration_main + 5)); /*Dynamically set refresh time*/
