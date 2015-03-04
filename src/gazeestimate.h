@@ -27,7 +27,7 @@
 
 
 float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template);
-int* gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template);
+int gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *ep_vector);
 bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_template);
 
 #endif /*GAZEESTIMATE_GIOS*/
