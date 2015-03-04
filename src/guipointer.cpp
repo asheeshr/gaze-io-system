@@ -301,7 +301,7 @@ static int updateTheMessageQueue()
 };
 
 
-static void redrawTheWindow()
+static void redrawTheWindow(struct position_vector *ptr)
 {
 	//float const aspect = (float)width / (float)height;
 
@@ -322,10 +322,10 @@ static void redrawTheWindow()
 	
 	glBegin(GL_POINTS); //starts drawing of points
 
-	glVertex3f(0,0,0.0f);
-	glVertex3f(1,1,0.0f);
-	glVertex3f(0,0,0.0f);
-	glVertex3f(1,-1,0.0f);
+//	glVertex3f(0,0,0.0f);
+//	glVertex3f(1,1,0.0f);
+	glVertex3f(ptr->px,ptr->py,0.0f);
+//	glVertex3f(1,-1,0.0f);
 
 //	glVertex3f(-0.25,+0.20,0.0f);
 //	glVertex3f(-0.15,+0.15,0.0f);
@@ -355,13 +355,12 @@ static void redrawTheWindow()
 }
 
 
-int start_update_gui_pointer()
+int start_update_gui_pointer(struct position_vector *ep_vector)
 {
 	createTheWindow();
 	createTheRenderContext();
-
 	while (updateTheMessageQueue()) {
-		redrawTheWindow();
+		redrawTheWindow(ep_vector);
 	}
 
 	return 0;

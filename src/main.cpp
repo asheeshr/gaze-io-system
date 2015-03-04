@@ -48,6 +48,7 @@ int main()
 	struct timing_info *update_frequency;
 	struct position_vector *ep_vector; /* Energy and Position Vector */
 	std::mutex mutex_face, mutex_eyes, mutex_eyes_template;
+	
 
 	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template, &update_frequency, &ep_vector)==0)
 	{
@@ -71,7 +72,7 @@ int main()
 	
 	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, update_frequency, ep_vector, &mutex_face, &mutex_eyes, &mutex_eyes_template);
 	std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, update_frequency, ep_vector, &mutex_face, &mutex_eyes, &mutex_eyes_template);
-	std::thread gui_pointer_thread(start_update_gui_pointer);
+	std::thread gui_pointer_thread(start_update_gui_pointer, ep_vector);
 
 	main_thread.join();
 	gui_thread.join();
