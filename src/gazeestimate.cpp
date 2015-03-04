@@ -20,6 +20,10 @@
 
 #include "gazeestimate.h"
 
+#define SCALING_CONSTANT 0.01
+#define ERROR_PER 10
+#define TEMP_THRESHOLD 30//threshold to determine the no of similar templates so as to determine whether the eyes is in template or not
+
 using namespace cv;
 
 float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template, int pos)
@@ -231,13 +235,12 @@ bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_tem
   return true;
 }
 
-/*int* energy_to_coord(float* energy)
-  {
-  int *coord;
-  coord = new int[2];
-  coord[0]=k * energy[0] + c;
-  coord[1]=k*energy[1] + c; 
-  return coord;
-  }
-*/
+int energy_to_coord(struct position_vector *ep_vector)
+{
+
+	ep_vector->px += ep_vector->ex * SCALING_CONSTANT;
+	ep_vector->py += ep_vector->ey * SCALING_CONSTANT;
+
+	return 1;
+}
 

@@ -56,6 +56,7 @@ int init_data_structures(struct face **f, struct eyes **e, struct eyes_template 
 	*freq = new struct timing_info;
 	*s = new struct screen_resolution;
 	*ep = new struct position_vector ;
+
 	
 	if( *ep!=NULL )
 	{

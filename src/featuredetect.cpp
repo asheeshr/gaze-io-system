@@ -23,6 +23,16 @@
 using namespace cv;
 
 //#define MIN_THRESHOLD 192
+
+#define DTHETA 5
+#define MAX_THETA 360
+#define DDISTANCE 1
+#define MAX_DISTANCE 25   
+#define ERROR_THRESHOLD 30
+#define PI 3.14159265
+#define INTEN_THRESHOLD 100    // minimum gradient image intensity to be crossed for the iris border
+#define ACC_THRESHOLD 40       // minimum no of templates required(3/4*360/DTHETA)
+
 extern std::vector<Rect> eyes;
 
 

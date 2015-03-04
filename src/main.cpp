@@ -134,11 +134,12 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 				  
 						  //  printf("Time taken in template: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 							update_frequency->status=2;
-							/*TODO: Add gaze estimator here */
+
 							printf("in if under eyes_closedetect\n");
 							if(gaze_energy(face_store, eyes_store, eyes_store_template, ep_vector))
 							{
 								update_frequency->status=3;
+								energy_to_coord(ep_vector);
 							}
 						}
 						test_and_unlock(mutex_eyes_template);
