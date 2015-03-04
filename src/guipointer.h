@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-int start_update_gui_pointer();
+int start_update_gui_pointer(struct screen_resolution *screen_store);
 
 #define _GNU_SOURCE
 

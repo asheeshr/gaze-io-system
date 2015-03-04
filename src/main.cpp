@@ -30,7 +30,7 @@
 using namespace cv;
 
 int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
-		struct timing_info *update_frequency, struct position_vector *ep_vector,
+		struct timing_info *update_frequency, struct position_vector *ep_vector, struct screen_resolution *screen_store,
 		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template);
 
 /* Program Logic */
@@ -48,8 +48,9 @@ int main()
 	struct timing_info *update_frequency;
 	struct position_vector *ep_vector; /* Energy and Position Vector */
 	std::mutex mutex_face, mutex_eyes, mutex_eyes_template;
+	struct screen_resolution *screen_store;
 
-	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template, &update_frequency, &ep_vector)==0)
+	if(init_data_structures(&face_store, &eyes_store, &eyes_store_template, &update_frequency, &ep_vector, &screen_store)==0)
 	{
 		printf("Data structures not initialised\n");
 		return 1;
@@ -57,9 +58,9 @@ int main()
 
 	printf("Using OpenCV %d.%d.%d\n", CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION);
 
-	int screen_width=0, screen_height=0;
-	getScreenSize(&screen_width, &screen_height);
-	printf (" Screen:  width = %d, height = %d \n", screen_width, screen_height);
+	//	int screen_width=0, screen_height=0;
+	getScreenSize(screen_store);
+		printf (" Screen:  width = %d, height = %d \n", screen_store->width, screen_store->height);
 
 	if (signal(SIGINT, sig_handler) == SIG_ERR) /* Attach signal handler for SIGNINT */
 		printf("\ncan't catch SIGINT\n");   
@@ -70,8 +71,8 @@ int main()
 	start_gui(); /* Initialise the Debug GUI */
 	
 	std::thread gui_thread(update_gui, face_store, eyes_store, eyes_store_template, update_frequency, ep_vector, &mutex_face, &mutex_eyes, &mutex_eyes_template);
-	std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, update_frequency, ep_vector, &mutex_face, &mutex_eyes, &mutex_eyes_template);
-	std::thread gui_pointer_thread(start_update_gui_pointer);
+	std::thread main_thread(start_geted, face_store, eyes_store, eyes_store_template, update_frequency, ep_vector, screen_store, &mutex_face, &mutex_eyes, &mutex_eyes_template);
+	std::thread gui_pointer_thread(start_update_gui_pointer, screen_store);
 
 	main_thread.join();
 	gui_thread.join();
@@ -82,9 +83,10 @@ int main()
 
 
 int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, 
-		struct timing_info *update_frequency, struct position_vector *ep_vector,
+		struct timing_info *update_frequency, struct position_vector *ep_vector, struct screen_resolution *screen_store,
 		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template)
 {
+  //  std::clock_t start;
 	Mat *frame = new Mat;
 	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status;
 	mutex_face_status = mutex_eyes_status = mutex_eyes_template_status = false;
@@ -117,8 +119,20 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 					{
 						test_and_unlock(mutex_eyes);
 						
+						if(eyes_store->eyes.size()==1)
+							//imshow("Eye 1", eyes_store->eye_frame[0]);
+							;
+						else if(eyes_store->eyes.size()==2)
+						{
+							//imshow("Eye 1", eyes_store->eye_frame[0]);
+							//imshow("Eye 2", eyes_store->eye_frame[1]);
+						}
+						//						start = std::clock();
+						
 						if(test_and_lock(mutex_eyes_template) && eyes_closedetect(face_store, eyes_store, eyes_store_template))
 						{
+				  
+						  //  printf("Time taken in template: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 							update_frequency->status=2;
 
 							printf("in if under eyes_closedetect\n");
@@ -129,7 +143,8 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 							}
 						}
 						test_and_unlock(mutex_eyes_template);
-						
+						//					printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
+			
 					}
 					
 					test_and_unlock(mutex_eyes);

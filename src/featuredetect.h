@@ -23,6 +23,16 @@
 #ifndef FEATUREDETECT_GIOS
 #define FEATUREDETECT_GIOS
 
+#define DTHETA 5
+#define MAX_THETA 360
+#define DDISTANCE 1
+#define MAX_DISTANCE 25   
+#define ERROR_THRESHOLD 30
+#define PI 3.14159265
+#define INTEN_THRESHOLD 100    // minimum gradient image intensity to be crossed for the iris border
+#define ACC_THRESHOLD 45       // minimum no of templates required(3/4*360/DTHETA)
+
+
 //cv::Mat* eyesdetect(cv::Mat );
 cv::Mat image_gradient(cv::Mat );
 int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template);

@@ -48,13 +48,15 @@ int update_face(cv::Mat frame, struct face *face_store)
 }
 
 
-int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et, struct timing_info **freq, struct position_vector **ep)
+int init_data_structures(struct face **f, struct eyes **e, struct eyes_template **et, struct timing_info **freq, struct position_vector **ep, struct screen_resolution **s)
 {
-	*f = new face;
+	*f = new struct face;
 	*e = new struct eyes;
 	*et = new struct eyes_template;
 	*freq = new struct timing_info;
-	*ep = new struct position_vector;
+	*s = new struct screen_resolution;
+	*ep = new struct position_vector ;
+
 	
 	if( *ep!=NULL )
 	{
@@ -80,7 +82,7 @@ void sig_handler(int signo)
 }
 
 
-int getScreenSize(int *w, int*h)
+int getScreenSize(struct screen_resolution *screen_store)
 {
 
  Display* pdsp = NULL;
@@ -98,8 +100,8 @@ int getScreenSize(int *w, int*h)
   return -2;
  }
 
- *w = pscr->width;
- *h = pscr->height;
+ screen_store->width = pscr->width;
+ screen_store->height = pscr->height;
 
  XCloseDisplay( pdsp );
  return 0;

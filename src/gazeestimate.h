@@ -22,6 +22,10 @@
 #ifndef GAZEESTIMATE_GIOS
 #define GAZEESTIMATE_GIOS
 
+#define ERROR_PER 10
+#define TEMP_THRESHOLD 30//threshold to determine the no of similar templates so as to determine whether the eyes is in template or not
+
+
 float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template);
 int gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *ep_vector);
 bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_template);
