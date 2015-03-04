@@ -22,8 +22,6 @@
 
 using namespace cv;
 
-//#define MIN_THRESHOLD 192
-
 #define DTHETA 5
 #define MAX_THETA 360
 #define DDISTANCE 1
@@ -35,31 +33,17 @@ using namespace cv;
 
 extern std::vector<Rect> eyes;
 
-
 int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
-  //std::clock_t start;
-	// start = std::clock();
-
 	std::uint8_t status = 0;
 	
 	face_store->frame_gradient = image_gradient(face_store->frame);
 	
-	if( eyes_store->position==0 )
-		return 0;
-	if( eyes_store->position & LEFT_EYE )
-	{
-		status |= eyes_closedetect_helper(LEFT_EYE, face_store, eyes_store, eyes_store_template);
-	}
-		    
-	if(eyes_store->position & RIGHT_EYE )
-	{
-		status |= eyes_closedetect_helper(RIGHT_EYE, face_store, eyes_store, eyes_store_template);
-	}
-
+	if( eyes_store->position==0 ) return 0;
+	if( eyes_store->position & LEFT_EYE ) status |= eyes_closedetect_helper(LEFT_EYE, face_store, eyes_store, eyes_store_template);
+	if( eyes_store->position & RIGHT_EYE ) status |= eyes_closedetect_helper(RIGHT_EYE, face_store, eyes_store, eyes_store_template);
 	return status;
 }
-
 
 
 int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
@@ -101,8 +85,6 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 					// std::cout<<iter<<"\t";
 					//std::cout<<iter.x<<","<<iter.y<<"\n";
 					//		  circle(frame[0], iter, 1, Scalar(127,0,127), 4, 8, 0);
-					//		  waitKey(0);
-					//add cvBox2D
 					break;
 					//	 printf("pixel intensity: %d\n", pixel_intensity);
 	     	  
@@ -116,7 +98,6 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 			// imwrite( "./data/template.jpg", frame[0] );
 			flag=0;	  
 //			printf("\n no of template count: %d",counter);
-//			waitKey(0);
 		}  
 		else
 			attemptno++;
@@ -130,12 +111,8 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 		return 0;
 	}
 
-	for(int i=0; i<counter; i++)
-	{
-		(eyes_store_template->windows)[eye_no][i] = templates[i];
-		(eyes_store_template->counter)[eye_no] = counter;
-	}
-
+	for(int i=0; i<counter; i++) (eyes_store_template->windows)[eye_no][i] = templates[i];
+	(eyes_store_template->counter)[eye_no] = counter;
 	return eye_no;
 }
 
@@ -147,14 +124,11 @@ Mat image_gradient(Mat frame)
 	int delta = 0;
 	int ddepth = CV_16S;
 
-	/// Generate grad_x and grad_y
 	Mat grad_x, grad_y;
 	Mat abs_grad_x, abs_grad_y;
 
 	GaussianBlur( frame, frame, Size(3,3), 0, 0, BORDER_DEFAULT );
 	//    GaussianBlur( frame, frame, Size(3,3), 0, 0, BORDER_DEFAULT );
-	//GaussianBlur( frame, frame, Size(3,3), 0, 0, BORDER_DEFAULT );
-
 
 	/// Gradient X
 	//Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
@@ -169,5 +143,4 @@ Mat image_gradient(Mat frame)
 	/// Total Gradient (approximate)
 	addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, S );
 	return S;
-
 }

@@ -19,7 +19,6 @@
  */
 
 #include "facedetect.h"
-//#include "opencv2/objdetect/src/cascadedetect.hpp"
 using namespace cv;
 
 
@@ -45,13 +44,9 @@ int init_facedetect()
 
 int facedetect_display(Mat frame, struct face *face_store)
 {
-
 	Mat frame_gray;
-	//Mat faceROI;
 	cvtColor( frame, frame_gray, CV_BGR2GRAY );
 	equalizeHist( frame_gray, frame_gray );
-
-	//printf("Inside facedetect\n");
 
 	//-- Detect faces
 	face_cascade.detectMultiScale( frame_gray, faces, 1.2, 2, 0 |CV_HAAR_FIND_BIGGEST_OBJECT, Size(min_face_size, min_face_size),Size(max_face_size, max_face_size) );
@@ -60,8 +55,6 @@ int facedetect_display(Mat frame, struct face *face_store)
 	{
 		Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
 		//ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0 );
-		//	printf("Writing to face store");
-		//fflush(stdin);
 		//faceROI = frame_gray( faces[i] );
 		face_store->frame = frame_gray( faces[i] );
 	}
@@ -69,7 +62,6 @@ int facedetect_display(Mat frame, struct face *face_store)
 	if(faces.size()==0)
 		return 0;
 	face_store->faces = faces;
-	
   	return 1;
 }
 
@@ -79,33 +71,17 @@ int eyesdetect_display(struct face *face_store, struct eyes *eyes_store)
 	eyes_store->frame = face_store->frame;
 	//-- In each face, detect eyes
 	eyes_cascade.detectMultiScale( eyes_store->frame, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
-	/*for( size_t i = 0; i < faces.size(); i++ )
-	{
-		Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
-		for( size_t j = 0; j < eyes.size(); j++ )
-		{
-			Point center( eyes[j].x + eyes[j].width*0.5, eyes[j].y + eyes[j].height*0.5 );
-			int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
-      
-			//       printf("height: %d width: %d\n", eyes[0].width, eyes[0].height);
-    
-			//	circle( faceROI, center, 1, Scalar( 255, 0, 0 ), 1, 8, 0 );	
-			//circle( eyes_store->frame, center, radius, Scalar( 0, 0, 0 ), 4, 8, 0 );
-		}
-		}*/
-	
+
 	if(eyes.size()==0)
 		return 0;
 	eyes_store->eyes.push_back(cv::Rect());
 	eyes_store->eyes = eyes;
-
 	return 1;  
 }
 
 
 int eyes_sepframes(struct eyes *eyes_store)
 {
-
 	if(eyes.size()==2)
 	{
 		/* Compare each eye with the other */

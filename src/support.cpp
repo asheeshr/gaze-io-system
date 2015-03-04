@@ -43,7 +43,6 @@ int update_face(cv::Mat frame, struct face *face_store)
 
 	face_store->frame = frame_gray(face_store->faces[0]);
 
-
 	return 1;
 }
 
@@ -56,7 +55,6 @@ int init_data_structures(struct face **f, struct eyes **e, struct eyes_template 
 	*freq = new struct timing_info;
 	*s = new struct screen_resolution;
 	*ep = new struct position_vector ;
-
 	
 	if( *ep!=NULL )
 	{
@@ -73,36 +71,36 @@ int init_data_structures(struct face **f, struct eyes **e, struct eyes_template 
 
 void sig_handler(int signo)
 {
-  if (signo == SIGINT)
-    printf("received SIGINT\n");
+	if (signo == SIGINT)
+		printf("received SIGINT\n");
 
-  capture.~VideoCapture();
-  cv::destroyAllWindows();
-  exit(0);
+	capture.~VideoCapture();
+	cv::destroyAllWindows();
+	exit(0);
 }
 
 
 int getScreenSize(struct screen_resolution *screen_store)
 {
 
- Display* pdsp = NULL;
- Screen* pscr = NULL;
+	Display* pdsp = NULL;
+	Screen* pscr = NULL;
 
- pdsp = XOpenDisplay( NULL );
- if ( !pdsp ) {
-  fprintf(stderr, "Failed to open default display.\n");
-  return -1;
- }
+	pdsp = XOpenDisplay( NULL );
+	if ( !pdsp ) {
+		fprintf(stderr, "Failed to open default display.\n");
+		return -1;
+	}
 
-    pscr = DefaultScreenOfDisplay( pdsp );
- if ( !pscr ) {
-  fprintf(stderr, "Failed to obtain the default screen of given display.\n");
-  return -2;
- }
+	pscr = DefaultScreenOfDisplay( pdsp );
+	if ( !pscr ) {
+		fprintf(stderr, "Failed to obtain the default screen of given display.\n");
+		return -2;
+	}
 
- screen_store->width = pscr->width;
- screen_store->height = pscr->height;
+	screen_store->width = pscr->width;
+	screen_store->height = pscr->height;
 
- XCloseDisplay( pdsp );
- return 0;
+	XCloseDisplay( pdsp );
+	return 0;
 }
