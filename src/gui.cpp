@@ -36,7 +36,6 @@ int start_gui()
 {
 	namedWindow("Gaze IO System", WINDOW_AUTOSIZE|WINDOW_OPENGL);
 	printf("Gui Started");
-	//	imshow("Gaze IO System", gui_frame);
 	return 1;
 }
 
@@ -56,9 +55,9 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 	 * ----------------------------------------------
 	 */
 
-	cv::Mat *graph[2];
-	graph[0] = new cv::Mat;
-	graph[1] = new cv::Mat;
+	cv::Mat *graph[3];
+	graph[LEFT_EYE] = new cv::Mat;
+	graph[RIGHT_EYE] = new cv::Mat;
 	struct face f; 
 	struct eyes e;
 	struct eyes_template et;
@@ -82,42 +81,47 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			{
 				//if(!eyes_store->frame.empty()) e.frame = eyes_store->frame;
 				e.eyes = eyes_store->eyes;
-				if(eyes_store->position & LEFT_EYE && !eyes_store->eye_frame[LEFT_EYE].empty()) e.eye_frame[0] = eyes_store->eye_frame[LEFT_EYE];
-				if(eyes_store->position & RIGHT_EYE && !eyes_store->eye_frame[RIGHT_EYE].empty()) e.eye_frame[1] = eyes_store->eye_frame[RIGHT_EYE];
+				e.position = eyes_store->position;
+				if(eyes_store->position & LEFT_EYE && !eyes_store->eye_frame[LEFT_EYE].empty()) e.eye_frame[LEFT_EYE] = eyes_store->eye_frame[LEFT_EYE];
+				if(eyes_store->position & RIGHT_EYE && !eyes_store->eye_frame[RIGHT_EYE].empty()) e.eye_frame[RIGHT_EYE] = eyes_store->eye_frame[RIGHT_EYE];
 				test_and_unlock(mutex_eyes);
 			}
 			
 			if(test_and_lock(mutex_eyes_template))
 			{
-				et.counter[0] = eyes_store_template->counter[LEFT_EYE];
-				et.counter[1] = eyes_store_template->counter[RIGHT_EYE];
+				et.counter[LEFT_EYE] = eyes_store_template->counter[LEFT_EYE];
+				et.counter[RIGHT_EYE] = eyes_store_template->counter[RIGHT_EYE];
 				
-				for(int counter=0; counter<et.counter[0]; counter++)
-					et.windows[0][counter] = eyes_store_template->windows[0][counter];
-				for(int counter=0; counter<et.counter[1]; counter++)
-					et.windows[1][counter] = eyes_store_template->windows[1][counter];
+				if(e.position & LEFT_EYE)
+					for(int counter=0; counter<et.counter[LEFT_EYE]; counter++)
+						et.windows[LEFT_EYE][counter] = eyes_store_template->windows[LEFT_EYE][counter];
+				if(eyes_store->position & RIGHT_EYE)
+					for(int counter=0; counter<et.counter[RIGHT_EYE]; counter++)
+						et.windows[RIGHT_EYE][counter] = eyes_store_template->windows[RIGHT_EYE][counter];
 				
 				test_and_unlock(mutex_eyes_template);
 				graph_state = plot_data(e, et, graph); /* Plot graph only if update available */
 			}
 			
-			//			printf("after all test and locks\n");
 			/* Create and display GUI */
 			if(!f.frame.empty()) 
 				resize(f.frame, gui_frame( Rect(GUI_XBORDER, GUI_YBORDER, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
 						    Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			if(!f.frame_gradient.empty()) 
+			{
 				resize(f.frame_gradient, gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, GUI_YBORDER, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
 				       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			
-			if(e.eyes.size()>=1)
-				resize(f.frame_gradient(e.eyes[0]), gui_frame(Rect(GUI_XBORDER, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
-				       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
-
-			if(e.eyes.size()==2)
-				resize(f.frame_gradient(e.eyes[1]), gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
-				       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
-			
+				if(e.position & LEFT_EYE)
+					resize(f.frame_gradient(e.eyes[LEFT_EYE]), 
+					       gui_frame(Rect(GUI_XBORDER, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
+					       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
+				
+				if(e.position & RIGHT_EYE)
+					resize(f.frame_gradient(e.eyes[RIGHT_EYE]), 
+					       gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
+					       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
+			}
 			//if(!e.frame.empty()) resize(e.frame, gui_frame(Rect(0 +  (GUI_HEIGHT/3)*2, GUI_WBORDER, GUI_HEIGHT/3, GUI_WIDTH/3)), Size(GUI_HEIGHT/3, GUI_WIDTH/3));
 			/*if(!e.eye_frame[0].empty()) 
 				resize(e.eye_frame[0], gui_frame(Rect(GUI_XBORDER, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
@@ -130,12 +134,14 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			/* Display Eye Graphs */
 			if(graph_state)
 			{
-				if(!(graph[0]->empty())) 
-					resize(*graph[0], gui_frame(Rect(GUI_XBORDER, 3*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
+				if(!(graph[LEFT_EYE]->empty())) 
+					resize(*graph[LEFT_EYE], 
+					       gui_frame(Rect(GUI_XBORDER, 3*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
 					       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
-				if(!(graph[1]->empty())) 
-					resize(*graph[1], gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, 3*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
-								Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
+				if(!(graph[RIGHT_EYE]->empty())) 
+					resize(*graph[RIGHT_EYE], 
+					       gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, 3*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)),								
+					       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			}
 
 			render_text(gui_frame, sleep_time, et, update_frequency, ep_vector);
@@ -204,9 +210,9 @@ int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct
 
 	putText(gui_frame, "Number of Windows::", Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 4*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
-	putText(gui_frame, "0: " + std::to_string(et.counter[0]), Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 6*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS), 
+	putText(gui_frame, "0: " + std::to_string(et.counter[LEFT_EYE]), Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 6*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
-	putText(gui_frame, "1: " + std::to_string(et.counter[1]), Point(7*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 6*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS), 
+	putText(gui_frame, "1: " + std::to_string(et.counter[RIGHT_EYE]), Point(7*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 6*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 			
 	/* Display Energy and Position Vectors */
@@ -240,24 +246,24 @@ int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[])
 		fprintf(pipe, "unset border; unset xtics; unset ytics \n");
 		fprintf(pipe, "set style line 1 linewidth 6 \n");
 
-		if(/*e.eyes.size()>=1 && */et.counter[0]>30)
+		if(e.position & LEFT_EYE && et.counter[LEFT_EYE]>10)
 		{
 			fprintf(pipe, "set output './data/eye0_plot.png'\n");
 			fprintf(pipe, "plot '-' with points pt 7 ps 3 notitle\n");
-			for(int i=1; i<et.counter[0]; i++)
+			for(int i=1; i<et.counter[LEFT_EYE]; i++)
 			{
-				fprintf(pipe, "%.0f %.0f\n", et.windows[0][i].center.x, et.windows[0][i].center.y);
+				fprintf(pipe, "%.0f %.0f\n", et.windows[LEFT_EYE][i].center.x, et.windows[LEFT_EYE][i].center.y);
 			}
 			fprintf(pipe, "%s\n", "e");
 		}
 		
-		if(/*e.eyes.size()==2 &&*/ et.counter[1]>30)
+		if(e.position & RIGHT_EYE && et.counter[RIGHT_EYE]>10)
 		{
 			fprintf(pipe, "set output './data/eye1_plot.png'\n");
 			fprintf(pipe, "plot '-' with points pt 7 ps 3 notitle\n");
-			for(int i=1; i<et.counter[1]; i++)
+			for(int i=1; i<et.counter[RIGHT_EYE]; i++)
 			{
-				fprintf(pipe, "%.0f %.0f\n", et.windows[1][i].center.x, et.windows[1][i].center.y);
+				fprintf(pipe, "%.0f %.0f\n", et.windows[RIGHT_EYE][i].center.x, et.windows[RIGHT_EYE][i].center.y);
 			}
 			fprintf(pipe, "%s\n", "e");
 			//fprintf(pipe, "plot './data/eye1.csv' notitle \n");
@@ -266,8 +272,8 @@ int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[])
 		fflush(pipe);
                 pclose(pipe);
 
-		*graph[0] = imread("./data/eye0_plot.png", CV_LOAD_IMAGE_GRAYSCALE);
-		*graph[1] = imread("./data/eye1_plot.png", CV_LOAD_IMAGE_GRAYSCALE);
+		*graph[LEFT_EYE] = imread("./data/eye0_plot.png", CV_LOAD_IMAGE_GRAYSCALE);
+		*graph[RIGHT_EYE] = imread("./data/eye1_plot.png", CV_LOAD_IMAGE_GRAYSCALE);
 		
 	}
 	else
@@ -276,7 +282,7 @@ int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[])
 		return 0;
 	}
 	
-	if(!(graph[0]->empty())||!(graph[1]->empty()))
+	if(!(graph[LEFT_EYE]->empty())||!(graph[RIGHT_EYE]->empty()))
 		return 1;
 	return 0;
 }

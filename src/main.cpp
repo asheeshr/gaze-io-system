@@ -109,15 +109,19 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 		//printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 		try
 		{
-			while( test_and_lock(mutex_face) && (update_frequency->status=1) && facedetect_display(*frame, face_store) )
+			while( test_and_lock(mutex_face) && (update_frequency->status=1) 
+			       && facedetect_display(*frame, face_store) )
 			{
 				test_and_unlock(mutex_face);
-				while( test_and_lock(mutex_eyes) && eyesdetect_display(face_store, eyes_store) && (eyes_found = eyes_sepframes(eyes_store)) )
+				while( test_and_lock(mutex_eyes) && eyesdetect_display(face_store, eyes_store) 
+				       && (eyes_found = eyes_sepframes(eyes_store)) )
 				{
 					test_and_unlock(mutex_eyes);
-					if(test_and_lock(mutex_eyes_template) && (update_frequency->status=2) && eyes_closedetect(face_store, eyes_store, eyes_store_template))
+					if(test_and_lock(mutex_eyes_template) && (update_frequency->status=2) 
+					   && (eyes_found = eyes_closedetect(face_store, eyes_store, eyes_store_template)))
 					{
-						if((update_frequency->status=3) && gaze_energy(face_store, eyes_store, eyes_store_template, energy_position_store))
+						if((update_frequency->status=3) 
+						   && gaze_energy(face_store, eyes_store, eyes_store_template, energy_position_store))
 						{
 							energy_to_coord(energy_position_store);
 							/* Add template adjustment function here*/
