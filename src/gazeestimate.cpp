@@ -26,125 +26,61 @@
 
 using namespace cv;
 
-float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template, int pos)
+static float xenergy_prev[3], yenergy_prev[3];
+
+
+int gaze_energy(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *energy_position_store)
 {
-	float* ene;
-	int j,i;
-	float energy_sum=0;//yenergy=0;
-	ene = new float[2];
-	ene[0]=ene[1]=0;
-	Point iter(eyes_store_template->windows[1][pos].center);
-	//  printf("after point\n");
-	int mid = (eyes_store_template->windows)[1][pos].size.width/2;
-	float costheta = cos((eyes_store_template->windows)[1][pos].angle * PI / 180.0);
-	float sintheta = sin((eyes_store_template->windows)[1][pos].angle * PI /180.0);
-	float xinc=0,yinc=0;
-	//      for(j=0;j<mid;j++)
-	j=0;
-	//  iter=eyes_store_template->windows[0][i].center;
-  
-	energy_sum+=(face_store->frame_gradient.at<uchar>(iter));
-	//  yenergy+=(face_store->frame_gradient.at<uchar>(iter));  
-	while(j<mid)
+	std::uint8_t status = 0;
+	int16_t ex[3], ey[3];
+	
+	if( eyes_store->position==0 ) return 0;
+	if( eyes_store->position & LEFT_EYE )
 	{
-		// int k=1;
-		xinc+=costheta;
-		yinc+=sintheta;
-		if(int(iter.x) != int(iter.x+xinc) || int(iter.y)!= int(iter.y+yinc))
-		{
-			j++;
-			iter.x+=xinc;
-			iter.y+=yinc;
-			energy_sum+=float((face_store->frame_gradient.at<uchar>(iter)));
-			//	  yenergy+=(face_store->frame_gradient.at<uchar>(iter));
-		}
-		//k++;
+		status |= gaze_energy_helper(LEFT_EYE, face_store, eyes_store, eyes_store_template, energy_position_store);
+		ex[LEFT_EYE] = energy_position_store->ex;
+		ey[LEFT_EYE] = energy_position_store->ey;
 	}
-	j=0;
-	xinc=yinc=0;
-	// printf("after first loop\n");
-	iter=eyes_store_template->windows[1][pos].center;
-	while(j<mid)
+
+	if( eyes_store->position & RIGHT_EYE )
 	{
-		//int k=0;
-		xinc+=costheta;
-		yinc+=sintheta;
-		if(int(iter.x) != int(iter.x-xinc) || int(iter.y)!= int(iter.y-yinc))
-		{
-			j++;
-			iter.x-=xinc;
-			iter.y-=yinc;
-			energy_sum+=float((face_store->frame_gradient.at<uchar>(iter)));
-			//	  printf("%f  1st\n",xenergy);
-			// yenergy+=(face_store->frame_gradient.at<uchar>(iter));
-		}
-		//      k--;
+		status |= gaze_energy_helper(RIGHT_EYE, face_store, eyes_store, eyes_store_template, energy_position_store);
+		ex[RIGHT_EYE] = energy_position_store->ex;
+		ey[RIGHT_EYE] = energy_position_store->ey;
 	}
-	fflush(stdout);
-	//  waitKey(0);
-	ene[0]=float((energy_sum/(eyes_store_template->windows[1][pos].size.width)-255/2)*costheta);
-	ene[1]=float((energy_sum/(eyes_store_template->windows[1][pos].size.width)-255/2)*sintheta);
-	//  printf("%f       %f    %f    %f\n",ene[0],ene[1],costheta,sintheta);
-	//  waitKey(0);
-	return ene;
+
+	/* Process as either parity or estimation and set energy_position_vector*/
+	energy_position_store->ex = (ex[RIGHT_EYE] + ex[LEFT_EYE])>>1;
+	energy_position_store->ey = (ey[RIGHT_EYE] + ey[LEFT_EYE])>>1;
+
+	return status;
 }
 
-int gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *ep_vector)
+
+int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *energy_position_store)
 { 
 	int i,j;
-	int *energy;
-	energy=new int[2];
-	energy[0]=energy[1]=0;
-	static float xenergy_prev,yenergy_prev;
 	float xenergy=0.0, yenergy=0.0;
-	float *ene=new float[2];//supplementary energy variable to store the pointer returned by calculate_energy
-	ene[0]=ene[1]=0.0;
-	//  printf("before for loop\n");
-	//  printf("%f i + %f j\n",xenergy,yenergy);
+	float *energy; //supplementary energy variable to store the pointer returned by calculate_energy
+//	ene[0]=ene[1]=0.0;
 
-	for(i=0;i<(eyes_store_template->counter)[1];i++)//counter is defined in featuredetect.cpp
+	for(i=1;i<(eyes_store_template->counter)[eye_no];i++)
 	{
-		//      printf("inside for\n");
-		ene=calculate_energy(face_store, eyes_store_template,i);
-		//      printf("ene %f i + ene %f j\n",ene[0],ene[1]);
-		// printf("%f i + %f j\n",xenergy,yenergy);
-		if(i==0)                     //at i=0 the value returned by calculate_energy is garbage. need to know why?????
-			continue;
-		xenergy+=float(ene[0]);
-		yenergy+=float(ene[1]);
-		//      printf("%f i + %f j\n",xenergy,yenergy);
-		//  printf("ene %f i + ene %f j\n",ene[0],ene[1]);
-
+		energy=calculate_energy(face_store, eyes_store_template,eye_no,i);
+		xenergy+=float(energy[0]);
+		yenergy+=float(energy[1]);
 	}
 
-	float delxenergy=xenergy - xenergy_prev;
-	float delyenergy=yenergy - yenergy_prev;
-	//  printf("%f i + %f j\n",delxenergy,delyenergy);
-	//waitKey(0);
+	float delta_xenergy=xenergy - xenergy_prev[eye_no];
+	float delta_yenergy=yenergy - yenergy_prev[eye_no];
+
 	if(xenergy_prev==0 && yenergy_prev==0)
 	{ 
-		// printf("1st if\n");
-		energy[0]=0;
-		energy[1]=0;
-		//return energy;
+		delta_xenergy=0;
+		delta_yenergy=0;	
 	}
-	else if(istemp_on_eye(face_store,eyes_store_template))
-	{
-		//      printf("2nd if\n");
-		// xenergy_prev=xenergy;
-		//      yenergy_prev=yenergy;
-		energy[0]=int(delxenergy);
-		energy[1]=int(delyenergy);
-		//      return energy;
-	}
-	xenergy_prev=xenergy;
-	yenergy_prev=yenergy;
-
-
-	ep_vector->ex = energy[0];
-	ep_vector->ey = energy[1];
-
-	//  printf("%d i + %d j\n",energy[0],energy[1]); 
+	energy_position_store->ex = delta_xenergy;
+	energy_position_store->ey = delta_yenergy;
 	return 1;
 }
 
@@ -235,11 +171,61 @@ bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_tem
   return true;
 }
 
-int energy_to_coord(struct position_vector *ep_vector)
+float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template, int eye_no, int pos)
+{
+	float* ene;
+	int j,i;
+	float energy_sum=0;//yenergy=0;
+	ene = new float[2];
+	ene[0]=ene[1]=0;
+	Point iter(eyes_store_template->windows[eye_no][pos].center);
+	int mid = (eyes_store_template->windows)[eye_no][pos].size.width/2;
+	float costheta = cos((eyes_store_template->windows)[eye_no][pos].angle * PI / 180.0);
+	float sintheta = sin((eyes_store_template->windows)[eye_no][pos].angle * PI /180.0);
+	float xinc=0,yinc=0;
+	j=0;
+  
+	energy_sum+=(face_store->frame.at<uchar>(iter));
+	while(j<mid)
+	{
+		xinc+=costheta;
+		yinc+=sintheta;
+		if(int(iter.x) != int(iter.x+xinc) || int(iter.y)!= int(iter.y+yinc))
+		{
+			j++;
+			iter.x+=xinc;
+			iter.y+=yinc;
+			energy_sum+=float((face_store->frame.at<uchar>(iter)));
+		}
+	}
+	j=0;
+	xinc=yinc=0;
+	iter=eyes_store_template->windows[eye_no][pos].center;
+	while(j<mid)
+	{
+		xinc+=costheta;
+		yinc+=sintheta;
+		if(int(iter.x) != int(iter.x-xinc) || int(iter.y)!= int(iter.y-yinc))
+		{
+			j++;
+			iter.x-=xinc;
+			iter.y-=yinc;
+			energy_sum+=float((face_store->frame.at<uchar>(iter)));
+		}
+	}
+	fflush(stdout);
+	ene[0]=float((energy_sum/(eyes_store_template->windows[eye_no][pos].size.width)-255/2)*costheta);
+	ene[1]=float((energy_sum/(eyes_store_template->windows[eye_no][pos].size.width)-255/2)*sintheta);
+	//  printf("%f       %f    %f    %f\n",ene[0],ene[1],costheta,sintheta);
+	return ene;
+}
+
+
+int energy_to_coord(struct position_vector *energy_position_store)
 {
 
-	ep_vector->px += ep_vector->ex * SCALING_CONSTANT;
-	ep_vector->py += ep_vector->ey * SCALING_CONSTANT;
+	energy_position_store->px += energy_position_store->ex * SCALING_CONSTANT;
+	energy_position_store->py += energy_position_store->ey * SCALING_CONSTANT;
 
 	return 1;
 }

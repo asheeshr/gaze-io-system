@@ -26,8 +26,9 @@
 #define TEMP_THRESHOLD 30//threshold to determine the no of similar templates so as to determine whether the eyes is in template or not
 
 
-float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template);
-int gaze_energy( struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *ep_vector);
+float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template, int eye_no, int pos);
+int gaze_energy(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *energy_position_store);
+int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *energy_position_store);
 bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_template);
 int energy_to_coord(struct position_vector *ep_vector);
 
