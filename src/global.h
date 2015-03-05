@@ -45,8 +45,8 @@
 
 /* Constants */
 #define PI 3.14159265
-#define LEFT_EYE 0b010
-#define RIGHT_EYE 0b001
+#define LEFT_EYE 0b001
+#define RIGHT_EYE 0b010
 
 /* Global Structures */
 

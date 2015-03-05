@@ -22,23 +22,13 @@
 
 using namespace cv;
 
-#define DTHETA 5
-#define MAX_THETA 360
-#define DDISTANCE 1
-#define MAX_DISTANCE 25   
-#define ERROR_THRESHOLD 30
-#define PI 3.14159265
-#define INTEN_THRESHOLD 100    // minimum gradient image intensity to be crossed for the iris border
-#define ACC_THRESHOLD 40       // minimum no of templates required(3/4*360/DTHETA)
-
-//extern std::vector<Rect> eyes;
-
 int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
 	std::uint8_t status = 0;
 	
 	face_store->frame_gradient = image_gradient(face_store->frame);
-	
+	if(!face_store->frame_gradient.empty()) return 0;
+
 	if( eyes_store->position==0 ) return 0;
 	if( eyes_store->position & LEFT_EYE ) status |= eyes_closedetect_helper(LEFT_EYE, face_store, eyes_store, eyes_store_template);
 	if( eyes_store->position & RIGHT_EYE ) status |= eyes_closedetect_helper(RIGHT_EYE, face_store, eyes_store, eyes_store_template);
@@ -49,7 +39,6 @@ int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct ey
 int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
 	CvBox2D templates[100];
-	int flip=0;
 	float theta, costheta, sintheta;
 	int distance;
     

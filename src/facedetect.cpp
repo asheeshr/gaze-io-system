@@ -74,14 +74,15 @@ int eyesdetect_display(struct face *face_store, struct eyes *eyes_store)
 
 	if(eyes.size()==0)
 		return 0;
-	eyes_store->eyes.push_back(cv::Rect());
-	eyes_store->eyes = eyes;
+//	eyes_store->eyes.push_back(cv::Rect());
+//	eyes_store->eyes = eyes;
 	return 1;  
 }
 
 
 int eyes_sepframes(struct eyes *eyes_store)
 {
+	eyes_store->eyes.push_back(cv::Rect());
 	if(eyes.size()==2)
 	{
 		/* Compare each eye with the other */
@@ -96,6 +97,7 @@ int eyes_sepframes(struct eyes *eyes_store)
 			eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[0]);
 		}
 
+		eyes_store->eyes = eyes;
 		return (eyes_store->position = LEFT_EYE|RIGHT_EYE);
 	}
 	else if(eyes.size()==1)
@@ -103,11 +105,15 @@ int eyes_sepframes(struct eyes *eyes_store)
 		/* Compare eye center with face center */
 		if( eyes[0].x<eyes_store->frame.size().width/2 )
 		{
+			//eyes_store->eyes.push_back(cv::Rect());
 			eyes_store->eye_frame[LEFT_EYE] = eyes_store->frame(eyes[0]);
+			eyes_store->eyes = eyes;
 			return (eyes_store->position = LEFT_EYE);
 		}
 		else
 		{
+			eyes_store->eyes.push_back(cv::Rect());
+			eyes_store->eyes = eyes;
 			eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[0]);
 			return (eyes_store->position = RIGHT_EYE);
 		}

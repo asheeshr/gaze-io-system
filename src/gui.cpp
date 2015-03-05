@@ -82,8 +82,8 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 				//if(!eyes_store->frame.empty()) e.frame = eyes_store->frame;
 				e.eyes = eyes_store->eyes;
 				e.position = eyes_store->position;
-				if(eyes_store->position & LEFT_EYE && !eyes_store->eye_frame[LEFT_EYE].empty()) e.eye_frame[LEFT_EYE] = eyes_store->eye_frame[LEFT_EYE];
-				if(eyes_store->position & RIGHT_EYE && !eyes_store->eye_frame[RIGHT_EYE].empty()) e.eye_frame[RIGHT_EYE] = eyes_store->eye_frame[RIGHT_EYE];
+				if((eyes_store->position & LEFT_EYE) && !eyes_store->eye_frame[LEFT_EYE].empty()) e.eye_frame[LEFT_EYE] = eyes_store->eye_frame[LEFT_EYE];
+				if((eyes_store->position & RIGHT_EYE) && !eyes_store->eye_frame[RIGHT_EYE].empty()) e.eye_frame[RIGHT_EYE] = eyes_store->eye_frame[RIGHT_EYE];
 				test_and_unlock(mutex_eyes);
 			}
 			
@@ -95,7 +95,7 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 				if(e.position & LEFT_EYE)
 					for(int counter=0; counter<et.counter[LEFT_EYE]; counter++)
 						et.windows[LEFT_EYE][counter] = eyes_store_template->windows[LEFT_EYE][counter];
-				if(eyes_store->position & RIGHT_EYE)
+				if(e.position & RIGHT_EYE)
 					for(int counter=0; counter<et.counter[RIGHT_EYE]; counter++)
 						et.windows[RIGHT_EYE][counter] = eyes_store_template->windows[RIGHT_EYE][counter];
 				
@@ -112,11 +112,11 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 				resize(f.frame_gradient, gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, GUI_YBORDER, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
 				       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			
-				if(e.position & LEFT_EYE)
+/*				if(e.position & LEFT_EYE)
 					resize(f.frame_gradient(e.eyes[LEFT_EYE]), 
 					       gui_frame(Rect(GUI_XBORDER, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
 					       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
-				
+*/				
 				if(e.position & RIGHT_EYE)
 					resize(f.frame_gradient(e.eyes[RIGHT_EYE]), 
 					       gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, 2*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
