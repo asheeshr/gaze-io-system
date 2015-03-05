@@ -31,7 +31,7 @@ using namespace cv;
 #define INTEN_THRESHOLD 100    // minimum gradient image intensity to be crossed for the iris border
 #define ACC_THRESHOLD 40       // minimum no of templates required(3/4*360/DTHETA)
 
-extern std::vector<Rect> eyes;
+//extern std::vector<Rect> eyes;
 
 int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
@@ -56,25 +56,23 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	Point iter, center;
 	uchar pixel_intensity;
 	int attemptno = 0,counter=0;
-	center.x=eyes[eye_no].x+eyes[eye_no].width*0.5;
-	center.y=eyes[eye_no].y+eyes[eye_no].height*0.5;
+	center.x=eyes_store->eyes[eye_no].x+eyes_store->eyes[eye_no].width*0.5;
+	center.y=eyes_store->eyes[eye_no].y+eyes_store->eyes[eye_no].height*0.5;
 	bool flag=1;
-	    
+	printf("\n before while");
 	while(flag && attemptno<5)
 	{
-		//printf("Start of set\n");
 		counter=0;
 		for(theta=0; theta<MAX_THETA; theta+=DTHETA)
 		{
 	  
 			costheta =  cos(theta * PI / 180.0);
 			sintheta =  sin(theta * PI / 180.0);
-			for(distance=fmin(eyes[eye_no].height,eyes[eye_no].width)/10+1; distance<MAX_DISTANCE; distance+=DDISTANCE)
+			for(distance=2/*fmin(eyes[eye_no].height,eyes[eye_no].width)/10+1*/; distance<MAX_DISTANCE; distance+=DDISTANCE)
 			{
 				iter.x = center.x + distance*costheta;
 				iter.y = center.y + distance*sintheta;
 				pixel_intensity = face_store->frame_gradient.at<uchar>(iter);
-				//std::cout<<iter.x<<","<<iter.y<<"\n";
 				if(pixel_intensity > (INTEN_THRESHOLD-attemptno*5))
 				{
 					counter++;
@@ -82,36 +80,20 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 					templates[counter].size.height=1;
 					templates[counter].size.width=5;
 					templates[counter].angle=theta;
-					// std::cout<<iter<<"\t";
-					//std::cout<<iter.x<<","<<iter.y<<"\n";
-					//		  circle(frame[0], iter, 1, Scalar(127,0,127), 4, 8, 0);
+					printf("%d   ",counter); 
 					break;
-					//	 printf("pixel intensity: %d\n", pixel_intensity);
 	     	  
 				}
 			}
 		}
-		//      printf("\n no of template count: %d",counter);
-		if(counter > ACC_THRESHOLD)
-		{
-	 
-			// imwrite( "./data/template.jpg", frame[0] );
-			flag=0;	  
-//			printf("\n no of template count: %d",counter);
-		}  
-		else
-			attemptno++;
-
-		//printf("End of set");
+		if(counter > ACC_THRESHOLD) flag=0;
+		else attemptno++;
 	}
-
-	if(counter < ACC_THRESHOLD)
-	{
-		//printf("counter : %d\n",counter);
-		return 0;
-	}
-
-	for(int i=0; i<counter; i++) (eyes_store_template->windows)[eye_no][i] = templates[i];
+	printf("\nafter while");
+	fflush(stdout);
+	if(counter < ACC_THRESHOLD) return 0;
+	for(int i=0; i<counter; i++) 
+		(eyes_store_template->windows)[eye_no][i] = templates[i];
 	(eyes_store_template->counter)[eye_no] = counter;
 	return eye_no;
 }

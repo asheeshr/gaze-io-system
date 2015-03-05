@@ -23,10 +23,13 @@ vpath %.o ./bin
 $(LINK_TARGET): $(OBJECTS)
 	g++ -o $@ $^ $(LIBS) $(CXXFLAGS)
 
-debug: CC+= -g
+debug: CXXFLAGS+= -g
 debug: $(LINK_TARGET)
 
-optimize: CC+= -O3
+warning: CXXFLAGS+= -Wall
+warning: $(LINK_TARGET)
+
+optimize: CXXFLAGS+= -O3
 optimize: $(LINK_TARGET)
 
 prepare:
