@@ -25,11 +25,11 @@ using namespace cv;
 int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
 	std::uint8_t status = 0;
-	
-	face_store->frame_gradient = image_gradient(face_store->frame);
-	if(!face_store->frame_gradient.empty()) return 0;
 
-	if( eyes_store->position==0 ) return 0;
+	face_store->frame_gradient = image_gradient(face_store->frame);
+	if(face_store->frame_gradient.empty()) return 0;
+
+	if( (eyes_store->position & LEFT_EYE|RIGHT_EYE) == 0 ) return 0;
 	if( eyes_store->position & LEFT_EYE ) status |= eyes_closedetect_helper(LEFT_EYE, face_store, eyes_store, eyes_store_template);
 	if( eyes_store->position & RIGHT_EYE ) status |= eyes_closedetect_helper(RIGHT_EYE, face_store, eyes_store, eyes_store_template);
 	return status;
@@ -48,16 +48,14 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	center.x=eyes_store->eyes[eye_no].x+eyes_store->eyes[eye_no].width*0.5;
 	center.y=eyes_store->eyes[eye_no].y+eyes_store->eyes[eye_no].height*0.5;
 	bool flag=1;
-	printf("\n before while");
 	while(flag && attemptno<5)
 	{
 		counter=0;
 		for(theta=0; theta<MAX_THETA; theta+=DTHETA)
 		{
-	  
 			costheta =  cos(theta * PI / 180.0);
 			sintheta =  sin(theta * PI / 180.0);
-			for(distance=2/*fmin(eyes[eye_no].height,eyes[eye_no].width)/10+1*/; distance<MAX_DISTANCE; distance+=DDISTANCE)
+			for(distance=2; distance<MAX_DISTANCE; distance+=DDISTANCE)
 			{
 				iter.x = center.x + distance*costheta;
 				iter.y = center.y + distance*sintheta;
@@ -69,7 +67,6 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 					templates[counter].size.height=1;
 					templates[counter].size.width=5;
 					templates[counter].angle=theta;
-					printf("%d   ",counter); 
 					break;
 	     	  
 				}
@@ -78,8 +75,6 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 		if(counter > ACC_THRESHOLD) flag=0;
 		else attemptno++;
 	}
-	printf("\nafter while");
-	fflush(stdout);
 	if(counter < ACC_THRESHOLD) return 0;
 	for(int i=0; i<counter; i++) 
 		(eyes_store_template->windows)[eye_no][i] = templates[i];

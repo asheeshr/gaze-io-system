@@ -1,4 +1,4 @@
- /* 
+/* 
  * Gaze I/O System
  * Copyright (C) 2014 Asheesh Ranjan, Pranav Jetley, Osank Jain,
  * Vasu Bhardwaj, Varun Kalra
@@ -88,87 +88,87 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_template)
 {
 // printf("in function\n");
-  int count=0; //to determine the no of templates that have passed the test
-  int i,j;
-  int mid;
-  float costheta, sintheta, xinc, yinc;
-  int inten, inten_max, inten_min,error;
-  int flag;
-  Point iter;
-  //printf("in istemp_eye function\n");
-  for(i=0;i<eyes_store_template->counter[1];i++)
-    {
-      flag=1;
-      mid = (eyes_store_template->windows)[1][i].size.width/2;
-      costheta = cos((eyes_store_template->windows)[1][i].angle * PI / 180.0);
-      sintheta = sin((eyes_store_template->windows)[1][i].angle * PI /180.0);
-      xinc=0,yinc=0;
-      j=0;
-      iter=eyes_store_template->windows[1][i].center;
-      inten=int(face_store->frame_gradient.at<uchar>(iter));
-      error= int(face_store->frame_gradient.at<uchar>(iter)) * ERROR_PER /100;
-      inten_max = inten + error;
-      inten_min = inten - error;      
-      while(j<mid && flag)
+	int count=0; //to determine the no of templates that have passed the test
+	int i,j;
+	int mid;
+	float costheta, sintheta, xinc, yinc;
+	int inten, inten_max, inten_min,error;
+	int flag;
+	Point iter;
+	//printf("in istemp_eye function\n");
+	for(i=0;i<eyes_store_template->counter[1];i++)
 	{
-	  // int k=1;
+		flag=1;
+		mid = (eyes_store_template->windows)[1][i].size.width/2;
+		costheta = cos((eyes_store_template->windows)[1][i].angle * PI / 180.0);
+		sintheta = sin((eyes_store_template->windows)[1][i].angle * PI /180.0);
+		xinc=0,yinc=0;
+		j=0;
+		iter=eyes_store_template->windows[1][i].center;
+		inten=int(face_store->frame_gradient.at<uchar>(iter));
+		error= int(face_store->frame_gradient.at<uchar>(iter)) * ERROR_PER /100;
+		inten_max = inten + error;
+		inten_min = inten - error;      
+		while(j<mid && flag)
+		{
+			// int k=1;
 	  
-	  xinc+=costheta;
-	  yinc+=sintheta;
-	  if(int(iter.x) != int(iter.x+xinc) || int(iter.y)!= int(iter.y+yinc))
-	    {
-	      j++;
-	      iter.x+=xinc;
-	      iter.y+=yinc;
-	      printf("%d    ", face_store->frame_gradient.at<uchar>(iter));
-	      //	      error= int(face_store->frame_gradient.at<uchar>(iter)) * ERROR_PER /100;
-	      if(int(face_store->frame_gradient.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
-		{
-		  flag=0;
+			xinc+=costheta;
+			yinc+=sintheta;
+			if(int(iter.x) != int(iter.x+xinc) || int(iter.y)!= int(iter.y+yinc))
+			{
+				j++;
+				iter.x+=xinc;
+				iter.y+=yinc;
+				printf("%d    ", face_store->frame_gradient.at<uchar>(iter));
+				//	      error= int(face_store->frame_gradient.at<uchar>(iter)) * ERROR_PER /100;
+				if(int(face_store->frame_gradient.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
+				{
+					flag=0;
+				}
+				//	      xenergy+=float((face_store->frame_gradient.at<uchar>(iter)));
+				//	  yenergy+=(face_store->frame_gradient.at<uchar>(iter));
+			}
+			//k++;
 		}
-	      //	      xenergy+=float((face_store->frame_gradient.at<uchar>(iter)));
-	      //	  yenergy+=(face_store->frame_gradient.at<uchar>(iter));
-	    }
-	  //k++;
-	}
-      j=0;
-      xinc=yinc=0;
-      // printf("after first loop\n");
-      iter=eyes_store_template->windows[1][i].center;
-      while(j<mid && flag)
-	{
-	  //int k=0;
-	  xinc+=costheta;
-	  yinc+=sintheta;
-	  if(int(iter.x) != int(iter.x-xinc) || int(iter.y)!= int(iter.y-yinc))
-	    {
-	      j++;
-	      iter.x-=xinc;
-	      iter.y-=yinc;
-	      printf("%d    ", face_store->frame_gradient.at<uchar>(iter));
-	      if(int(face_store->frame_gradient.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
+		j=0;
+		xinc=yinc=0;
+		// printf("after first loop\n");
+		iter=eyes_store_template->windows[1][i].center;
+		while(j<mid && flag)
 		{
-		  flag=0;
-		}
+			//int k=0;
+			xinc+=costheta;
+			yinc+=sintheta;
+			if(int(iter.x) != int(iter.x-xinc) || int(iter.y)!= int(iter.y-yinc))
+			{
+				j++;
+				iter.x-=xinc;
+				iter.y-=yinc;
+				printf("%d    ", face_store->frame_gradient.at<uchar>(iter));
+				if(int(face_store->frame_gradient.at<uchar>(iter)) > inten_max || int(face_store->frame_gradient.at<uchar>(iter)) < inten_min)
+				{
+					flag=0;
+				}
 	    
-	      //	  printf("%f  1st\n",xenergy);
-	      // yenergy+=(face_store->frame_gradient.at<uchar>(iter));
-	    }
-	  //      k--;
+				//	  printf("%f  1st\n",xenergy);
+				// yenergy+=(face_store->frame_gradient.at<uchar>(iter));
+			}
+			//      k--;
+		}
+		printf("\n");
+		if(flag==1)
+		{
+			count++;
+			printf("count of no of similar templates %d\n",count);
+		}
 	}
-      printf("\n");
-      if(flag==1)
-	{
-	  count++;
-	  printf("count of no of similar templates %d\n",count);
-	}
-    }
   
-  if(count>TEMP_THRESHOLD)//threshold to determine 
-    {
-      return false;
-    }
-  return true;
+	if(count>TEMP_THRESHOLD)//threshold to determine 
+	{
+		return false;
+	}
+	return true;
 }
 
 float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template, int eye_no, int pos)

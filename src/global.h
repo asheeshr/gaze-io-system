@@ -21,6 +21,7 @@
 #ifndef GLOBAL_GIOS
 #define GLOBAL_GIOS
 
+
 /* Standard Headers */
 #include <iostream>
 #include <ctime>
@@ -37,16 +38,19 @@
 #include <exception>
 #include <atomic>
 
+
 /* OpenCV Headers */
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/core/core.hpp>
 
+
 /* Constants */
 #define PI 3.14159265
 #define LEFT_EYE 0b001
 #define RIGHT_EYE 0b010
+
 
 /* Global Structures */
 
@@ -64,7 +68,7 @@ struct face {
 
 struct eyes {
 	
-	std::vector<cv::Rect> eyes;
+	cv::Rect eyes[3]; /* Position 0 unused */
 	cv::Mat frame;
 	cv::Mat eye_frame[3]; /* Position 0 unused */
 	std::uint8_t position;
@@ -97,11 +101,14 @@ struct screen_resolution{
 
         std::int16_t width;
         std::int16_t height;
-};
+}; /* Doesnt need mutex as atomic types */
+
+
 /* Macros */
 #define test_and_lock(X) (X##_status || (X##_status = X->try_lock())) /* Provides a reliable interface for std::mutex. Checks if unlocked, before locking. */
 #define test_and_unlock(X) if(X##_status) {X->unlock(); X##_status = false;} /* Provides a reliable interface for std::mutex. Checks if locked, before unlocking. */
 #define constrain(X,XMIN,XMAX) (X<XMIN?XMIN:(X>XMAX?XMAX:X)) /* Constrain X to the range [XMIN, XMAX] */
+
 
 /* Functions */
 inline const char * gios_state(int state)
