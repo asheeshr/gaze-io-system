@@ -5,7 +5,9 @@
 
 int start_update_gui_pointer(struct screen_resolution *, struct position_vector *);
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif /* _GNU_SOURCE */
 
 #include <stdlib.h>
 #include <stdio.h>

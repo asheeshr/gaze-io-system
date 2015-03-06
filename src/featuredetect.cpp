@@ -29,7 +29,7 @@ int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct ey
 	face_store->frame_gradient = image_gradient(face_store->frame);
 	if(face_store->frame_gradient.empty()) return 0;
 
-	if( (eyes_store->position & LEFT_EYE|RIGHT_EYE) == 0 ) return 0;
+	if( (eyes_store->position & (LEFT_EYE|RIGHT_EYE)) == 0 ) return 0;
 	if( eyes_store->position & LEFT_EYE ) status |= eyes_closedetect_helper(LEFT_EYE, face_store, eyes_store, eyes_store_template);
 	if( eyes_store->position & RIGHT_EYE ) status |= eyes_closedetect_helper(RIGHT_EYE, face_store, eyes_store, eyes_store_template);
 	return status;

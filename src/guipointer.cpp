@@ -17,7 +17,6 @@ static int numfbconfigs;
 static GLXContext render_context;
 static Window Xroot, window_handle;
 static GLXWindow glX_window_handle;
-static int width, height;
 static int VisData[] = {
 GLX_RENDER_TYPE, GLX_RGBA_BIT,
 GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
@@ -93,7 +92,7 @@ static void createTheWindow(struct screen_resolution *screen_store)
 	XWMHints *startup_state;
 	XTextProperty textprop;
 	XSetWindowAttributes attr = {0,};
-	static char *title = "Transparent OpenGL Window";
+	static const char *title = "Transparent OpenGL Window";
 
 	Xdisplay = XOpenDisplay(NULL);
 	if (!Xdisplay) {

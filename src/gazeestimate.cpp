@@ -59,7 +59,7 @@ int gaze_energy(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 
 int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *energy_position_store)
 { 
-	int i,j;
+	int i;
 	float xenergy=0.0, yenergy=0.0;
 	float *energy; //supplementary energy variable to store the pointer returned by calculate_energy
 //	ene[0]=ene[1]=0.0;
@@ -174,7 +174,7 @@ bool istemp_on_eye(struct face *face_store, struct eyes_template *eyes_store_tem
 float* calculate_energy(struct face *face_store, struct eyes_template *eyes_store_template, int eye_no, int pos)
 {
 	float* ene;
-	int j,i;
+	int j;
 	float energy_sum=0;//yenergy=0;
 	ene = new float[2];
 	ene[0]=ene[1]=0;
