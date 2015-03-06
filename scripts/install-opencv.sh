@@ -16,7 +16,7 @@
 #with this program; if not, write to the Free Software Foundation, Inc.,
 #51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-echo "This script will install OpenCV 2.4.10 on your system"
+echo "This script will download, build and install OpenCV 2.4.10 on your system"
 echo "This script may take upto an hour depending on your internet speed and processor capability"
 echo "Manual intervention will be required in between the process."
 
@@ -38,7 +38,7 @@ fi
 #echo "Installing Dependencies"
 #Add install command for all dependencies
 
-echo "(2/5) Starting OpenCV build"
+echo "(2/5) Extracting files from OpenCV zip file"
 unzip ./OpenCV-2.4.10.zip
 cd ./opencv-2.4.10
 mkdir build
@@ -62,7 +62,7 @@ cmake \
 #Need to add arguments for Gtk support
 
 echo "(4/5) Building OpenCV - This will take some time."
-make -j$((`nproc`*3)) >> ../../installer-log.txt
+make -j$((`nproc`*2)) >> ../../installer-log.txt
 
 
 echo "(5/5) Build complete. Enter password to install."
