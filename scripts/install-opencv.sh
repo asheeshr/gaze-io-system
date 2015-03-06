@@ -24,9 +24,8 @@ if [ ! -d ~/opencv ]; then
     mkdir ~/opencv
 fi
 
-touch ~/opencv/installer-log.txt #Log file
-
 cd ~/opencv
+touch ./installer-log.txt #Log file
 
 echo "(1/5) Checking for OpenCV zip file"
 if [ -f ./"OpenCV-2.4.10.zip" ]; then
@@ -49,17 +48,16 @@ echo "(3/5) Configuring options for OpenCV build"
 cmake \
     -D CMAKE_BUILD_TYPE=RELEASE \
     -D CMAKE_INSTALL_PREFIX=/usr/local \
-    -D WITH_TBB=OFF \ #Conflicts with OpenMP and OpenCL
+    -D WITH_TBB=OFF \
     -D BUILD_NEW_PYTHON_SUPPORT=ON \
     -D WITH_V4L=ON \
     -D INSTALL_C_EXAMPLES=OFF \
     -D INSTALL_PYTHON_EXAMPLES=OFF \
     -D BUILD_EXAMPLES=OFF \
-    -D WITH_QT=OFF \ #Doesn't work well when multithreading
+    -D WITH_QT=OFF \
     -D WITH_OPENGL=ON \
     -D WITH_OPENMP=ON \
     -D WITH_OPENCL=ON \
-    -D WITH_=ON \
     .. >> ../../installer-log.txt
 #Need to add arguments for Gtk support
 
