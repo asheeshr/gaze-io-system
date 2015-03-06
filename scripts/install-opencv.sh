@@ -24,22 +24,24 @@ if [ ! -d ~/opencv ]; then
     mkdir ~/opencv
 fi
 
-touch installer-log.txt #Log file
+touch ~/opencv/installer-log.txt #Log file
+
+cd ~/opencv
 
 echo "(1/5) Checking for OpenCV zip file"
-if[ -f ~/opencv/"OpenCV-2.4.10.zip" ]; then
+if [ -f ./"OpenCV-2.4.10.zip" ]; then
     echo "Found OpenCV zip file"
 else
     echo "Downloading OpenCV 2.4.10"
-    wget -O OpenCV-2.4.10.zip http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.10/opencv-2.4.10.zip/download > installer-log.txt
+    wget -O OpenCV-2.4.10.zip http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.10/opencv-2.4.10.zip/download > ./installer-log.txt
 fi
 
 #echo "Installing Dependencies"
 #Add install command for all dependencies
 
 echo "(2/5) Starting OpenCV build"
-unzip ~/opencv/OpenCV-2.4.9.zip
-cd ./opencv/opencv-2.4.9
+unzip ./OpenCV-2.4.9.zip
+cd ./opencv-2.4.9
 mkdir build
 cd build
 
@@ -58,15 +60,15 @@ cmake \
     -D WITH_OPENMP=ON \
     -D WITH_OPENCL=ON \
     -D WITH_=ON \
-    .. >> installer-log.txt
+    .. >> ../../installer-log.txt
 #Need to add arguments for Gtk support
 
 echo "(4/5) Building OpenCV - This will take some time."
-make -j$((`nproc`*3)) >> installer-log.txt
+make -j$((`nproc`*3)) >> ../../installer-log.txt
 
 
 echo "(5/5) Build complete. Enter password to install."
-sudo make install >> installer-log.txt
+sudo make install >> ../../installer-log.txt
 sudo ldconfig
 
 echo "OpenCV 2.4.10 should be ready for use. Check log file in case of any errors."
