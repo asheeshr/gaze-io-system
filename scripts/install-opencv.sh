@@ -40,8 +40,8 @@ fi
 #Add install command for all dependencies
 
 echo "(2/5) Starting OpenCV build"
-unzip ./OpenCV-2.4.9.zip
-cd ./opencv-2.4.9
+unzip ./OpenCV-2.4.10.zip
+cd ./opencv-2.4.10
 mkdir build
 cd build
 
