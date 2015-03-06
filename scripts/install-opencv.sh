@@ -27,7 +27,7 @@ fi
 touch installer-log.txt #Log file
 
 echo "(1/5) Checking for OpenCV zip file"
-if[ -f ~/opencv/"OpenCV-2.4.10.zip" ] then
+if[ -f ~/opencv/"OpenCV-2.4.10.zip" ]; then
     echo "Found OpenCV zip file"
 else
     echo "Downloading OpenCV 2.4.10"

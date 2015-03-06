@@ -68,7 +68,7 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 	
 	while(1)
 	{
-//		try{
+		try{
 			/* Copy data locally */
 			if(test_and_lock(mutex_face))
 			{
@@ -158,14 +158,14 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			update_frequency->start_gui = std::chrono::system_clock::now();
 			//std::this_thread::yield();
 			//std::this_thread::sleep_for(sleep_time);
-//		}
-/*		catch(std::exception &e)
+		}
+		catch(std::exception &e)
 		{
 			printf("GUI - Exception!\n");
 			std::cout<<e.what();
 			waitKey(100);
 		};
-*/
+
 	}
 
 	return 1;
