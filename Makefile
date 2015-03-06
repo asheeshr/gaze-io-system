@@ -36,3 +36,6 @@ prepare:
 	if [ ! -d ./bin ]; then mkdir ./bin; fi
 	if [ ! -d ./data ]; then mkdir ./data; fi
 
+clean:
+	find -maxdepth 2 -name *.o -delete
+	find -maxdepth 1 -name gios -delete
