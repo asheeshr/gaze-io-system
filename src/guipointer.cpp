@@ -312,8 +312,8 @@ static void redrawTheWindow(struct screen_resolution *screen_store, struct posit
 	static float counterx = 0.0, countery = 0.0;
 	
  	struct test_pos pos;                       /* list for storing 5 latest ep_vector's at any given time */  
-	list<struct test_pos> ep_list;
-	list<struct test_pos>::iterator itr;
+ 	std::list<struct test_pos> ep_list;
+	std::list<struct test_pos>::iterator itr;
 	
 	pos.x=ptr->px;							   
 	pos.y=ptr->py;

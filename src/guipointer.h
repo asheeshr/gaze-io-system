@@ -14,8 +14,6 @@ int start_update_gui_pointer(struct screen_resolution *, struct position_vector 
 #include <string.h>
 #include <math.h>
 
-using namespace std;
-
 #include <sys/types.h>
 #include <time.h>
 
