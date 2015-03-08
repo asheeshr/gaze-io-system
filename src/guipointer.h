@@ -14,6 +14,8 @@ int start_update_gui_pointer(struct screen_resolution *, struct position_vector 
 #include <string.h>
 #include <math.h>
 
+using namespace std;
+
 #include <sys/types.h>
 #include <time.h>
 
@@ -23,6 +25,15 @@ int start_update_gui_pointer(struct screen_resolution *, struct position_vector 
 #include <X11/Xatom.h>
 #include <X11/extensions/Xrender.h>
 #include <X11/Xutil.h>
+
+/*Pointer Queue Structure*/
+
+struct test_pos
+{
+	int x;
+	int y;
+};
+
 
 #define USE_CHOOSE_FBCONFIG
 
