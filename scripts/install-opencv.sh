@@ -15,7 +15,6 @@
 #You should have received a copy of the GNU General Public License along
 #with this program; if not, write to the Free Software Foundation, Inc.,
 #51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
 echo "This script will download, build and install OpenCV 2.4.10 on your system"
 echo "This script may take upto an hour depending on your internet speed and processor capability"
 echo "Manual intervention will be required in between the process."
@@ -37,6 +36,12 @@ fi
 
 #echo "Installing Dependencies"
 #Add install command for all dependencies
+sudo apt-get install build-essential
+sudo apt-get install cmake checkinstall libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+#sudo apt-get install libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libv4l-dev v4l-utils 
+sudo apt-get install libgtkglext1 libgtkglext1-dev #for libgtk
+sudo apt-get install freeglut3-dev #for opengl
+sudo apt-get install libgomp1 #for opemmp
 
 echo "(2/5) Extracting files from OpenCV zip file"
 unzip ./OpenCV-2.4.10.zip
