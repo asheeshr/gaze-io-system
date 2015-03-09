@@ -37,7 +37,7 @@
 #include <chrono>
 #include <exception>
 #include <atomic>
-
+#include <list>
 
 /* OpenCV Headers */
 #include "opencv2/objdetect/objdetect.hpp"
