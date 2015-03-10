@@ -176,8 +176,8 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
 	float* ene;
 	int j;
 	float energy_sum=0;//yenergy=0;
-	ene = new float[2];
-	ene[0]=ene[1]=0;
+	ene = new float[3]; /* Memory leak. Needs to be fixed */
+	ene[0]=ene[1]=ene[2]=0; 
 	Point iter(eyes_store_template->windows[eye_no][pos].center);
 	int mid = (eyes_store_template->windows)[eye_no][pos].size.width/2;
 	float costheta = cos((eyes_store_template->windows)[eye_no][pos].angle * PI / 180.0);
@@ -213,16 +213,19 @@ float* calculate_energy(struct face *face_store, struct eyes_template *eyes_stor
 			energy_sum+=float((face_store->frame.at<uchar>(iter)));
 		}
 	}
-	fflush(stdout);
-	ene[0]=float((energy_sum/(eyes_store_template->windows[eye_no][pos].size.width)-255/2)*costheta);
-	ene[1]=float((energy_sum/(eyes_store_template->windows[eye_no][pos].size.width)-255/2)*sintheta);
-	//  printf("%f       %f    %f    %f\n",ene[0],ene[1],costheta,sintheta);
+
+	ene[0] = float((energy_sum/(eyes_store_template->windows[eye_no][pos].size.width)-255/2)*costheta);
+	ene[1] = float((energy_sum/(eyes_store_template->windows[eye_no][pos].size.width)-255/2)*sintheta);
+	ene[2] = float((energy_sum/(eyes_store_template->windows[eye_no][pos].size.width)-255/2)); /* Vector magnitude */
 	return ene;
 }
 
 
 int energy_to_coord(struct position_vector *energy_position_store)
 {
+	/* Needs to generate two vectors. 
+	   One for pointer position change. 
+	   Second for shifting the template over to the eye. */
 
 	energy_position_store->px += energy_position_store->ex * SCALING_CONSTANT;
 	energy_position_store->py += energy_position_store->ey * SCALING_CONSTANT;
@@ -230,3 +233,9 @@ int energy_to_coord(struct position_vector *energy_position_store)
 	return 1;
 }
 
+int shift_template(struct eyes_template *eyes_store_template, struct position_vector *energy_position_store)
+{
+	/* Shifts the template over the eye if required */
+	
+
+}

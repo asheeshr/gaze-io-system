@@ -60,7 +60,7 @@ int init_data_structures(struct face **f, struct eyes **e, struct eyes_template 
 		(*e)->position = 0;
 	
 	if( *et != NULL )
-		(*et)->counter[LEFT_EYE] = (*et)->counter[RIGHT_EYE] = 0;
+		(*et)->counter[LEFT_EYE] = (*et)->counter[RIGHT_EYE] = (*et)->status = 0;
 	
 	if( *s!=NULL )
 		(*s)->width = (*s)->height = 0;

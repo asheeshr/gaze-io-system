@@ -79,6 +79,10 @@ struct eyes_template {
 	
 	CvBox2D windows[3][100]; /* Position 0 unused */
 	uint8_t counter[3]; /* Position 0 unused */
+	uint8_t status; /* 0 -> Error
+			   1 -> Template on eye
+			   2 -> Template partially on eye 
+			   3 -> Template outside eye */
 
 };
 
