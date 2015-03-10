@@ -310,7 +310,22 @@ static void redrawTheWindow(struct screen_resolution *screen_store, struct posit
 	//float const aspect = (float)width / (float)height;
 
 	static float counterx = 0.0, countery = 0.0;
+	
+ 	struct test_pos pos;                       /* list for storing 5 latest ep_vector's at any given time */  
+ 	std::list<struct test_pos> ep_list;
+	std::list<struct test_pos>::iterator itr;
+	
+	pos.x=ptr->px;							   
+	pos.y=ptr->py;
+	ep_list.push_front(pos);	 
 
+	if(ep_list.size()>5)
+	{
+		ep_list.pop_back();
+	}	
+	
+	
+	
 	glDrawBuffer(GL_BACK);
 
 	glViewport(0, 0, screen_store->width, screen_store->height);
@@ -326,9 +341,16 @@ static void redrawTheWindow(struct screen_resolution *screen_store, struct posit
 	
 	glBegin(GL_POINTS); //starts drawing of points
 
+	 for(itr=ep_list.begin();itr!=ep_list.end();itr++)
+    {
+        glVertex3f(itr->x,itr->y,0.0f);
+    }
+
+
+
 //	glVertex3f(0,0,0.0f);
 //	glVertex3f(1,1,0.0f);
-	glVertex3f(ptr->px,ptr->py,0.0f);
+//	glVertex3f(ptr->px,ptr->py,0.0f);
 //	glVertex3f(1,-1,0.0f);
 
 //	glVertex3f(-0.25,+0.20,0.0f);
