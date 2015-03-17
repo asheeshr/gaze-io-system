@@ -31,7 +31,7 @@ using namespace cv;
 #define ERROR_THRESHOLD 30
 #define PI 3.14159265
 #define INTEN_THRESHOLD 100   // minimum gradient image intensity to be crossed for the iris border
-#define ACC_THRESHOLD 50      // minimum no of templates required(3/4*360/DTHETA)
+#define ACC_THRESHOLD 100      // minimum no of templates required(3/4*360/DTHETA)
 extern std::vector<Rect> eyes;
 
 int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
@@ -49,7 +49,7 @@ int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct ey
 
 int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
-	printf("Hello");
+	//printf("Hello");
 	CvBox2D templates[100];
 	float theta, costheta, sintheta;
 	int distance;
@@ -64,6 +64,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	center.y=eyes_store->eyes[eye_no].y+eyes_store->eyes[eye_no].height*0.5;
 	//cout<<"center starts\n";
 	//cout<<center.x<<" "<<center.y<<"\n";
+
 	queue <Point> q;
 	int dx[]={1,1,1,-1,-1,-1,0,0};
 	int dy[]={1,-1,0,1,-1,0,1,-1};
@@ -71,6 +72,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	q.push(center);
 	uchar pixel_intensity;
 	bool flag=1;
+	circle(face_store->frame, center, 1, 255);
 	int cnt=0;
 	
 	while(!q.empty())
@@ -91,7 +93,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 		cnt++;
 		//cout<<cnt<<"\n";
 	
-		if(cnt>100)
+		if(cnt>1000)
 			break;
 		for(int i=0;i<8;i++)
 					{
@@ -99,7 +101,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 						temp=iter;
 						temp.x+=dx[i];
 						temp.y+=dy[i];
-						if(temp.x>=0&&temp.y>=0&&abs(center.x -temp.x)<25&&abs(center.y - temp.y)<25)
+						if(temp.x>=0&&temp.y>=0&&abs(center.x -temp.x)<30&&abs(center.y - temp.y)<30)
 						if(vis[temp.x][temp.y]==0)
 							{	
 								vis[temp.x][temp.y]=1;
@@ -114,7 +116,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 				
 				{
 					circle(face_store->frame, iter, 1, 255);
-					//cout<<abs(center.x - iter.x )<<" "<<(center.y-iter.y)<<"\n";
+					cout<<abs(center.x - iter.x )<<" "<<(center.y-iter.y)<<"\n";
 					int theta;
 					int xdiff,ydiff;
 					float angle = atan2(center.y - iter.y, center.x -iter.x);
@@ -193,6 +195,30 @@ Mat image_gradient(Mat frame)
 	//    GaussianBlur( frame, frame, Size(3,3), 0, 0, BORDER_DEFAULT );
 
 	/// Gradient X
+	//Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
+	Sobel( frame, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
+	convertScaleAbs( grad_x, abs_grad_x );
+    
+	/// Gradient Y
+	//Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
+	Sobel( frame, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT );
+	convertScaleAbs( grad_y, abs_grad_y );
+    
+	/// Total Gradient (approximate)
+	addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, S );
+/// Gradient X
+	//Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
+	Sobel( frame, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
+	convertScaleAbs( grad_x, abs_grad_x );
+    
+	/// Gradient Y
+	//Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
+	Sobel( frame, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT );
+	convertScaleAbs( grad_y, abs_grad_y );
+    
+	/// Total Gradient (approximate)
+	addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, S );
+/// Gradient X
 	//Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
 	Sobel( frame, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
 	convertScaleAbs( grad_x, abs_grad_x );
