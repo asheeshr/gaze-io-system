@@ -59,11 +59,46 @@ int gaze_energy(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 
 int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *energy_position_store)
 { 
+	float *energy1, *energy2;
+	int ex_sum, ey_sum;
+	int counter_inside_eye, counter_inside_template;
+
 	/* Calculate and test energy values iterating over theeta */
+	for(i=0; i<180; i+=DTHETA)
+	{
+		if(eyes_store_template->windows[i].height==4) continue;
+		/* Check template at theta and theta + 180 +- 1*/
+		energy1 = calculate_energy(face_store, eyes_store_template, eye_no, i/DTHETA);
+		
+		if(eyes_store_template->windows[(i+180)/DTHETA].height!=4) energy2 = calculate_energy(face_store, eyes_store_template, eye_no, (i+180)/DTHETA);
+		else if(eyes_store_template->windows[((i + 180 - DTHETA)%360)/DTHETA].height!=4) 
+			energy2 = calculate_energy(face_store, eyes_store_template, eye_no, ((i + 180 - DTHETA)%360)/DTHETA);
+		else if(eyes_store_template->windows[((i + 180 - DTHETA)%360)/DTHETA].height!=4) 
+			energy2 = calculate_energy(face_store, eyes_store_template, eye_no, ((i + 180 + DTHETA)%360)/DTHETA);
+		else energy2 = NULL;
+		
+		/* Perform test on sum and on individual values */
+		
+		if(energy2 != NULL)
+		{
+			/* Check for + and - values in estimated range and then evaluate sum if previous test is true */
+
+
+
+			/* Update counter */
+			/* Check for sum of values within eye region range */
+
+			/* Update counter */
+		}
+
+	}
 
 	/* Store result in globals ex and ey */
+	ex[eye_no] = ex_sum;
+	ey[eye_no] = ey_sum;
 
-	return eye_no; /* Should return 0 when template is outside eye */
+	if(counter_inside_eye>min_inside_eye_threshold) return eye_no;
+	if(counter_inside_template>min_inside_template_threshold) return eye_no;
 }
 
 int energy_to_coord(struct position_vector *energy_position_store)
