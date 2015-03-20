@@ -12,10 +12,14 @@ Dependencies
 ------------
 The project has the following dependencies for building:
 - OpenGL
-- OpenMP
-- OpenCV compiled using OpenGL, OpenMP, and Gtk. Also, OpenCL is preferable but not necessary.
+- OpenMP (implemented by GCC 4.7 and higher)
+- OpenCV compiled using OpenGL, OpenMP, and Gtk (requires `libgtkglext`). Also, OpenCL is preferable but not necessary.
+- GNUplot
 
 The project also uses X11 API, and hence will only run on distros that utilise X11 display servers.
+
+A [script](https://github.com/asheeshr/gaze-io-system/blob/master/scripts/install-opencv.sh) that configures and installs OpenCV is included in the repo. 
+
 
 Structure
 ---------
