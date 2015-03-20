@@ -30,8 +30,8 @@ using namespace cv;
 #define MAX_DISTANCE 25   
 #define ERROR_THRESHOLD 30
 #define PI 3.14159265
-#define INTEN_THRESHOLD 100   // minimum gradient image intensity to be crossed for the iris border
-#define ACC_THRESHOLD 50      // minimum no of templates required(3/4*360/DTHETA)
+#define INTEN_THRESHOLD 50   // minimum gradient image intensity to be crossed for the iris border
+#define ACC_THRESHOLD 20      // minimum no of templates required(3/4*360/DTHETA)
 extern std::vector<Rect> eyes;
 
 int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
