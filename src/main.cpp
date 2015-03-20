@@ -120,10 +120,15 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 					if(test_and_lock(mutex_eyes_template) && (update_frequency->status=2) 
 					   && (eyes_found = eyes_closedetect(face_store, eyes_store, eyes_store_template)))
 					{
-						if((update_frequency->status=3) 
+						sort_template(eyes_store, eyes_store_template);
+
+						while((update_frequency->status=3) 
 						   && gaze_energy(face_store, eyes_store, eyes_store_template, energy_position_store))
 						{
+							if((eyes_store_template->status[LEFT_EYE]==0 || eyes_store_template->status[LEFT_EYE]==3) && (eyes_store_template->status[RIGHT_EYE]==0 || eyes_store_template->status[RIGHT_EYE]==3))
+								break;
 							energy_to_coord(energy_position_store);
+							shift_template(face_store, eyes_store_template);
 							/* Add template adjustment function here*/
 							/* Update new frame */
 						}
