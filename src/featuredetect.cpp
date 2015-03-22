@@ -64,11 +64,11 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 				pixel_intensity = face_store->frame_gradient.at<uchar>(iter);
 				if(pixel_intensity > (intensity_threshold-attemptno*5))
 				{
-					counter++;
 					templates[counter].center=iter;
 					templates[counter].size.height=1;
 					templates[counter].size.width=5;
 					templates[counter].angle=theta;
+					counter++;
 					break;
 	     	  
 				}
@@ -96,7 +96,7 @@ int sort_template(struct eyes *eyes_store, struct eyes_template *eyes_store_temp
 	if( eyes_store->position & LEFT_EYE ) 
 	{
 		for(int i=0; i<360/DTHETA; i++)	windows[i].size.height=4;
-		for(int i=1; i<(eyes_store_template->counter)[LEFT_EYE]; i++)
+		for(int i=0; i<(eyes_store_template->counter)[LEFT_EYE]; i++)
 		{
 			windows[int(eyes_store_template->windows[LEFT_EYE][i].angle/DTHETA)] = eyes_store_template->windows[LEFT_EYE][i];
 		}
@@ -111,7 +111,7 @@ int sort_template(struct eyes *eyes_store, struct eyes_template *eyes_store_temp
 	if( eyes_store->position & RIGHT_EYE ) 
 	{
 		for(int i=0; i<360/DTHETA; i++)	windows[i].size.height=4;
-		for(int i=1; i<(eyes_store_template->counter)[RIGHT_EYE]; i++)
+		for(int i=0; i<(eyes_store_template->counter)[RIGHT_EYE]; i++)
 		{
 			windows[int(eyes_store_template->windows[RIGHT_EYE][i].angle/DTHETA)] = eyes_store_template->windows[RIGHT_EYE][i];
 		}

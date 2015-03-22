@@ -251,7 +251,7 @@ int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[])
 		{
 			fprintf(pipe, "set output './data/eye0_plot.png'\n");
 			fprintf(pipe, "plot '-' with points pt 7 ps 3 notitle\n");
-			for(int i=1; i<et.counter[LEFT_EYE]; i++)
+			for(int i=0; i<et.counter[LEFT_EYE]; i++)
 			{
 				fprintf(pipe, "%.0f %.0f\n", et.windows[LEFT_EYE][i].center.x, et.windows[LEFT_EYE][i].center.y);
 			}
@@ -262,7 +262,7 @@ int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[])
 		{
 			fprintf(pipe, "set output './data/eye1_plot.png'\n");
 			fprintf(pipe, "plot '-' with points pt 7 ps 3 notitle\n");
-			for(int i=1; i<et.counter[RIGHT_EYE]; i++)
+			for(int i=0; i<et.counter[RIGHT_EYE]; i++)
 			{
 				fprintf(pipe, "%.0f %.0f\n", et.windows[RIGHT_EYE][i].center.x, et.windows[RIGHT_EYE][i].center.y);
 			}

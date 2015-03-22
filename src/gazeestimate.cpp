@@ -222,7 +222,7 @@ int energy_to_coord(struct position_vector *energy_position_store)
 }
 
 
-float* calculate_energy(int eye_no, struct face *face_store, struct eyes_template *eyes_store_template, int pos)
+float* calculate_energy(int pos, struct face *face_store, struct eyes_template *eyes_store_template, int eye_no)
 {
 	float* ene;
 	int j;
