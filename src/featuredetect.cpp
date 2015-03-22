@@ -81,50 +81,30 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	
 	if(counter < ACC_THRESHOLD) return 0;
 
+	sort_template(eye_no, eyes_store_template);
 	for(int i=0; i<counter; i++) 
 		(eyes_store_template->windows)[eye_no][i] = templates[i];
 	return eye_no;
 }
 
-int sort_template(struct eyes *eyes_store, struct eyes_template *eyes_store_template)
+int sort_template(int eye_no, struct eyes_template *eyes_store_template)
 {
 	CvBox2D windows[360/DTHETA+1];
-	std::uint8_t status = 0;
-
-	if( (eyes_store->position & (LEFT_EYE|RIGHT_EYE)) == 0 ) return 0;
-
-	if( eyes_store->position & LEFT_EYE ) 
+	
+	for(int i=0; i<360/DTHETA; i++)	windows[i].size.height=4;
+	for(int i=0; i<(eyes_store_template->counter)[eye_no]; i++)
 	{
-		for(int i=0; i<360/DTHETA; i++)	windows[i].size.height=4;
-		for(int i=0; i<(eyes_store_template->counter)[LEFT_EYE]; i++)
-		{
-			windows[int(eyes_store_template->windows[LEFT_EYE][i].angle/DTHETA)] = eyes_store_template->windows[LEFT_EYE][i];
-		}
-
-		for(int i=0; i<360/DTHETA; i++)
-		{
-			eyes_store_template->windows[LEFT_EYE][i] = windows[i];
-		}
-		
-		status |= LEFT_EYE;
+		windows[int(eyes_store_template->windows[eye_no][i].angle/DTHETA)] = eyes_store_template->windows[eye_no][i];
 	}
-	if( eyes_store->position & RIGHT_EYE ) 
+	
+	for(int i=0; i<360/DTHETA; i++)
 	{
-		for(int i=0; i<360/DTHETA; i++)	windows[i].size.height=4;
-		for(int i=0; i<(eyes_store_template->counter)[RIGHT_EYE]; i++)
-		{
-			windows[int(eyes_store_template->windows[RIGHT_EYE][i].angle/DTHETA)] = eyes_store_template->windows[RIGHT_EYE][i];
-		}
-		
-		for(int i=0; i<360/DTHETA; i++)
-		{
-			eyes_store_template->windows[RIGHT_EYE][i] = windows[i];
-		}
-
-		status |= RIGHT_EYE;
+		eyes_store_template->windows[eye_no][i] = windows[i];
+//		printf("%d", eyes_store_template->windows[eye_no][i].size.height);
 	}
+		
 
-	return status;
+	return eye_no;
 }
 
 
@@ -133,25 +113,31 @@ int set_threshold(int eye_no, struct face *face_store, struct eyes *eyes_store)
 	printf("Calculating histogram\n");
 	int hbins = 256;
 	int histSize[] = {hbins};
-	float hranges[] = { 0, 256};
+	float hranges[] = { 0, 255};
 	const float* ranges[] = {hranges};
 	Mat hist, img = face_store->frame_gradient(eyes_store->eyes[eye_no]);
 	int channels[] = {0};
 	int no_of_pixels = eyes_store->eyes[eye_no].height * eyes_store->eyes[eye_no].width;
 	printf("No of pixels: %d\n", no_of_pixels);
 	calcHist( &img,
-		  1, channels, Mat(), // do not use mask
-		  hist, 1, histSize, ranges,
+		  1, 
+		  channels, 
+		  Mat(), // do not use mask
+		  hist, 
+		  1, 
+		  histSize, 
+		  ranges,
 		  true, // the histogram is uniform
 		  false);
-	for(int i=256, hist_sum=0; i>0;i--)
-	{
-		hist_sum+=hist.at<uchar>(i);
 
-		if(hist_sum >= 0.5*no_of_pixels)
+	for(int i=hbins-1, hist_sum=0; i>=0;i--)
+	{
+		hist_sum+=hist.at<float>(i);
+
+		if(hist_sum >= 0.05*no_of_pixels)
 		{
-			printf("Found intensity %d\n", i);
-			return i;
+			printf("Found intensity %d at %d\n", i, hist_sum);
+			return i*256/hbins;
 		}
 	}
 	return INTEN_THRESHOLD;
