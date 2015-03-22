@@ -89,12 +89,12 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 
 int sort_template(int eye_no, struct eyes_template *eyes_store_template)
 {
-	CvBox2D windows[360/DTHETA+1];
+	CvBox2D windows[360/DTHETA];
 	
 	for(int i=0; i<360/DTHETA; i++)	windows[i].size.height=4;
 	for(int i=0; i<(eyes_store_template->counter)[eye_no]; i++)
 	{
-		windows[int(eyes_store_template->windows[eye_no][i].angle/DTHETA)] = eyes_store_template->windows[eye_no][i];
+		windows[int(eyes_store_template->windows[eye_no][i].angle/DTHETA)%(360/DTHETA)] = eyes_store_template->windows[eye_no][i];
 	}
 	
 	for(int i=0; i<360/DTHETA; i++)
