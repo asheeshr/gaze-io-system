@@ -42,7 +42,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	float theta, costheta, sintheta;
 	int distance;
     
-	int intensity_threshold = set_threshold(eye_no, face_store, eyes_store)
+	int intensity_threshold = set_threshold(eye_no, face_store, eyes_store); 
 
 	Point iter, center;
 	uchar pixel_intensity;
@@ -62,7 +62,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 				iter.x = center.x + distance*costheta;
 				iter.y = center.y + distance*sintheta;
 				pixel_intensity = face_store->frame_gradient.at<uchar>(iter);
-				if(pixel_intensity > (intern_threshold-attemptno*5))
+				if(pixel_intensity > (intensity_threshold-attemptno*5))
 				{
 					counter++;
 					templates[counter].center=iter;
@@ -96,7 +96,7 @@ int sort_template(struct eyes *eyes_store, struct eyes_template *eyes_store_temp
 		for(int i=0; i<360/DTHETA; i++)	windows[i].size.height=4;
 		for(int i=1; i<(eyes_store_template->counter)[LEFT_EYE]; i++)
 		{
-			windows[eyes_store_template->windows[LEFT_EYE][i].angle/DTHETA] = eyes_store_template->windows[LEFT_EYE][i];
+			windows[int(eyes_store_template->windows[LEFT_EYE][i].angle/DTHETA)] = eyes_store_template->windows[LEFT_EYE][i];
 		}
 
 		for(int i=0; i<360/DTHETA; i++)
@@ -111,7 +111,7 @@ int sort_template(struct eyes *eyes_store, struct eyes_template *eyes_store_temp
 		for(int i=0; i<360/DTHETA; i++)	windows[i].size.height=4;
 		for(int i=1; i<(eyes_store_template->counter)[RIGHT_EYE]; i++)
 		{
-			windows[eyes_store_template->windows[RIGHT_EYE][i].angle/DTHETA] = eyes_store_template->windows[RIGHT_EYE][i];
+			windows[int(eyes_store_template->windows[RIGHT_EYE][i].angle/DTHETA)] = eyes_store_template->windows[RIGHT_EYE][i];
 		}
 		
 		for(int i=0; i<360/DTHETA; i++)
@@ -136,14 +136,12 @@ int set_threshold(int eye_no, struct face *face_store, struct eyes *eyes_store)
 	// 255 (pure spectrum color)
 	// float sranges[] = { 0, 256 };
 	const float* ranges[] = {hranges};
-	Mat hist;
+	Mat hist, img = face_store->frame_gradient( eyes_store->eyes[eye_no]);
 	// we compute the histogram from the 0-th and 1-st channels
 	int channels[] = {0};
 
 	int no_of_pixels = eyes_store->eyes[eye_no].height * eyes_store->eyes[eye_no].width;
-	calcHist( face_store->face_gradient(Rect(eyes_store->eyes[eye_no].center.x-eyes_store->eyes[eye_no].width/2, 
-						 eyes_store->eyes[eye_no].center.y-eyes_store->eyes[eye_no].height/2, 
-						 eyes_store->eyes[eye_no].width, eyes_store->eyes[eye_no].height)),
+	calcHist( &img,
 		  1, channels, Mat(), // do not use mask
 		  hist, 1, histSize, ranges,
 		  true, // the histogram is uniform

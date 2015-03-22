@@ -28,7 +28,7 @@ float* calculate_energy(int eye_no, struct face *face_store, struct eyes_templat
 int gaze_energy(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *energy_position_store);
 int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template);
 int energy_to_coord(struct position_vector *ep_vector);
-int shift_template(struct face *face_store, struct eyes_template *eyes_store_template);
+int shift_template(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template);
 int shift_template_helper(int eye_no, struct face *face_store, struct eyes_template *eyes_store_template);
 
 #endif /*GAZEESTIMATE_GIOS*/
