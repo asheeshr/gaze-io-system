@@ -77,10 +77,12 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 		if(counter > ACC_THRESHOLD) flag=0;
 		else attemptno++;
 	}
+	(eyes_store_template->counter)[eye_no] = counter;
+	
 	if(counter < ACC_THRESHOLD) return 0;
+
 	for(int i=0; i<counter; i++) 
 		(eyes_store_template->windows)[eye_no][i] = templates[i];
-	(eyes_store_template->counter)[eye_no] = counter;
 	return eye_no;
 }
 
@@ -128,19 +130,15 @@ int sort_template(struct eyes *eyes_store, struct eyes_template *eyes_store_temp
 
 int set_threshold(int eye_no, struct face *face_store, struct eyes *eyes_store)
 {   
+	printf("Calculating histogram\n");
 	int hbins = 256;
 	int histSize[] = {hbins};
-	// hue varies from 0 to 179, see cvtColor
 	float hranges[] = { 0, 256};
-	// saturation varies from 0 (black-gray-white) to
-	// 255 (pure spectrum color)
-	// float sranges[] = { 0, 256 };
 	const float* ranges[] = {hranges};
-	Mat hist, img = face_store->frame_gradient( eyes_store->eyes[eye_no]);
-	// we compute the histogram from the 0-th and 1-st channels
+	Mat hist, img = face_store->frame_gradient(eyes_store->eyes[eye_no]);
 	int channels[] = {0};
-
 	int no_of_pixels = eyes_store->eyes[eye_no].height * eyes_store->eyes[eye_no].width;
+	printf("No of pixels: %d\n", no_of_pixels);
 	calcHist( &img,
 		  1, channels, Mat(), // do not use mask
 		  hist, 1, histSize, ranges,
@@ -149,9 +147,12 @@ int set_threshold(int eye_no, struct face *face_store, struct eyes *eyes_store)
 	for(int i=256, hist_sum=0; i>0;i--)
 	{
 		hist_sum+=hist.at<uchar>(i);
-		if(hist_sum >= 0.1*no_of_pixels)
-			return i;
 
+		if(hist_sum >= 0.5*no_of_pixels)
+		{
+			printf("Found intensity %d\n", i);
+			return i;
+		}
 	}
 	return INTEN_THRESHOLD;
 
