@@ -61,7 +61,7 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 	int energy1[3], energy2[3];
 	int ex_sum = 0, ey_sum = 0, e_temp_sum = 0;
 	int counter_template_on_eye = 0, counter_partial_template_eye = 0;
-	const int template_on_eye_threshold = 0.40*eyes_store_template->counter[eye_no], partial_template_eye_threshold = 0.20*eyes_store_template->counter[eye_no];
+	const int template_on_eye_threshold = 0.60*eyes_store_template->counter[eye_no], partial_template_eye_threshold = 0.40*eyes_store_template->counter[eye_no];
 	/* Calculate and test energy values iterating over theeta */
 	for(i=0; i<180; i+=DTHETA)
 	{

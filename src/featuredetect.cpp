@@ -64,6 +64,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 				pixel_intensity = face_store->frame_gradient.at<uchar>(iter);
 				if(pixel_intensity > (intensity_threshold-attemptno*5))
 				{
+					circle(face_store->frame, iter, 1, 255);
 					templates[counter].center=iter;
 					templates[counter].size.height=1;
 					templates[counter].size.width=5;
