@@ -23,7 +23,6 @@
 #define GAZEESTIMATE_GIOS
 
 
-
 int calculate_energy(int eye_no, struct face *face_store, struct eyes_template *eyes_store_template, int energy[], int pos);
 int gaze_energy(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template, struct position_vector *energy_position_store);
 int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template);
