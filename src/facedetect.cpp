@@ -78,6 +78,7 @@ int eyesdetect_display(struct face *face_store, struct eyes *eyes_store)
 	return 1;  
 }
 
+int set_threshold(int eye_no, struct eyes *eyes_store);
 
 int eyes_sepframes(struct eyes *eyes_store)
 {
@@ -90,13 +91,17 @@ int eyes_sepframes(struct eyes *eyes_store)
 		{
 			eyes_store->eyes[LEFT_EYE] = eyes[0]; eyes_store->eye_frame[LEFT_EYE] = eyes_store->frame(eyes[0]);
 			eyes_store->eyes[RIGHT_EYE] = eyes[1]; eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[1]);
+				
 		}
 		else
 		{
 			eyes_store->eyes[LEFT_EYE] = eyes[1]; eyes_store->eye_frame[LEFT_EYE] = eyes_store->frame(eyes[1]);
 			eyes_store->eyes[RIGHT_EYE] = eyes[0]; eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[0]);
-		}
 
+		}
+		set_threshold(LEFT_EYE, eyes_store); 			
+		set_threshold(RIGHT_EYE, eyes_store); 
+			
 		return (eyes_store->position = LEFT_EYE|RIGHT_EYE);
 	}
 	else if(eyes.size()==1)
@@ -106,14 +111,46 @@ int eyes_sepframes(struct eyes *eyes_store)
 		{
 			eyes_store->eyes[LEFT_EYE] = eyes[0];
 			eyes_store->eye_frame[LEFT_EYE] = eyes_store->frame(eyes[0]);
+			set_threshold(LEFT_EYE, eyes_store); 
+
 			return (eyes_store->position = LEFT_EYE);
+
 		}
 		else
 		{
 			eyes_store->eyes[RIGHT_EYE] = eyes[0];
 			eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[0]);
+			set_threshold(RIGHT_EYE, eyes_store); 
+
 			return (eyes_store->position = RIGHT_EYE);
 		}
 	}
 	return (eyes_store->position = 0);
+}
+
+
+int set_threshold(int eye_no, struct eyes *eyes_store)
+{   
+//	printf("Calculating histogram\n");
+	int hbins = 32;
+	int histSize[] = {hbins};
+	float hranges[] = { 0, 255};
+	const float* ranges[] = {hranges};
+	Mat hist, img = eyes_store->eye_frame[eye_no];
+	int channels[] = {0};
+	int no_of_pixels = eyes_store->eyes[eye_no].height * eyes_store->eyes[eye_no].width;
+	printf("No of pixels: %d\n", no_of_pixels);
+	calcHist( &img,
+		  1, 
+		  channels, 
+		  Mat(), // do not use mask
+		  hist, 
+		  1, 
+		  histSize, 
+		  ranges,
+		  true, // the histogram is uniform]
+		  false);
+//	std::cout<<hist<<std::endl;
+	return 1;
+
 }

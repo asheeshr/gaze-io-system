@@ -61,7 +61,7 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 	int energy1[3], energy2[3];
 	int ex_sum = 0, ey_sum = 0, e_temp_sum = 0;
 	int counter_template_on_eye = 0, counter_partial_template_eye = 0;
-	const int template_on_eye_threshold = 0.60*eyes_store_template->counter[eye_no], partial_template_eye_threshold = 0.40*eyes_store_template->counter[eye_no];
+	const int template_on_eye_threshold = 0.80*eyes_store_template->counter[eye_no], partial_template_eye_threshold = 0.60*eyes_store_template->counter[eye_no];
 	/* Calculate and test energy values iterating over theeta */
 	for(i=0; i<180; i+=DTHETA)
 	{
@@ -86,22 +86,22 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 		
 		if(energy2[0] != -1337)
 		{
-			e_temp_sum = energy1[2] + energy2[2];
-			//printf("Energy 1 %d Energy 2 %d \n", energy1[2], energy2[2]);
+			e_temp_sum = energy1[2] - energy2[2];
+//			printf("Energy 1 %d Energy 2 %d \n", energy1[2], energy2[2]);
 			/* Check for + and - values in estimated range and then evaluate sum if previous test is true */
 			if((energy1[2]<0 && energy2[2]>0) || (energy1[2]>0 && energy2[2]<0))
 			{
-				if(e_temp_sum < +120 && e_temp_sum > +80 || e_temp_sum > -120 && e_temp_sum < -80)
+				if(e_temp_sum < +70 && e_temp_sum > +50 || e_temp_sum > -70 && e_temp_sum < -50)
 				{
-					counter_partial_template_eye++;
+					counter_partial_template_eye+=2;
 				}
 					
 			}
 			/* Update counter */
 			/* Check for sum of values within eye region range */
-			if(e_temp_sum < +80 && e_temp_sum > -80)
+			if(e_temp_sum < +50 && e_temp_sum > -50)
 			{
-				counter_template_on_eye++;
+				counter_template_on_eye+=2;
 			}
 			/* Update counter */
 		
@@ -203,7 +203,7 @@ int shift_template_helper(int eye_no, struct face *face_store, struct eyes_templ
 		
 		if(energy2[0] != -1337)
 		{
-			e_temp_sum = energy1[2] + energy2[2];
+			e_temp_sum = energy1[2] - energy2[2];
 			ex_sum = energy1[0] +  energy2[0];
 			ey_sum = energy1[1] +  energy2[1];
 		}

@@ -111,7 +111,7 @@ int sort_template(int eye_no, struct eyes_template *eyes_store_template)
 
 int set_threshold(int eye_no, struct face *face_store, struct eyes *eyes_store)
 {   
-	printf("Calculating histogram\n");
+//	printf("Calculating histogram\n");
 	int hbins = 256;
 	int histSize[] = {hbins};
 	float hranges[] = { 0, 255};

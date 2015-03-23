@@ -122,10 +122,11 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 					{
 						test_and_unlock(mutex_eyes_template);
 
-						
-						while(test_and_lock(mutex_eyes_template) && (update_frequency->status=3) 
+					       
+						if(test_and_lock(mutex_eyes_template) && (update_frequency->status=3) 
 						   && gaze_energy(face_store, eyes_store, eyes_store_template, energy_position_store))
 						{
+							//	getchar();
 							if((eyes_store_template->status[LEFT_EYE]==0 || eyes_store_template->status[LEFT_EYE]==3) && 
 							   (eyes_store_template->status[RIGHT_EYE]==0 || eyes_store_template->status[RIGHT_EYE]==3))
 								break;
@@ -134,7 +135,7 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 							energy_to_coord(energy_position_store);
 							
 							//shift_template(face_store, eyes_store, eyes_store_template);
-							
+							/*
 							std::this_thread::sleep_for(wait_time);
 							if(get_frame(frame, update_frequency)==0)
 							{
@@ -147,8 +148,9 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 									update_face(*frame, face_store);
 									test_and_unlock(mutex_face);
 								}
-							}
-							
+								}*/
+//							getchar();
+							//waitKey(0);	
 						}
 					}
 					test_and_unlock(mutex_eyes_template);
