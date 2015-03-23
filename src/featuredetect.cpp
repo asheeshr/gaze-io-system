@@ -103,14 +103,15 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 			int xdiff,ydiff;
 			float angle = atan2(center.y - iter.y, center.x -iter.x);
 //			printf("Angle %f ", angle);
-			theta=angle * (float)180 / float(3.14);
+			theta=(angle) * float(180) / 3.14;
+			theta=theta<0?theta+360:theta;
 			counter++;
 			if(counter > MAX_ACC_THRESHOLD) flag=0;
 			templates[counter].center=iter;
 			templates[counter].size.height=1;
 			templates[counter].size.width=5;
 			templates[counter].angle=theta;
-//	     	  	printf("Theta %f \t", theta);
+	     	  	printf("Theta %d \t", theta);
 					
 		}
 		
@@ -123,6 +124,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	cout<<"after count\n";
 	for(int i=0; i<counter; i++) 
 		(eyes_store_template->windows)[eye_no][i] = templates[i];
+	(eyes_store_template->counter)[eye_no] = counter;
 	sort_template(eye_no, eyes_store_template);	
 	return eye_no;
 }
@@ -139,8 +141,9 @@ int sort_template(int eye_no, struct eyes_template *eyes_store_template)
 
 	for(int i=0; i<360/DTHETA; i++)
 	{
+		
 		eyes_store_template->windows[eye_no][i] = windows[i];
-//		printf("%d", eyes_store_template->windows[eye_no][i].size.height);
+		printf("%d ", eyes_store_template->windows[eye_no][i].angle);
 	}
 		
 	return eye_no;
