@@ -62,23 +62,16 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	q.push(center);
 	uchar pixel_intensity;
 	bool flag=1;
-	circle(face_store->frame, center, 1, 255);
+//	circle(face_store->frame, center, 1, 255);
 	int cnt=0;
 	
 	while(!q.empty())
 	{
 		Point iter= q.front();
 		q.pop();
-	//	cout<<vis[iter.x][iter.y]<<"\n";
+		//	cout<<vis[iter.x][iter.y]<<"\n";
 
 		vis[iter.x][iter.y]=1;
-		
-		//cout<<iter.x<<" "<<iter.y<<"\n";
-		
-		//iter.x = center.x + distance*costheta;
-		//iter.y = center.y + distance*sintheta;
-		
-		//printf("Hello");
 		
 		cnt++;
 		//cout<<cnt<<"\n";
@@ -86,51 +79,51 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 		if(cnt>1000)
 			break;
 		for(int i=0;i<8;i++)
-					{
-						Point temp;
-						temp=iter;
-						temp.x+=dx[i];
-						temp.y+=dy[i];
-						if(temp.x>=0&&temp.y>=0&&abs(center.x -temp.x)<30&&abs(center.y - temp.y)<30)
-						if(vis[temp.x][temp.y]==0)
-							{	
-								vis[temp.x][temp.y]=1;
-								//cout<<temp.x<<" "<<temp.y<<"\n";
-								q.push(temp);
-							}
-					}
+		{
+			Point temp;
+			temp=iter;
+			temp.x+=dx[i];
+			temp.y+=dy[i];
+			if(temp.x>=0&&temp.y>=0&&abs(center.x -temp.x)<25&&abs(center.y - temp.y)<25)
+				if(vis[temp.x][temp.y]==0)
+				{	
+					vis[temp.x][temp.y]=1;
+					//cout<<temp.x<<" "<<temp.y<<"\n";
+					q.push(temp);
+				}
+		}
 
 		pixel_intensity = face_store->frame_gradient.at<uchar>(iter);
 		
 		if(pixel_intensity > intensity_threshold)
-				
-				{
-					circle(face_store->frame, iter, 1, 255);
-					cout<<abs(center.x - iter.x )<<" "<<(center.y-iter.y)<<"\n";
-					int theta;
-					int xdiff,ydiff;
-					float angle = atan2(center.y - iter.y, center.x -iter.x);
-					theta=angle * (float)180 / float(3.14);
-					counter++;
-					if(counter > ACC_THRESHOLD) flag=0;
-					templates[counter].center=iter;
-					templates[counter].size.height=1;
-					templates[counter].size.width=5;
-					templates[counter].angle=theta;
-	     	  	
+       		{
+			circle(face_store->frame, iter, 1, 255);
+//					cout<<abs(center.x - iter.x )<<" "<<(center.y-iter.y)<<"\n";
+			int theta;
+			int xdiff,ydiff;
+			float angle = atan2(center.y - iter.y, center.x -iter.x);
+//			printf("Angle %f ", angle);
+			theta=angle * (float)180 / float(3.14);
+			counter++;
+			if(counter > MAX_ACC_THRESHOLD) flag=0;
+			templates[counter].center=iter;
+			templates[counter].size.height=1;
+			templates[counter].size.width=5;
+			templates[counter].angle=theta;
+//	     	  	printf("Theta %f \t", theta);
 					
-				}
+		}
 		
-				if(!flag)
-					break;
+		if(!flag)
+			break;
 		
 	}
-	cout<<counter<<"\n";
 	
-	if(counter < 30) return 0;
-
+	if(counter < MIN_ACC_THRESHOLD) return 0;
+	cout<<"after count\n";
 	for(int i=0; i<counter; i++) 
 		(eyes_store_template->windows)[eye_no][i] = templates[i];
+	sort_template(eye_no, eyes_store_template);	
 	return eye_no;
 }
 
@@ -141,16 +134,15 @@ int sort_template(int eye_no, struct eyes_template *eyes_store_template)
 	for(int i=0; i<360/DTHETA; i++)	windows[i].size.height=4;
 	for(int i=0; i<(eyes_store_template->counter)[eye_no]; i++)
 	{
-		windows[int(eyes_store_template->windows[eye_no][i].angle/DTHETA)%(360/DTHETA)] = eyes_store_template->windows[eye_no][i];
+		windows[int(eyes_store_template->windows[eye_no][i].angle/DTHETA)/*%(360/DTHETA)*/] = eyes_store_template->windows[eye_no][i];
 	}
-	
+
 	for(int i=0; i<360/DTHETA; i++)
 	{
 		eyes_store_template->windows[eye_no][i] = windows[i];
 //		printf("%d", eyes_store_template->windows[eye_no][i].size.height);
 	}
 		
-
 	return eye_no;
 }
 

@@ -29,7 +29,8 @@
 #define MAX_DISTANCE 15   
 #define ERROR_THRESHOLD 30
 #define INTEN_THRESHOLD 100    // minimum gradient image intensity to be crossed for the iris border
-#define ACC_THRESHOLD 20       // minimum no of templates required(3/4*360/DTHETA)
+#define MAX_ACC_THRESHOLD (360/DTHETA)       // minimum no of templates required(3/4*360/DTHETA)
+#define MIN_ACC_THRESHOLD (2*DTHETA)       // minimum no of templates required(3/4*360/DTHETA)
 
 
 //cv::Mat* eyesdetect(cv::Mat );

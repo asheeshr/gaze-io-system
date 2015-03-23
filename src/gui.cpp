@@ -20,6 +20,7 @@
 
 
 #include "gui.h"
+#include "featuredetect.h"
 
 using namespace cv;
 
@@ -94,10 +95,10 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 				et.counter[RIGHT_EYE] = eyes_store_template->counter[RIGHT_EYE];
 				
 				if(e.position & LEFT_EYE)
-					for(int counter=0; counter<et.counter[LEFT_EYE]; counter++)
+					for(int counter=0; counter<360/DTHETA; counter++)
 						et.windows[LEFT_EYE][counter] = eyes_store_template->windows[LEFT_EYE][counter];
 				if(e.position & RIGHT_EYE)
-					for(int counter=0; counter<et.counter[RIGHT_EYE]; counter++)
+					for(int counter=0; counter<360/DTHETA; counter++)
 						et.windows[RIGHT_EYE][counter] = eyes_store_template->windows[RIGHT_EYE][counter];
 				
 				test_and_unlock(mutex_eyes_template);
@@ -251,8 +252,9 @@ int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[])
 		{
 			fprintf(pipe, "set output './data/eye0_plot.png'\n");
 			fprintf(pipe, "plot '-' with points pt 7 ps 3 notitle\n");
-			for(int i=0; i<et.counter[LEFT_EYE]; i++)
+			for(int i=0; i<360/DTHETA; i++)
 			{
+				if(et.windows[LEFT_EYE][i].size.height==4) continue;
 				fprintf(pipe, "%.0f %.0f\n", et.windows[LEFT_EYE][i].center.x, et.windows[LEFT_EYE][i].center.y);
 			}
 			fprintf(pipe, "%s\n", "e");
@@ -262,8 +264,9 @@ int plot_data(struct eyes e, struct eyes_template et, cv::Mat *graph[])
 		{
 			fprintf(pipe, "set output './data/eye1_plot.png'\n");
 			fprintf(pipe, "plot '-' with points pt 7 ps 3 notitle\n");
-			for(int i=0; i<et.counter[RIGHT_EYE]; i++)
+			for(int i=0; i<360/DTHETA; i++)
 			{
+				if(et.windows[RIGHT_EYE][i].size.height==4) continue;
 				fprintf(pipe, "%.0f %.0f\n", et.windows[RIGHT_EYE][i].center.x, et.windows[RIGHT_EYE][i].center.y);
 			}
 			fprintf(pipe, "%s\n", "e");
