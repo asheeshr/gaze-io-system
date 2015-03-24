@@ -27,7 +27,6 @@ using namespace cv;
 int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
 	std::uint8_t status = 0;
-	//printf("Hello");
 	face_store->frame_gradient = image_gradient(face_store->frame);
 	
 	if( eyes_store->position==0 ) return 0;
@@ -39,14 +38,13 @@ int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct ey
 
 int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
-	//printf("Hello");
 	CvBox2D templates[100];
 	float theta, costheta, sintheta;
 	int distance;
 	int vis[1000][1000];
 	memset(vis,0,sizeof(vis));	
     
-	int intensity_threshold = set_threshold(eye_no, face_store, eyes_store); 
+	int intensity_threshold = set_threshold_gradient(eye_no, face_store, eyes_store, float(0.05)); 
 
 	Point iter, center;
 	int attemptno = 0,counter=0;
@@ -60,7 +58,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	int dy[]={1,-1,0,1,-1,0,1,-1};
 
 	q.push(center);
-	uchar pixel_intensity;
+	uchar pixel_intensity, image_pixel_intensity;
 	bool flag=1;
 //	circle(face_store->frame, center, 1, 255);
 	int cnt=0;
@@ -76,17 +74,18 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 		cnt++;
 		//cout<<cnt<<"\n";
 	
-		if(cnt>1000)
-			break;
+	     
 		for(int i=0;i<8;i++)
 		{
 			Point temp;
 			temp=iter;
 			temp.x+=dx[i];
 			temp.y+=dy[i];
-			if(temp.x>=0&&temp.y>=0&&abs(center.x -temp.x)<25&&abs(center.y - temp.y)<25)
-				if(vis[temp.x][temp.y]==0)
-				{	
+			image_pixel_intensity = face_store->frame.at<uchar>(iter);
+
+			if(temp.x>=0 && temp.y>=0 && abs(center.x -temp.x)<15 && abs(center.y - temp.y)<15)
+				if(vis[temp.x][temp.y]==0 && image_pixel_intensity<set_threshold_frame(eye_no, face_store,eyes_store, float(0.95)))
+				{      
 					vis[temp.x][temp.y]=1;
 					//cout<<temp.x<<" "<<temp.y<<"\n";
 					q.push(temp);
@@ -111,7 +110,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 			templates[counter].size.height=1;
 			templates[counter].size.width=5;
 			templates[counter].angle=theta;
-	     	  	printf("Theta %d \t", theta);
+//	     	  	printf("Theta %d \t", theta);
 					
 		}
 		
@@ -124,7 +123,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	cout<<"after count\n";
 	for(int i=0; i<counter; i++) 
 		(eyes_store_template->windows)[eye_no][i] = templates[i];
-	(eyes_store_template->counter)[eye_no] = counter;
+	(eyes_store_template->counter)[eye_no] = counter; /* DO NOT DELETE */
 	sort_template(eye_no, eyes_store_template);	
 	return eye_no;
 }
@@ -143,14 +142,14 @@ int sort_template(int eye_no, struct eyes_template *eyes_store_template)
 	{
 		
 		eyes_store_template->windows[eye_no][i] = windows[i];
-		printf("%d ", eyes_store_template->windows[eye_no][i].angle);
+//		printf("%f ", eyes_store_template->windows[eye_no][i].angle);
 	}
 		
 	return eye_no;
 }
 
 
-int set_threshold(int eye_no, struct face *face_store, struct eyes *eyes_store)
+int set_threshold_gradient(int eye_no, struct face *face_store, struct eyes *eyes_store, float percentile)
 {   
 //	printf("Calculating histogram\n");
 	int hbins = 256;
@@ -160,7 +159,7 @@ int set_threshold(int eye_no, struct face *face_store, struct eyes *eyes_store)
 	Mat hist, img = face_store->frame_gradient(eyes_store->eyes[eye_no]);
 	int channels[] = {0};
 	int no_of_pixels = eyes_store->eyes[eye_no].height * eyes_store->eyes[eye_no].width;
-	printf("No of pixels: %d\n", no_of_pixels);
+//	printf("No of pixels: %d\n", no_of_pixels);
 	calcHist( &img,
 		  1, 
 		  channels, 
@@ -176,13 +175,48 @@ int set_threshold(int eye_no, struct face *face_store, struct eyes *eyes_store)
 	{
 		hist_sum+=hist.at<float>(i);
 
-		if(hist_sum >= 0.05*no_of_pixels)
+		if(hist_sum >= percentile*no_of_pixels)
 		{
-			printf("Found intensity %d at %d\n", i, hist_sum);
+//			printf("Found intensity %d at %d\n", i, hist_sum);
 			return i*256/hbins;
 		}
 	}
 	return INTEN_THRESHOLD;
+
+}
+
+int set_threshold_frame(int eye_no, struct face *face_store, struct eyes *eyes_store, float percentile)
+{   
+//	printf("Calculating histogram\n");
+	int hbins = 256;
+	int histSize[] = {hbins};
+	float hranges[] = { 0, 255};
+	const float* ranges[] = {hranges};
+	Mat hist, img = face_store->frame(eyes_store->eyes[eye_no]);
+	int channels[] = {0};
+	int no_of_pixels = eyes_store->eyes[eye_no].height * eyes_store->eyes[eye_no].width;
+//	printf("No of pixels: %d\n", no_of_pixels);
+	calcHist( &img,
+		  1, 
+		  channels, 
+		  Mat(), // do not use mask
+		  hist, 
+		  1, 
+		  histSize, 
+		  ranges,
+		  true, // the histogram is uniform
+		  false);
+
+	for(int i=hbins-1, hist_sum=0; i>=0;i--)
+	{
+		hist_sum+=hist.at<float>(i);
+		if(hist_sum >= percentile*no_of_pixels)
+		{
+//			printf("Found intensity %d at %d\n", i, hist_sum);
+			return i*256/hbins;
+		}
+	}
+	return 30;
 
 }
 
@@ -212,18 +246,5 @@ Mat image_gradient(Mat frame)
     
 	/// Total Gradient (approximate)
 	addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, S );
-/*/// Gradient X
-	//Scharr( src_gray, grad_x, ddepth, 1, 0, scale, delta, BORDER_DEFAULT );
-	Sobel( frame, grad_x, ddepth, 1, 0, 3, scale, delta, BORDER_DEFAULT );
-	convertScaleAbs( grad_x, abs_grad_x );
-    
-	/// Gradient Y
-	//Scharr( src_gray, grad_y, ddepth, 0, 1, scale, delta, BORDER_DEFAULT );
-	Sobel( frame, grad_y, ddepth, 0, 1, 3, scale, delta, BORDER_DEFAULT );
-	convertScaleAbs( grad_y, abs_grad_y );
-    
-	/// Total Gradient (approximate)
-	addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, S );
-*/
 	return S;
 }
