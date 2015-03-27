@@ -84,7 +84,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 			image_pixel_intensity = face_store->frame.at<uchar>(iter);
 
 			if(temp.x>=0 && temp.y>=0 && abs(center.x -temp.x)<15 && abs(center.y - temp.y)<15)
-				if(vis[temp.x][temp.y]==0 && image_pixel_intensity<set_threshold_frame(eye_no, face_store,eyes_store, float(0.95)))
+				if(vis[temp.x][temp.y]==0 && image_pixel_intensity<set_threshold_frame(eye_no, face_store,eyes_store, float(0.85)))
 				{      
 					vis[temp.x][temp.y]=1;
 					//cout<<temp.x<<" "<<temp.y<<"\n";
@@ -104,12 +104,12 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 //			printf("Angle %f ", angle);
 			theta=(angle) * float(180) / 3.14;
 			theta=theta<0?theta+360:theta;
-			counter++;
 			if(counter > MAX_ACC_THRESHOLD) flag=0;
 			templates[counter].center=iter;
 			templates[counter].size.height=1;
 			templates[counter].size.width=5;
 			templates[counter].angle=theta;
+			counter++;
 //	     	  	printf("Theta %d \t", theta);
 					
 		}
@@ -120,7 +120,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	}
 	
 	if(counter < MIN_ACC_THRESHOLD) return 0;
-	cout<<"after count\n";
+//	cout<<"after count\n";
 	for(int i=0; i<counter; i++) 
 		(eyes_store_template->windows)[eye_no][i] = templates[i];
 	(eyes_store_template->counter)[eye_no] = counter; /* DO NOT DELETE */
