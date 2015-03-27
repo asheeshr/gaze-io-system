@@ -78,7 +78,7 @@ int eyesdetect_display(struct face *face_store, struct eyes *eyes_store)
 	return 1;  
 }
 
-int set_threshold(int eye_no, struct eyes *eyes_store);
+//int set_threshold(int eye_no, struct eyes *eyes_store);
 
 int eyes_sepframes(struct eyes *eyes_store)
 {
@@ -99,8 +99,8 @@ int eyes_sepframes(struct eyes *eyes_store)
 			eyes_store->eyes[RIGHT_EYE] = eyes[0]; eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[0]);
 
 		}
-		set_threshold(LEFT_EYE, eyes_store); 			
-		set_threshold(RIGHT_EYE, eyes_store); 
+		//set_threshold(LEFT_EYE, eyes_store); 			
+		//set_threshold(RIGHT_EYE, eyes_store); 
 			
 		return (eyes_store->position = LEFT_EYE|RIGHT_EYE);
 	}
@@ -111,7 +111,7 @@ int eyes_sepframes(struct eyes *eyes_store)
 		{
 			eyes_store->eyes[LEFT_EYE] = eyes[0];
 			eyes_store->eye_frame[LEFT_EYE] = eyes_store->frame(eyes[0]);
-			set_threshold(LEFT_EYE, eyes_store); 
+			//set_threshold(LEFT_EYE, eyes_store); 
 
 			return (eyes_store->position = LEFT_EYE);
 
@@ -120,7 +120,7 @@ int eyes_sepframes(struct eyes *eyes_store)
 		{
 			eyes_store->eyes[RIGHT_EYE] = eyes[0];
 			eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[0]);
-			set_threshold(RIGHT_EYE, eyes_store); 
+			//set_threshold(RIGHT_EYE, eyes_store); 
 
 			return (eyes_store->position = RIGHT_EYE);
 		}
@@ -128,7 +128,7 @@ int eyes_sepframes(struct eyes *eyes_store)
 	return (eyes_store->position = 0);
 }
 
-
+/*
 int set_threshold(int eye_no, struct eyes *eyes_store)
 {   
 //	printf("Calculating histogram\n");
@@ -154,3 +154,4 @@ int set_threshold(int eye_no, struct eyes *eyes_store)
 	return 1;
 
 }
+*/
