@@ -44,7 +44,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	int vis[1000][1000];
 	memset(vis,0,sizeof(vis));	
     
-	int intensity_threshold = set_threshold_gradient(eye_no, face_store, eyes_store, float(0.05)); 
+	int intensity_threshold = set_threshold_gradient(eye_no, face_store, eyes_store, float(0.15)); 
 
 	Point iter, center;
 	int attemptno = 0,counter=0;
@@ -54,7 +54,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	//cout<<center.x<<" "<<center.y<<"\n";
 
 	queue <Point> q;
-	int dx[]={1,1,1,-1,-1,-1,0,0};
+	int dx[]={0,1,1,-1,-1,-1,1,0};
 	int dy[]={1,-1,0,1,-1,0,1,-1};
 
 	q.push(center);
@@ -84,8 +84,10 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 			image_pixel_intensity = face_store->frame.at<uchar>(iter);
 
 			if(temp.x>=0 && temp.y>=0 && abs(center.x -temp.x)<15 && abs(center.y - temp.y)<15)
-				if(vis[temp.x][temp.y]==0 && image_pixel_intensity<set_threshold_frame(eye_no, face_store,eyes_store, float(0.95)))
-				{      
+				if(vis[temp.x][temp.y]==0 && image_pixel_intensity<set_threshold_frame(eye_no, face_store,eyes_store, float(0.85)))
+				{  
+				    
+										
 					vis[temp.x][temp.y]=1;
 					//cout<<temp.x<<" "<<temp.y<<"\n";
 					q.push(temp);
@@ -104,12 +106,12 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 //			printf("Angle %f ", angle);
 			theta=(angle) * float(180) / 3.14;
 			theta=theta<0?theta+360:theta;
-			counter++;
 			if(counter > MAX_ACC_THRESHOLD) flag=0;
 			templates[counter].center=iter;
 			templates[counter].size.height=1;
 			templates[counter].size.width=5;
 			templates[counter].angle=theta;
+			counter++;
 //	     	  	printf("Theta %d \t", theta);
 					
 		}
@@ -135,7 +137,7 @@ int sort_template(int eye_no, struct eyes_template *eyes_store_template)
 	for(int i=0; i<360/DTHETA; i++)	windows[i].size.height=4;
 	for(int i=0; i<(eyes_store_template->counter)[eye_no]; i++)
 	{
-		windows[int(eyes_store_template->windows[eye_no][i].angle/DTHETA)/*%(360/DTHETA)*/] = eyes_store_template->windows[eye_no][i];
+		windows[int(eyes_store_template->windows[eye_no][i].angle/DTHETA)%(360/DTHETA)] = eyes_store_template->windows[eye_no][i];
 	}
 
 	for(int i=0; i<360/DTHETA; i++)
