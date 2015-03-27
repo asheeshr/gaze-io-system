@@ -1,3 +1,4 @@
+MAKEFLAGS= -j3
 CXXFLAGS= -std=c++11 `pkg-config --cflags opencv` -lX11 -lXext -lXrender -lGL
 LIBS = `pkg-config --libs opencv`
 
