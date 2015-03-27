@@ -36,24 +36,25 @@ double sine[]={0,0.00999983,0.0199987,0.0299955,0.0399893,0.0499792,0.059964,0.0
 
 float ncos(float value)
 {
-	while(value>2*PI)
+	while(value>=2*PI)
 		value-=2*PI;
 	int ind=value*100;
 	if(value<=PI)
 		return cosine[ind];
 	else
-		return -cosine[ind];
+		return -cosine[ind-314];
 	
 }
 float nsin(float value)
 {
-	while(value>2*PI)
+	while(value>=2*PI)
 		value-=2*PI;
+
 	int ind=value*100;
 	if(value<=PI)
 		return sine[ind];
 	else
-		return -sine[ind];
+		return -sine[ind-314];
 }
 
 
@@ -109,7 +110,7 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 		else if(eyes_store_template->windows[eye_no][((i + 180 + 2*DTHETA)%360)/DTHETA].size.height!=4) 
 			calculate_energy(eye_no, face_store, eyes_store_template, energy2,((i + 180 + 2*DTHETA)%360)/DTHETA);
 		else energy2[0] = -1337;
-	       
+
 		
 		/* Perform test on sum and on individual values */
 		
@@ -117,7 +118,7 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 		{
 			e_temp_sum = energy1[2] - energy2[2];
 //			printf("Energy 1 %d Energy 2 %d \n", energy1[2], energy2[2]);
-			printf("sumenergy: %d \n", e_temp_sum);
+			printf("sumenergy: \"    %d      \"   ey1 = %d  ey2 = %d  \n", e_temp_sum,energy1[1], energy2[1]);
 			/* Check for + and - values in estimated range and then evaluate sum if previous test is true */
 			if((energy1[2]<-70 && energy2[2]>-70) || (energy1[2]>-70 && energy2[2]<-70))
 			{
@@ -136,8 +137,8 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 			/* Update counter */
 		
 		
-		ex_sum = energy1[0] +  energy2[0];
-		ey_sum = energy1[1] +  energy2[1];
+		ex_sum += energy1[0] +  energy2[0];
+		ey_sum += energy1[1] +  energy2[1];
 		}
 	}
 
@@ -151,11 +152,13 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 	if(counter_template_on_eye>template_on_eye_threshold) 
 	{
 		eyes_store_template->status[eye_no] = 1;
+		printf("template on eye\n");
 		return eye_no;
 	}
 	if(counter_partial_template_eye>partial_template_eye_threshold) 
 	{
 		eyes_store_template->status[eye_no] = 2;
+		printf("template partially on eye\n");
 		return eye_no;
 	}
 	
