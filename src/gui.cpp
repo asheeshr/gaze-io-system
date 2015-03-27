@@ -184,9 +184,9 @@ int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct
 	int32_t px = ep_vector->px;	int32_t py = ep_vector->py;
 	
 	ex = constrain(ex, -999, +999);
-	ey = constrain(ex, -999, +999);
-	px = constrain(ex, -999, +999);
-	py = constrain(ex, -999, +999);
+	ey = constrain(ey, -999, +999);
+	px = constrain(px, -999, +999);
+	py = constrain(py, -999, +999);
 	
 
 	//ex = ex>1000 || -ex>1000

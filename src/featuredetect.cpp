@@ -85,9 +85,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 
 			if(temp.x>=0 && temp.y>=0 && abs(center.x -temp.x)<15 && abs(center.y - temp.y)<15)
 				if(vis[temp.x][temp.y]==0 && image_pixel_intensity<set_threshold_frame(eye_no, face_store,eyes_store, float(0.85)))
-				{  
-				    
-										
+				{      
 					vis[temp.x][temp.y]=1;
 					//cout<<temp.x<<" "<<temp.y<<"\n";
 					q.push(temp);
@@ -122,7 +120,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	}
 	
 	if(counter < MIN_ACC_THRESHOLD) return 0;
-	cout<<"after count\n";
+//	cout<<"after count\n";
 	for(int i=0; i<counter; i++) 
 		(eyes_store_template->windows)[eye_no][i] = templates[i];
 	(eyes_store_template->counter)[eye_no] = counter; /* DO NOT DELETE */
