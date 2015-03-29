@@ -64,12 +64,12 @@ int gaze_energy(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 	std::uint8_t status = 0;
 	
 	if( eyes_store->position==0 ) return 0;
-	if( eyes_store->position & LEFT_EYE )
+	if( eyes_store->position & LEFT_EYE && eyes_store_template->counter[LEFT_EYE]>0 )
 	{
 		status |= gaze_energy_helper(LEFT_EYE, face_store, eyes_store, eyes_store_template);
 	}
 
-	if( eyes_store->position & RIGHT_EYE )
+	if( eyes_store->position & RIGHT_EYE && eyes_store_template->counter[RIGHT_EYE]>0 )
 	{
 		status |= gaze_energy_helper(RIGHT_EYE, face_store, eyes_store, eyes_store_template);
 	}
@@ -79,7 +79,7 @@ int gaze_energy(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 	energy_position_store->ex = ((status&RIGHT_EYE==RIGHT_EYE)?ex[RIGHT_EYE]:0 + (status&LEFT_EYE==LEFT_EYE)?ex[LEFT_EYE]:0)/((status&(LEFT_EYE|RIGHT_EYE)==LEFT_EYE|RIGHT_EYE)?2:1);
 	energy_position_store->ey = ((status&RIGHT_EYE==RIGHT_EYE)?ey[RIGHT_EYE]:0 + (status&LEFT_EYE==LEFT_EYE)?ey[LEFT_EYE]:0)/((status&(LEFT_EYE|RIGHT_EYE)==LEFT_EYE|RIGHT_EYE)?2:1);
 	int interex = energy_position_store->ex , interey = energy_position_store->ey ;
-	printf("ex = %d , ey= %d , status = %d \n" , interex, interey, status);
+      	printf("status = %d \n" , status);
 	return status;
 }
 
@@ -118,7 +118,7 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 		{
 			e_temp_sum = energy1[2] - energy2[2];
 //			printf("Energy 1 %d Energy 2 %d \n", energy1[2], energy2[2]);
-			printf("sumenergy: \"    %d      \"   ey1 = %d  ey2 = %d  \n", e_temp_sum,energy1[1], energy2[1]);
+//			printf("sumenergy: \"    %d      \"   ey1 = %d  ey2 = %d  \n", e_temp_sum,energy1[1], energy2[1]);
 			/* Check for + and - values in estimated range and then evaluate sum if previous test is true */
 			if((energy1[2]<-70 && energy2[2]>-70) || (energy1[2]>-70 && energy2[2]<-70))
 			{

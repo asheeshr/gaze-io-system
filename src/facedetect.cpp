@@ -78,7 +78,6 @@ int eyesdetect_display(struct face *face_store, struct eyes *eyes_store)
 	return 1;  
 }
 
-//int set_threshold(int eye_no, struct eyes *eyes_store);
 
 int eyes_sepframes(struct eyes *eyes_store)
 {
