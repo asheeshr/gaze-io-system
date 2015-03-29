@@ -96,11 +96,9 @@ int eyes_sepframes(struct eyes *eyes_store)
 		{
 			eyes_store->eyes[LEFT_EYE] = eyes[1]; eyes_store->eye_frame[LEFT_EYE] = eyes_store->frame(eyes[1]);
 			eyes_store->eyes[RIGHT_EYE] = eyes[0]; eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[0]);
-
 		}
 		//set_threshold(LEFT_EYE, eyes_store); 			
 		//set_threshold(RIGHT_EYE, eyes_store); 
-			
 		return (eyes_store->position = LEFT_EYE|RIGHT_EYE);
 	}
 	else if(eyes.size()==1)
@@ -113,14 +111,12 @@ int eyes_sepframes(struct eyes *eyes_store)
 			//set_threshold(LEFT_EYE, eyes_store); 
 
 			return (eyes_store->position = LEFT_EYE);
-
 		}
 		else
 		{
 			eyes_store->eyes[RIGHT_EYE] = eyes[0];
 			eyes_store->eye_frame[RIGHT_EYE] = eyes_store->frame(eyes[0]);
 			//set_threshold(RIGHT_EYE, eyes_store); 
-
 			return (eyes_store->position = RIGHT_EYE);
 		}
 	}

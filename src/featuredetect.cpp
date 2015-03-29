@@ -159,7 +159,7 @@ int set_threshold_gradient(int eye_no, struct face *face_store, struct eyes *eye
 	Mat hist, img = face_store->frame_gradient(eyes_store->eyes[eye_no]);
 	int channels[] = {0};
 	int no_of_pixels = eyes_store->eyes[eye_no].height * eyes_store->eyes[eye_no].width;
-//	printf("No of pixels: %d\n", no_of_pixels);
+	//	printf("No of pixels: %d\n", no_of_pixels);
 	calcHist( &img,
 		  1, 
 		  channels, 
@@ -170,15 +170,15 @@ int set_threshold_gradient(int eye_no, struct face *face_store, struct eyes *eye
 		  ranges,
 		  true, // the histogram is uniform
 		  false);
-
 	for(int i=hbins-1, hist_sum=0; i>=0;i--)
 	{
 		hist_sum+=hist.at<float>(i);
-
+		//		printf("%f  ", hist.at<float>(i));
+		
 		if(hist_sum >= percentile*no_of_pixels)
 		{
-//			printf("Found intensity %d at %d\n", i, hist_sum);
-			return i*256/hbins;
+		  //	  printf("Found intensity %d at %d\n", i, hist_sum);
+		  return i*256/hbins;
 		}
 	}
 	return INTEN_THRESHOLD;
@@ -195,7 +195,7 @@ int set_threshold_frame(int eye_no, struct face *face_store, struct eyes *eyes_s
 	Mat hist, img = face_store->frame(eyes_store->eyes[eye_no]);
 	int channels[] = {0};
 	int no_of_pixels = eyes_store->eyes[eye_no].height * eyes_store->eyes[eye_no].width;
-//	printf("No of pixels: %d\n", no_of_pixels);
+	//	printf("No of pixels: %d\n", no_of_pixels);
 	calcHist( &img,
 		  1, 
 		  channels, 
@@ -206,13 +206,12 @@ int set_threshold_frame(int eye_no, struct face *face_store, struct eyes *eyes_s
 		  ranges,
 		  true, // the histogram is uniform
 		  false);
-
 	for(int i=hbins-1, hist_sum=0; i>=0;i--)
 	{
 		hist_sum+=hist.at<float>(i);
 		if(hist_sum >= percentile*no_of_pixels)
 		{
-//			printf("Found intensity %d at %d\n", i, hist_sum);
+		  //			printf("Found intensity %d at %d\n", i, hist_sum);
 			return i*256/hbins;
 		}
 	}
