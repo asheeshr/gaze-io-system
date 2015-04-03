@@ -127,17 +127,17 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 		if(energy2[0] != -1337)
 		  {
 			e_temp_sum = energy1[2] - energy2[2];
-//			printf("Energy 1 %d Energy 2 %d \n", energy1[2], energy2[2]);
+			printf("\t\t\tEnergy 1 %d Energy 2 %d \n", energy1[2], energy2[2]);
 			printf("\t\t\tsumenergy: \"    %d    \n", e_temp_sum);
 			/* Check for + and - values in estimated range and then evaluate sum if previous test is true */
-			//	if((energy1[2]<-70 && energy2[2]>-70) || (energy1[2]>-70 && energy2[2]<-70))
-			//	{
-				if(e_temp_sum < +70 && e_temp_sum > +50 || e_temp_sum > -70 && e_temp_sum < -50)
+			if((energy1[2]<-70 && energy2[2]>-70) || (energy1[2]>-70 && energy2[2]<-70))
+			  {
+				if(e_temp_sum < +100 && e_temp_sum > +50 || e_temp_sum > -100 && e_temp_sum < -50)
 				{
 					counter_partial_template_eye+=2;
 				}
 					
-			 //	}
+			  }
 			/* Update counter */
 			/* Check for sum of values within eye region range */
 			if(e_temp_sum < +50 && e_temp_sum > -50)
@@ -161,81 +161,81 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 	if(counter_partial_template_eye>partial_template_eye_threshold) 
 	{
 		eyes_store_template->status[eye_no] = 2;
-		printf("\t\t\t\ttemplate partially on eye\n");
-		RETURN EYE_NO;
+		printf("\t\t\t\t\ttemplate partially on eye\n");
+		return eye_no;
 	}
 
 
-	IF(COUNTER_TEMPLATE_ON_EYE>TEMPLATE_ON_EYE_THRESHOLD) 
+	if(counter_template_on_eye>template_on_eye_threshold) 
 	{
-		EYES_STORE_TEMPLATE->STATUS[EYE_NO] = 1;
-		PRINTF("TEMPLATE ON EYE\N");
-		RETURN EYE_NO;
+		eyes_store_template->status[eye_no] = 1;
+		printf("template on eye\n");
+		return eye_no;
 	}
-	/*	IF(COUNTER_PARTIAL_TEMPLATE_EYE>PARTIAL_TEMPLATE_EYE_THRESHOLD) 
+	/*	if(counter_partial_template_eye>partial_template_eye_threshold) 
 	{
-		EYES_STORE_TEMPLATE->STATUS[EYE_NO] = 2;
-		PRINTF("TEMPLATE PARTIALLY ON EYE\N");
-		RETURN EYE_NO;
+		eyes_store_template->status[eye_no] = 2;
+		printf("template partially on eye\n");
+		return eye_no;
 	}
 	*/
 	
-	EYES_STORE_TEMPLATE->STATUS[EYE_NO] = 3;
-	PRINTF("\T\T\T\TOUTSIDE\N");
-	RETURN 0;
+	eyes_store_template->status[eye_no] = 3;
+	printf("\t\t\t\toutside\n");
+	return 0;
 }
 
 
-INT SHIFT_TEMPLATE(STRUCT FACE *FACE_STORE, STRUCT EYES *EYES_STORE, STRUCT EYES_TEMPLATE *EYES_STORE_TEMPLATE)
+int shift_template(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
-	/* SHIFTS THE TEMPLATE OVER THE EYE IF REQUIRED */
-	STD::UINT8_T STATUS = 0;
-	IF( EYES_STORE->POSITION==0 ) RETURN 0;
-	IF( EYES_STORE->POSITION & LEFT_EYE && EYES_STORE_TEMPLATE->COUNTER[LEFT_EYE]>0 && EYES_STORE_TEMPLATE->STATUS[LEFT_EYE] == 2)
+	/* Shifts the template over the eye if required */
+	std::uint8_t status = 0;
+	if( eyes_store->position==0 ) return 0;
+	if( eyes_store->position & LEFT_EYE && eyes_store_template->counter[LEFT_EYE]>0 && eyes_store_template->status[LEFT_EYE] == 2)
 	{
-		STATUS |= SHIFT_TEMPLATE_HELPER(LEFT_EYE, FACE_STORE, EYES_STORE_TEMPLATE);
-		EX_PREV[LEFT_EYE] = EX[LEFT_EYE];
-		EY_PREV[LEFT_EYE] = EY[LEFT_EYE];
+		status |= shift_template_helper(LEFT_EYE, face_store, eyes_store_template);
+		ex_prev[LEFT_EYE] = ex[LEFT_EYE];
+		ey_prev[LEFT_EYE] = ey[LEFT_EYE];
 	}
 
-	IF( EYES_STORE->POSITION & RIGHT_EYE && EYES_STORE_TEMPLATE->COUNTER[RIGHT_EYE]>0 && EYES_STORE_TEMPLATE->STATUS[RIGHT_EYE] == 2)
+	if( eyes_store->position & RIGHT_EYE && eyes_store_template->counter[RIGHT_EYE]>0 && eyes_store_template->status[RIGHT_EYE] == 2)
 	{
-  	       	STATUS |= SHIFT_TEMPLATE_HELPER(RIGHT_EYE, FACE_STORE, EYES_STORE_TEMPLATE);
-		EX_PREV[RIGHT_EYE] = EX[RIGHT_EYE];
-		EY_PREV[RIGHT_EYE] = EY[RIGHT_EYE];
+  	       	status |= shift_template_helper(RIGHT_EYE, face_store, eyes_store_template);
+		ex_prev[RIGHT_EYE] = ex[RIGHT_EYE];
+		ey_prev[RIGHT_EYE] = ey[RIGHT_EYE];
 	}
 
-	RETURN STATUS;
+	return status;
 }
 
 
-INT SHIFT_TEMPLATE_HELPER(INT EYE_NO, STRUCT FACE *FACE_STORE, STRUCT EYES_TEMPLATE *EYES_STORE_TEMPLATE)
+int shift_template_helper(int eye_no, struct face *face_store, struct eyes_template *eyes_store_template)
 {
-  PRINTF("\T\T\T\TINSIDE SHIFT\N");
-        INT I;
-	INT SHIFT_X=0, SHIFT_Y=0;
-	SHIFT_X = EX[EYE_NO]>>4;
-	SHIFT_Y = EY[EYE_NO]>>4;
-	PRINTF("X ENERGY %D  Y ENERGY %D  SHIFT_X %D  SHIFT_Y %D \N",EX[EYE_NO],EY[EYE_NO],SHIFT_X,SHIFT_Y); 
-	/* SHIFTS TEMPLATE FOR ONE EYE */
-	FOR(I=0;I<360/DTHETA;I++)
+  printf("\t\t\t\tinside shift\n");
+        int i;
+	int shift_x=0, shift_y=0;
+	shift_x = ex[eye_no]>>4;
+	shift_y = ey[eye_no]>>4;
+	printf("x energy %d  y energy %d  shift_x %d  shift_y %d \n",ex[eye_no],ey[eye_no],shift_x,shift_y); 
+	/* Shifts template for one eye */
+	for(i=0;i<360/DTHETA;i++)
 	{
-		IF(EYES_STORE_TEMPLATE->WINDOWS[EYE_NO][I].SIZE.HEIGHT==4) CONTINUE;
-		EYES_STORE_TEMPLATE->WINDOWS[EYE_NO][I].CENTER.X+=SHIFT_X;		
-		EYES_STORE_TEMPLATE->WINDOWS[EYE_NO][I].CENTER.Y+=SHIFT_Y;
+		if(eyes_store_template->windows[eye_no][i].size.height==4) continue;
+		eyes_store_template->windows[eye_no][i].center.x+=shift_x;		
+		eyes_store_template->windows[eye_no][i].center.y+=shift_y;
 	}
-        /* ESTIMATE POSITION VECTOR */
-	/* ADD TO BOX CENTERS */
+        /* Estimate position vector */
+	/* Add to box centers */
 
-	/* RECALCULATES EX_PREV AND EY_PREV FOR EYE */
-	INT ENERGY1[3], ENERGY2[3];
-	INT EX_SUM, EY_SUM, E_TEMP_SUM;
-	/* CALCULATE AND TEST ENERGY VALUES ITERATING OVER THEETA */
-	FOR(I=0; I<180; I+=DTHETA)
+	/* Recalculates ex_prev and ey_prev for eye */
+	int energy1[3], energy2[3];
+	int ex_sum, ey_sum, e_temp_sum;
+	/* Calculate and test energy values iterating over theeta */
+	for(i=0; i<180; i+=DTHETA)
 	{
-		IF(EYES_STORE_TEMPLATE->WINDOWS[EYE_NO][I].SIZE.HEIGHT==4) CONTINUE;
-		/* CHECK TEMPLATE AT THETA AND THETA + 180 +- 1*/
-		CALCULATE_ENERGY(I/DHETA, face_store, eyes_store_template, energy1, eye_no);
+		if(eyes_store_template->windows[eye_no][i].size.height==4) continue;
+		/* Check template at theta and theta + 180 +- 1*/
+		calculate_energy(eye_no, face_store, eyes_store_template, energy1, i/DTHETA);
 	
 		if(eyes_store_template->windows[eye_no][(i+180)/DTHETA].size.height!=4) 
 			calculate_energy(eye_no, face_store, eyes_store_template, energy2, (i+180)/DTHETA);
