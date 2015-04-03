@@ -113,10 +113,8 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 //	     	  	printf("Theta %d \t", theta);
 					
 		}
-		
 		if(!flag)
 			break;
-		
 	}
 	
 	if(counter < MIN_ACC_THRESHOLD) return 0;
@@ -124,7 +122,7 @@ int eyes_closedetect_helper(int eye_no, struct face *face_store, struct eyes *ey
 	for(int i=0; i<counter; i++) 
 		(eyes_store_template->windows)[eye_no][i] = templates[i];
 	(eyes_store_template->counter)[eye_no] = counter; /* DO NOT DELETE */
-	sort_template(eye_no, eyes_store_template);	
+	//	sort_template(eye_no, eyes_store_template);	
 	return eye_no;
 }
 
@@ -206,6 +204,12 @@ int set_threshold_frame(int eye_no, struct face *face_store, struct eyes *eyes_s
 		  ranges,
 		  true, // the histogram is uniform
 		  false);
+	//	for(int i=0; i<=hbins-1;i++)
+	//{
+	//  printf("%f  ", hist.at<float>(i));
+	//}
+	//printf("\n\n");
+
 	for(int i=hbins-1, hist_sum=0; i>=0;i--)
 	{
 		hist_sum+=hist.at<float>(i);

@@ -83,28 +83,31 @@ int gaze_energy(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 	return status;
 }
 
-
 int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 { 
 	int i;
 	int energy[3];
 	int ex_sum = 0, ey_sum = 0;
 	int counter_template_on_eye = 0, counter_w5=0, counter_b5=0, counter_partial_template_eye = 0;
-	const int template_on_eye_threshold = 0.50*eyes_store_template->counter[eye_no], partial_template_eye_threshold = 0.30*eyes_store_template->counter[eye_no];
+	const int template_on_eye_threshold = 0.40*eyes_store_template->counter[eye_no], partial_template_eye_threshold = 0.30*eyes_store_template->counter[eye_no];
 	printf("counter= %d\n",eyes_store_template->counter[eye_no]);
-	int white_inten = set_threshold_frame(eye_no, face_store, eyes_store, 0.08);
-	int black_inten = set_threshold_frame(eye_no, face_store, eyes_store, 0.90);
+	int white_inten = set_threshold_gradient(eye_no, face_store, eyes_store, 0.25);
+	int black_inten = set_threshold_gradient(eye_no, face_store, eyes_store, 0.75);
 	Point iter;
 	int sum_pixel_window;
-	for(i=0;i<360/DTHETA;i++)
+	printf("white_inten = %d  ,black_inten =  %d \n",white_inten, black_inten);
+	for(i=0;i<eyes_store_template->counter[eye_no];i++)
 	  {
 	    if(eyes_store_template->windows[eye_no][i].size.height==4)
 	      continue;
 	    iter=eyes_store_template->windows[eye_no][i].center;
-	    circle(face_store->frame, iter, 1, 255);// for drawing a center for the window on the iris
+	    //	    circle(face_store->frame, iter, 1, 255);// for drawing a center for the window on the iris
 	    sum_pixel_window = set_and_calculate_energy(eye_no, face_store, eyes_store_template, energy, black_inten, white_inten, i);
 	    if(sum_pixel_window == 0)
-	          break;
+	      {
+		printf("continue\n");
+	          continue;
+	      }
 	    else if(sum_pixel_window == 2 || sum_pixel_window == 3 || sum_pixel_window == 4 || sum_pixel_window == 5)
 		  counter_template_on_eye++;
 	    else if(sum_pixel_window == 1)
@@ -112,14 +115,19 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 	    else if(sum_pixel_window == 6)
 	          counter_w5++;
 	    ex_sum += energy[0];
-	    ey_sum += energy[1] ;
-	    	    
+	    ey_sum += energy[1] ;	    	    
 	  }
 	ex[eye_no] = ex_sum - ex_prev[eye_no];
 	ey[eye_no] = ey_sum - ey_prev[eye_no];
 	
-	printf("Counter w5 \t%d   b5  %d \t", counter_w5, counter_b5);
+	printf("Counter w5 \t%d   b5  %d \t\n", counter_w5, counter_b5);
 	printf("Counter template on eye  %d  \n", counter_template_on_eye);
+	if(counter_template_on_eye>template_on_eye_threshold) 
+	{
+		eyes_store_template->status[eye_no] = 1;
+		printf("template on eye\n");
+		return eye_no;
+	}
 	if(counter_b5 + counter_w5 > partial_template_eye_threshold) 
 	{ 
 		eyes_store_template->status[eye_no] = 2;
@@ -127,26 +135,9 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 		return eye_no;
 	}
 
-
-	if(counter_template_on_eye>template_on_eye_threshold) 
-	{
-		eyes_store_template->status[eye_no] = 1;
-		printf("template on eye\n");
-		return eye_no;
-	}
-	/*	if(counter_partial_template_eye>partial_template_eye_threshold) 
-	{
-		eyes_store_template->status[eye_no] = 2;
-		printf("template partially on eye\n");
-		return eye_no;
-	}
-	*/
-	
 	eyes_store_template->status[eye_no] = 3;
 	printf("\t\t\t\toutside\n");
 	return 0;
-
-
 }
 
 
@@ -184,7 +175,7 @@ int shift_template_helper(int eye_no, struct face *face_store, struct eyes_templ
 	shift_y = ey[eye_no]>>4;
 	printf("x energy %d  y energy %d  shift_x %d  shift_y %d \n",ex[eye_no],ey[eye_no],shift_x,shift_y); 
 	/* Shifts template for one eye */
-	for(i=0;i<360/DTHETA;i++)
+	for(i=0; i < eyes_store_template->counter[eye_no];i++)
 	{
 		if(eyes_store_template->windows[eye_no][i].size.height==4) continue;
 		eyes_store_template->windows[eye_no][i].center.x+=shift_x;		
@@ -198,49 +189,6 @@ int shift_template_helper(int eye_no, struct face *face_store, struct eyes_templ
 	ey_prev[eye_no] = ey_sum;
 
 	return eye_no;
-
-        /* Estimate position vector */
-	/* Add to box centers */
-
-	/* Recalculates ex_prev and ey_prev for eye */
-	/* Calculate and test energy values iterating over theeta */
-	/*	for(i=0; i<180; i+=DTHETA)
-	{
-		if(eyes_store_template->windows[eye_no][i].size.height==4) continue;
-		/* Check template at theta and theta + 180 +- 1*/
-	/*		calculate_energy(eye_no, face_store, eyes_store_template, energy1, i/DTHETA);
-	
-		if(eyes_store_template->windows[eye_no][(i+180)/DTHETA].size.height!=4) 
-			calculate_energy(eye_no, face_store, eyes_store_template, energy2, (i+180)/DTHETA);
-		else if(eyes_store_template->windows[eye_no][((i + 180 - DTHETA)%360)/DTHETA].size.height!=4) 
-			calculate_energy(eye_no, face_store, eyes_store_template, energy2, ((i + 180 - DTHETA)%360)/DTHETA);
-		else if(eyes_store_template->windows[eye_no][((i + 180 + DTHETA)%360)/DTHETA].size.height!=4) 
-			calculate_energy(eye_no, face_store, eyes_store_template, energy2, ((i + 180 + DTHETA)%360)/DTHETA);
-		else if(eyes_store_template->windows[eye_no][((i + 180 - 2*DTHETA)%360)/DTHETA].size.height!=4) 
-			calculate_energy(eye_no, face_store, eyes_store_template, energy2, ((i + 180 - 2*DTHETA)%360)/DTHETA);
-		else if(eyes_store_template->windows[eye_no][((i + 180 + 2*DTHETA)%360)/DTHETA].size.height!=4) 
-			calculate_energy(eye_no, face_store, eyes_store_template, energy2,((i + 180 + 2*DTHETA)%360)/DTHETA);
-		else energy2[0] = -1337;
-	       
-		
-		/* Perform test on sum and on individual values */
-	/*		
-		if(energy2[0] != -1337)
-		{
-			e_temp_sum = energy1[2] - energy2[2];
-			ex_sum = energy1[0] +  energy2[0];
-			ey_sum = energy1[1] +  energy2[1];
-		}
-	}
-*/
-
-	/* Store result in globals ex and ey */
-	/*
-	ex_prev[eye_no] = ex_sum;
-	ey_prev[eye_no] = ey_sum;
-
-	return eye_no;
-	*/
 }
 
 int energy_to_coord(struct position_vector *energy_position_store)
@@ -323,12 +271,16 @@ int set_and_calculate_energy(int eye_no, struct face *face_store, struct eyes_te
 	float xinc=0,yinc=0;
 	j=0;
 	int sum_pixel_window = 0;
+	int flag = 0;// to keep track of the no of pixels that are neither white nor black. 
 	energy_sum+=(face_store->frame.at<uchar>(iter));
-	if(face_store->frame.at<uchar>(iter) < black_inten);
-	else if(face_store->frame.at<uchar>(iter) > white_inten)
+	if(face_store->frame_gradient.at<uchar>(iter) < black_inten);
+	else if(face_store->frame_gradient.at<uchar>(iter) > white_inten)
 	        sum_pixel_window += 1;
+	//else if(flag==2)
+        //        return 0;
+	//else flag++;
 	else
-                return 0;
+	  return 0;
 
 	while(j<mid )
 	{
@@ -340,9 +292,9 @@ int set_and_calculate_energy(int eye_no, struct face *face_store, struct eyes_te
 			iter.x+=xinc;
 			iter.y+=yinc;
 			energy_sum+=face_store->frame.at<uchar>(iter);
-			if(face_store->frame.at<uchar>(iter) < black_inten)
+			if(face_store->frame_gradient.at<uchar>(iter) < black_inten)
 			  continue;
-			else if(face_store->frame.at<uchar>(iter) > white_inten)
+			else if(face_store->frame_gradient.at<uchar>(iter) > white_inten)
 			  sum_pixel_window += 1;
 			else
 			    return 0;
@@ -361,9 +313,9 @@ int set_and_calculate_energy(int eye_no, struct face *face_store, struct eyes_te
 			iter.x-=xinc;
 			iter.y-=yinc;
 			energy_sum+=face_store->frame.at<uchar>(iter);
-			if(face_store->frame.at<uchar>(iter) < black_inten)
+			if(face_store->frame_gradient.at<uchar>(iter) < black_inten)
 			  continue;
-			else if(face_store->frame.at<uchar>(iter) > white_inten)
+			else if(face_store->frame_gradient.at<uchar>(iter) > white_inten)
 			  sum_pixel_window += 1;
 			else
 			  return 0;
