@@ -29,5 +29,15 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 int energy_to_coord(struct position_vector *ep_vector);
 int shift_template(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template);
 int shift_template_helper(int eye_no, struct face *face_store, struct eyes_template *eyes_store_template);
+int set_and_calculate_energy(int eye_no, struct face *face_store, struct eyes_template *eyes_store_template, int energy[], int blac_inten, int white_inten, int pos);
+
+ 
+//returns 0 if window not on iris edge
+//        1 if B5
+//        2 if W1B4
+//        3 if W2B3
+//        4 if W3B2
+//        5 if W4B1
+//        6 if W5
 
 #endif /*GAZEESTIMATE_GIOS*/
