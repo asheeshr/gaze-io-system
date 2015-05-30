@@ -199,7 +199,8 @@ int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct
 	putText(gui_frame, "Loop Time: " + std::to_string(duration_main>1000?999:duration_main) + " ms", 
 		Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 3*GUI_YBORDER), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
-			
+	printf("%lu\n", duration_main);
+	fflush(stdout);
 	putText(gui_frame, "GUI Time: " + std::to_string(duration_gui>1000?999:/*((duration_gui - sleep_time.count())<0)?0:*/duration_gui/* - sleep_time.count()*/) + " ms", 
 		Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 5*GUI_YBORDER), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
