@@ -142,7 +142,7 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 							    test_and_unlock(mutex_eyes_template);
 							    printf("template shifted\n");
 							  }
-							getchar();
+							//getchar();
 							std::this_thread::sleep_for(wait_time);
 							if(get_frame(frame, update_frequency)==0)
 							{
