@@ -134,7 +134,7 @@ int set_threshold(int eye_no, struct eyes *eyes_store)
 	Mat hist, img = eyes_store->eye_frame[eye_no];
 	int channels[] = {0};
 	int no_of_pixels = eyes_store->eyes[eye_no].height * eyes_store->eyes[eye_no].width;
-	printf("No of pixels: %d\n", no_of_pixels);
+//	printf("No of pixels: %d\n", no_of_pixels);
 	calcHist( &img,
 		  1, 
 		  channels, 

@@ -79,7 +79,7 @@ int gaze_energy(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 	energy_position_store->ex = ((status&RIGHT_EYE==RIGHT_EYE)?ex[RIGHT_EYE]:0 + (status&LEFT_EYE==LEFT_EYE)?ex[LEFT_EYE]:0)/((status&(LEFT_EYE|RIGHT_EYE)==LEFT_EYE|RIGHT_EYE)?2:1);
 	energy_position_store->ey = ((status&RIGHT_EYE==RIGHT_EYE)?ey[RIGHT_EYE]:0 + (status&LEFT_EYE==LEFT_EYE)?ey[LEFT_EYE]:0)/((status&(LEFT_EYE|RIGHT_EYE)==LEFT_EYE|RIGHT_EYE)?2:1);
 	int interex = energy_position_store->ex , interey = energy_position_store->ey ;
-      	printf("xenergy= %d  yenergy= %d  status = %d \n" ,interex, interey, status);
+	//      	printf("xenergy= %d  yenergy= %d  status = %d \n" ,interex, interey, status);
 	return status;
 }
 
@@ -91,7 +91,7 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 	int ex_sum = 0, ey_sum = 0, e_temp_sum = 0;
 	int counter_template_on_eye = 0, counter_partial_template_eye = 0;
 	const int template_on_eye_threshold = 0.50*eyes_store_template->counter[eye_no], partial_template_eye_threshold = 0.20*eyes_store_template->counter[eye_no];
-	printf("counter= %d\n",eyes_store_template->counter[eye_no]);
+	//	printf("counter= %d\n",eyes_store_template->counter[eye_no]);
 	
 	Point iter;
 	for(i=0;i<360/DTHETA;i++)
@@ -127,8 +127,8 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 		if(energy2[0] != -1337)
 		  {
 			e_temp_sum = energy1[2] - energy2[2];
-			printf("\t\t\tEnergy 1 %d Energy 2 %d \n", energy1[2], energy2[2]);
-			printf("\t\t\tsumenergy: \"    %d    \n", e_temp_sum);
+			//			printf("\t\t\tEnergy 1 %d Energy 2 %d \n", energy1[2], energy2[2]);
+			//			printf("\t\t\tsumenergy: \"    %d    \n", e_temp_sum);
 			/* Check for + and - values in estimated range and then evaluate sum if previous test is true */
 			if((energy1[2]<-70 && energy2[2]>-70) || (energy1[2]>-70 && energy2[2]<-70))
 			  {
@@ -161,7 +161,7 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 	if(counter_partial_template_eye>partial_template_eye_threshold) 
 	{
 		eyes_store_template->status[eye_no] = 2;
-		printf("\t\t\t\t\ttemplate partially on eye\n");
+		//		printf("\t\t\t\t\ttemplate partially on eye\n");
 		return eye_no;
 	}
 
@@ -169,7 +169,7 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 	if(counter_template_on_eye>template_on_eye_threshold) 
 	{
 		eyes_store_template->status[eye_no] = 1;
-		printf("template on eye\n");
+		//		printf("template on eye\n");
 		return eye_no;
 	}
 	/*	if(counter_partial_template_eye>partial_template_eye_threshold) 
@@ -181,7 +181,7 @@ int gaze_energy_helper(int eye_no, struct face *face_store, struct eyes *eyes_st
 	*/
 	
 	eyes_store_template->status[eye_no] = 3;
-	printf("\t\t\t\toutside\n");
+	//	printf("\t\t\t\toutside\n");
 	return 0;
 }
 
@@ -211,12 +211,12 @@ int shift_template(struct face *face_store, struct eyes *eyes_store, struct eyes
 
 int shift_template_helper(int eye_no, struct face *face_store, struct eyes_template *eyes_store_template)
 {
-  printf("\t\t\t\tinside shift\n");
+  //  printf("\t\t\t\tinside shift\n");
         int i;
 	int shift_x=0, shift_y=0;
 	shift_x = ex[eye_no]>>4;
 	shift_y = ey[eye_no]>>4;
-	printf("x energy %d  y energy %d  shift_x %d  shift_y %d \n",ex[eye_no],ey[eye_no],shift_x,shift_y); 
+	//	printf("x energy %d  y energy %d  shift_x %d  shift_y %d \n",ex[eye_no],ey[eye_no],shift_x,shift_y); 
 	/* Shifts template for one eye */
 	for(i=0;i<360/DTHETA;i++)
 	{
@@ -273,11 +273,11 @@ int energy_to_coord(struct position_vector *energy_position_store)
 	int px = energy_position_store->px, py =  energy_position_store->py;
 	int interex = energy_position_store->ex * SCALING_CONSTANT;
 	int interey = energy_position_store->ey * SCALING_CONSTANT;
-	printf("Before %d px + %d py \n", px, py);
+	//	printf("Before %d px + %d py \n", px, py);
 	energy_position_store->px += interex;//energy_position_store->ex * SCALING_CONSTANT;
 	energy_position_store->py += interey;//energy_position_store->ey * SCALING_CONSTANT;
 	px = energy_position_store->px; py =  energy_position_store->py;
-	printf("After %d px + %d py \n", px, py);
+	//	printf("After %d px + %d py \n", px, py);
 	/* Smoothing to be added here */
 
 	return 1;
