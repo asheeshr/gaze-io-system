@@ -90,7 +90,7 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 		struct timing_info *update_frequency, struct position_vector *energy_position_store, struct screen_resolution *screen_store,
 		std::mutex *mutex_face, std::mutex *mutex_eyes, std::mutex *mutex_eyes_template)
 {
-	//  std::clock_t start;
+    std::clock_t start_face, start_eyes,start_gaze;
 	Mat *frame = new Mat;
 	bool mutex_face_status, mutex_eyes_status, mutex_eyes_template_status;
 	mutex_face_status = mutex_eyes_status = mutex_eyes_template_status = false;
@@ -110,21 +110,27 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 		try
 		{
 			while( test_and_lock(mutex_face) && (update_frequency->status=1) 
-			       && facedetect_display(*frame, face_store) )
+			       && facedetect_display(*frame, face_store))
 			{
 				test_and_unlock(mutex_face);
-				while( test_and_lock(mutex_eyes) && eyesdetect_display(face_store, eyes_store) 
-				       && (eyes_found = eyes_sepframes(eyes_store)) )
+				while( test_and_lock(mutex_eyes) && (start_face = std::clock())
+				       && eyesdetect_display(face_store, eyes_store)
+				       && printf("Time taken by FaceDetect: %7.3f\n", (std::clock()-start_face)/(double)(CLOCKS_PER_SEC / 1000))
+				       && (eyes_found = eyes_sepframes(eyes_store)))
 				{
 					test_and_unlock(mutex_eyes);
-					if(test_and_lock(mutex_eyes_template) && (update_frequency->status=2) 
-					   && (eyes_found = eyes_closedetect(face_store, eyes_store, eyes_store_template))) /* Calculates and requires gradient */
+					if( test_and_lock(mutex_eyes_template) && (update_frequency->status=2)
+					    && (start_eyes = std::clock())
+					    && (eyes_found = eyes_closedetect(face_store, eyes_store, eyes_store_template)) /* Calculates and requires gradient */
+					    && printf("Time taken by EyesDetect: %7.3f\n", (std::clock()-start_eyes)/(double)(CLOCKS_PER_SEC / 1000)))
 					{
 						test_and_unlock(mutex_eyes_template);
 
 					       
-						while(test_and_lock(mutex_eyes_template) && (update_frequency->status=3) 
-						   && gaze_energy(face_store, eyes_store, eyes_store_template, energy_position_store))
+						while( test_and_lock(mutex_eyes_template) && (update_frequency->status=3)
+						       && (start_gaze = std::clock())
+						       && gaze_energy(face_store, eyes_store, eyes_store_template, energy_position_store)
+						       && printf("Time taken by GazeEstima: %7.3f\n", (std::clock()-start_gaze)/(double)(CLOCKS_PER_SEC / 1000)))
 						  {
 						    //						    printf("inside gaze energy while \n");
 						  //						        test_and_unlock(mutex_eyes_template);
