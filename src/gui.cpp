@@ -219,7 +219,7 @@ int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 			
 	/* Display Energy and Position Vectors */
-
+/*
 	putText(gui_frame, "Energy Vector::", Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 5*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 	putText(gui_frame, "X: " + std::to_string(ex), Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 7*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
@@ -233,7 +233,7 @@ int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 	putText(gui_frame, "Y: " + std::to_string(py), Point(9*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 11*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
-
+*/
 	return 1;
 }
 
