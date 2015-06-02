@@ -44,10 +44,9 @@ int init_facedetect()
 
 int facedetect_display(Mat frame, struct face *face_store)
 {
-	Mat frame_gray;
+    	Mat frame_gray;
 	cvtColor( frame, frame_gray, CV_BGR2GRAY );
 	equalizeHist( frame_gray, frame_gray );
-
 	//-- Detect faces
 	face_cascade.detectMultiScale( frame_gray, faces, 1.2, 2, 0 |CV_HAAR_FIND_BIGGEST_OBJECT, Size(min_face_size, min_face_size),Size(max_face_size, max_face_size) );
 

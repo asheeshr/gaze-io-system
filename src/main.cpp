@@ -97,6 +97,8 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 	std::chrono::milliseconds wait_time(25);
 	std::uint8_t eyes_found; /* Identifies which eye has been found */
 
+	
+	
 	while(get_frame(frame, update_frequency)==0)
 	{
 		printf("Cannot load frame!");
@@ -109,42 +111,19 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 		//printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 		try
 		{
-			while( test_and_lock(mutex_face) && (update_frequency->status=1) 
-			       && facedetect_display(*frame, face_store))
+		    while( test_and_lock(mutex_face) && (update_frequency->status=1) 
+			   && facedetect_display(*frame, face_store))
 			{
 				test_and_unlock(mutex_face);
-				while( test_and_lock(mutex_eyes) && (start_face = std::clock())
+			        if( test_and_lock(mutex_eyes) && (start_face = std::clock())
 				       && eyesdetect_display(face_store, eyes_store)
 				       && printf("Time taken by FaceDetect: %7.3f\n", (std::clock()-start_face)/(double)(CLOCKS_PER_SEC / 1000))
 				       && (eyes_found = eyes_sepframes(eyes_store)))
 				{
-					test_and_unlock(mutex_eyes);
-					if( test_and_lock(mutex_eyes_template) && (update_frequency->status=2)
-					    && (start_eyes = std::clock())
-					    && (eyes_found = eyes_closedetect(face_store, eyes_store, eyes_store_template)) /* Calculates and requires gradient */
-					    && printf("Time taken by EyesDetect: %7.3f\n", (std::clock()-start_eyes)/(double)(CLOCKS_PER_SEC / 1000)))
-					{
-						test_and_unlock(mutex_eyes_template);
-					        
-					}
-					test_and_unlock(mutex_eyes_template);
-					
-					std::this_thread::sleep_for(wait_time);
-					if(get_frame(frame, update_frequency)==0)
-					{
-						printf("Cannot load frame!");
-					}
-					else
-					{
-						if(update_frequency->status=1 && test_and_lock(mutex_face))
-						{
-							update_face(*frame, face_store);
-							test_and_unlock(mutex_face);
-						}
-					}
+					test_and_unlock(mutex_eyes);      
 				}
 				if(get_frame(frame, update_frequency)==0)
-				{
+				{	
 					printf("Cannot load frame!");
 				}
 	

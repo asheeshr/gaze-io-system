@@ -59,6 +59,7 @@
 
 struct face {
 
+        cv::Mat fullframe;
 	std::vector<cv::Rect> faces;
 	cv::Mat frame;
 	cv::Mat frame_gradient;

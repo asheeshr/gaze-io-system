@@ -36,6 +36,7 @@ cv::Mat gui_frame(Size(GUI_XMAX + (GUI_XSECTIONS+1)*GUI_XBORDER, GUI_YMAX + (GUI
 int start_gui()
 {
 	namedWindow("Gaze IO System", WINDOW_AUTOSIZE|WINDOW_OPENGL);
+//	namedWindow("Input to FaceDetect", WINDOW_AUTOSIZE );// Create a window for display.
 	printf("Gui Started");
 	return 1;
 }
@@ -104,7 +105,6 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 				test_and_unlock(mutex_eyes_template);
 				graph_state = plot_data(e, et, graph); /* Plot graph only if update available */
 			}
-			
 			/* Create and display GUI */
 			if(!f.frame.empty()) 
 				resize(f.frame, gui_frame( Rect(GUI_XBORDER, GUI_YBORDER, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)), 
@@ -134,7 +134,7 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 				       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			*/
 			/* Display Eye Graphs */
-			if(graph_state)
+/*			if(graph_state)
 			{
 				if(!(graph[LEFT_EYE]->empty())) 
 					resize(*graph[LEFT_EYE], 
@@ -145,7 +145,7 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 					       gui_frame(Rect(2*GUI_XBORDER + GUI_XMAX/GUI_XSECTIONS, 3*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS, GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS)),								
 					       Size(GUI_XMAX/GUI_XSECTIONS, GUI_YMAX/GUI_YSECTIONS));
 			}
-
+*/
 			render_text(gui_frame, sleep_time, et, update_frequency, ep_vector);
 
 			sleep_time = (std::chrono::milliseconds((update_frequency->duration_main>1000)?1000:update_frequency->duration_main + 5)); /*Dynamically set refresh time*/
@@ -154,6 +154,8 @@ int update_gui(struct face *face_store, struct eyes *eyes_store, struct eyes_tem
 			update_frequency->duration_gui = (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - update_frequency->start_gui).count());
 			
 			imshow("Gaze IO System", gui_frame);
+//			if(!f.fullframe.empty()) 
+//			    imshow("Input to FaceDetect", f.fullframe );                   // Show our image inside it.
 			//updateWindow("Gaze IO System");
 			if('q' == waitKey(sleep_time.count())) raise(SIGSEGV);
 			update_frequency->start_gui = std::chrono::system_clock::now();
@@ -210,14 +212,14 @@ int render_text(cv::Mat& gui_frame, std::chrono::milliseconds sleep_time, struct
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 
 	/* Display Eye Detection Accuracy Info */
-
+/*
 	putText(gui_frame, "Number of Windows::", Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 4*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 	putText(gui_frame, "0: " + std::to_string(et.counter[LEFT_EYE]), Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 6*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
 	putText(gui_frame, "1: " + std::to_string(et.counter[RIGHT_EYE]), Point(7*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 6*GUI_YBORDER + GUI_YMAX/GUI_YSECTIONS), 
 		FONT_HERSHEY_SIMPLEX, GUI_FONT_SCALE, Scalar(255,0,0));
-			
+*/			
 	/* Display Energy and Position Vectors */
 /*
 	putText(gui_frame, "Energy Vector::", Point(3*GUI_XBORDER + 2*GUI_XMAX/GUI_XSECTIONS, 5*GUI_YBORDER + 2*GUI_YMAX/GUI_YSECTIONS), 
