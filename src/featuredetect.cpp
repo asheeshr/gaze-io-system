@@ -27,11 +27,18 @@ using namespace cv;
 int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct eyes_template *eyes_store_template)
 {
 	std::uint8_t status = 0;
+	std::clock_t start;
 	face_store->frame_gradient = image_gradient(face_store->frame);
-	
+
+
 	if( eyes_store->position==0 ) return 0;
+
+	start = std::clock();
 	if( eyes_store->position & LEFT_EYE ) status |= eyes_closedetect_helper(LEFT_EYE, face_store, eyes_store, eyes_store_template);
+	if( status & LEFT_EYE ) printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));
+	start = std::clock();
 	if( eyes_store->position & RIGHT_EYE ) status |= eyes_closedetect_helper(RIGHT_EYE, face_store, eyes_store, eyes_store_template);
+	if( status & RIGHT_EYE ) printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
 	return status;
 }
 

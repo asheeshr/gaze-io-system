@@ -57,10 +57,10 @@ int main()
 		return 1;
 	}
 
-	printf("Using OpenCV %d.%d.%d\n", CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION); 
+	//printf("Using OpenCV %d.%d.%d\n", CV_MAJOR_VERSION, CV_MINOR_VERSION, CV_SUBMINOR_VERSION); 
 
 	getScreenSize(screen_store);
-	printf (" Screen:  width = %d, height = %d \n", screen_store->width, screen_store->height);
+	//printf (" Screen:  width = %d, height = %d \n", screen_store->width, screen_store->height);
 
 	if (signal(SIGINT, sig_handler) == SIG_ERR) /* Attach signal handler for SIGNINT */
 		printf("\ncan't catch SIGINT\n");   
@@ -123,7 +123,7 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 						test_and_unlock(mutex_eyes_template);
 
 					       
-						while(test_and_lock(mutex_eyes_template) && (update_frequency->status=3) 
+/*						while(test_and_lock(mutex_eyes_template) && (update_frequency->status=3) 
 						   && gaze_energy(face_store, eyes_store, eyes_store_template, energy_position_store))
 						  {
 						    //						    printf("inside gaze energy while \n");
@@ -158,7 +158,7 @@ int start_geted(struct face *face_store, struct eyes *eyes_store, struct eyes_te
 							}
 							//getchar();
 							//waitKey(0);	
-						}
+							}*/
 					}
 					test_and_unlock(mutex_eyes_template);
 					
