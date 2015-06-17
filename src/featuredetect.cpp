@@ -35,10 +35,11 @@ int eyes_closedetect(struct face *face_store, struct eyes *eyes_store, struct ey
 
 	start = std::clock();
 	if( eyes_store->position & LEFT_EYE ) status |= eyes_closedetect_helper(LEFT_EYE, face_store, eyes_store, eyes_store_template);
-	if( status & LEFT_EYE ) printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));
+	if( status & LEFT_EYE ) printf("%f, %d\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000),eyes_store_template->counter[LEFT_EYE]);
 	start = std::clock();
 	if( eyes_store->position & RIGHT_EYE ) status |= eyes_closedetect_helper(RIGHT_EYE, face_store, eyes_store, eyes_store_template);
-	if( status & RIGHT_EYE ) printf("Time taken: %f\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000));	
+	if( status & RIGHT_EYE ) printf("%f, %d\n", (std::clock()-start)/(double)(CLOCKS_PER_SEC / 1000),eyes_store_template->counter[RIGHT_EYE]);	
+	fflush(stdout);	
 	return status;
 }
 
